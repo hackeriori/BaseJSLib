@@ -1,0 +1,53 @@
+// flex左右排列
+.ls-flex {
+  display: flex;
+}
+
+// flex上下排列
+.ls-flexV {
+  display: flex;
+  flex-direction: column;
+}
+
+// flex左右排列换行
+.ls-flex-wap {
+  .ls-flex;
+  flex-wrap: wrap;
+}
+
+// flex上下排列换行
+.ls-flexV-wap {
+  .ls-flexV;
+  flex-wrap: wrap;
+}
+
+// flex居中
+.ls-flex-center {
+  .ls-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// flex左右排列只垂直居中
+.ls-flex-centerV {
+  .ls-flex;
+  align-items: center;
+}
+
+// flex上下排列只水平居中
+.ls-flexV-centerH {
+  .ls-flexV;
+  align-items: center;
+}
+
+// flex盒模型下所有的div不缩小
+.ls-flex-unShrink {
+  > div {
+    flex-shrink: 0;
+  }
+}
+
+// 应用div使得它填充剩余主轴空间
+.ls-flexItem-grow {
+  flex-grow: 1;
+}

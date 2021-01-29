@@ -10,6 +10,10 @@ module.exports = {
       {
         test: /\.css$/i,
         use: ['css-loader']
+      },
+      {
+        test: /\.less$/i,
+        use: [{loader: "file-loader?name=[name].css"}, 'extract-loader', 'css-loader', 'less-loader']
       }
     ]
   }
