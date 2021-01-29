@@ -29,7 +29,7 @@ export default class App extends Vue {
   private async test() {
     const model = this.mapHelper.modelHelper.createModel({
       id: '1',
-      url: 'http://127.0.0.1:8081/CesiumAir/Cesium_Air.glb',
+      url: '/MapCoreC/dist/Cesium/Models/CesiumAir/Cesium_Air.glb',
       coordinate: [116.58266327220134, 35.35501742561701, 0]
     });
     if(model instanceof ModelShell) {
