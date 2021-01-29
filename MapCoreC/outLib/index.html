@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+  <title>测试运行</title>
+  <style>
+      html, body, #app {
+          margin: 0;
+          height: 100%;
+      }
+  </style>
+  <link rel="stylesheet" href="./Cesium/Widgets/widgets.css" type="text/css">
+<!--  <link rel="stylesheet" href="./mapCoreC.css" type="text/css">-->
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="./Cesium/Cesium.js"></script>
+<script src="./mapCoreC.js"></script>
+<script>
+  new Vue({
+    render: h => h(MapCoreC)
+  }).$mount('#app');
+</script>
+</body>
+</html>
