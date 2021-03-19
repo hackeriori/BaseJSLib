@@ -40,7 +40,7 @@ export default class MapView extends Vue {
 
   //初始化地图
   initMap(options?: MapOptions) {
-    const mapInitOptions: MapOptions = options ? options : {};
+    const mapInitOptions: MapOptions = options || {};
     mapInitOptions.target = this.$el as HTMLElement;
     this.mapHelper = new MapHelper(mapInitOptions, this.addDefaultLayer);
     this.mapLoaded(this.mapHelper);

@@ -18,9 +18,18 @@ export default class App extends Vue {
   @Ref() readonly mapView!: MapView;
 
   mapLoaded(mapHelper: MapHelper) {
-
+    const layer = mapHelper.layer.createLayer('test', {source: mapHelper.layer.createVectorSource({})});
+    if (layer) {
+      layer.createFeature(
+        {
+          type: "Feature",
+          id: 'test',
+          geometry: {type: 'Point', coordinates: [11849201.99781884, 3430156.63782584]},
+          properties: {id: 'test', name: 'test', clickable: true}
+        });
+      layer.removeFeature('test');
+    }
   }
-
 }
 </script>
 
