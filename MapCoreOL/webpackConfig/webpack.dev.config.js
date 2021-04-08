@@ -42,7 +42,8 @@ module.exports = {
   },
   externals: [
     {
-      vue: 'Vue'
+      vue: 'Vue',
+      '@turf/turf': 'turf'
     },
     function ({context, request}, callback) {
       if (request.startsWith('ol/')) {

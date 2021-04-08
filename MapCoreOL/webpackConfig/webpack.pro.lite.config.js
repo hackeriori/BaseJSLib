@@ -12,6 +12,11 @@ module.exports = {
         root: 'Vue',
         commonjs: 'vue',
         commonjs2: 'vue'
+      },
+      '@turf/turf': {
+        root: 'turf',
+        commonjs: 'turf',
+        commonjs2: 'turf'
       }
     },
     function ({context, request}, callback) {

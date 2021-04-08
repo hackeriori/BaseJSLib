@@ -4,7 +4,6 @@ export interface FeaturePropCreateType {
   id: string;
   name: string;
   clickable: boolean;
-  layerID?: string
 }
 
 export default interface FeaturePropType extends FeaturePropCreateType {

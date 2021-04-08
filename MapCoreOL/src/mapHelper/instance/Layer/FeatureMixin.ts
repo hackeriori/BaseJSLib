@@ -1,9 +1,11 @@
 import FeatureInstance from "../Feature";
-import {FeaturePropCreateType, FeatureGeoType} from "../Feature/types";
+import FeaturePropType, {FeaturePropCreateType, FeatureGeoType} from "../Feature/types";
 import SourceMixin from "./SourceMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
 import {MapFrame} from "../../MapFrame";
-import {Geometry as GeometryType} from "geojson";
+import {Geometry as GeometryType, FeatureCollection} from "geojson";
+import geoJson from "../../global";
+import * as turf from '@turf/turf'
 
 class FeatureMixin {
   //元素列表
@@ -12,7 +14,7 @@ class FeatureMixin {
   readonly id!: string;
 
   /**
-   * 创建元素
+   * 创建元素（瓦片图层不影响，如果是瓦片图层由于拿不到source，该方法会返回undefined）
    * @param geoJSONFeature 元素geoJSON
    */
   createFeature(geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropCreateType>) {
@@ -21,15 +23,16 @@ class FeatureMixin {
     else {
       const source = this.getVectorSource();
       if (source) {
-        geoJSONFeature.properties.layerID = geoJSONFeature.properties.layerID || this.id;
-        return new FeatureInstance(this.map, geoJSONFeature, this.featureList, source);
+        const geoJSONDate = geoJSONFeature as FeatureGeoType<GeometryType, FeaturePropType>;
+        geoJSONDate.properties.layerID = this.id;
+        return new FeatureInstance(this.map, geoJSONDate, this.featureList, source);
       }
     }
   }
 
   /**
    * 按元素ID获取元素实例
-   * @param id
+   * @param id 元素ID
    */
   getFeature(id: string) {
     return this.featureList[id] as FeatureInstance | undefined;
@@ -46,6 +49,21 @@ class FeatureMixin {
       return true;
     } else
       return false;
+  }
+
+  /**
+   * 获取图层的BBox(extent)，如果图层不包含元素，则返回undefined
+   */
+  getBBox() {
+    const geoCollection: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: []
+    };
+    for (let id in this.featureList) {
+      geoCollection.features.push(geoJson.writeFeatureObject(this.featureList[id].nativeFeature));
+    }
+    if (geoCollection.features.length > 0)
+      return turf.bbox(geoCollection);
   }
 }
 

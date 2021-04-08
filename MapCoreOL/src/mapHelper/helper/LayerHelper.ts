@@ -4,6 +4,8 @@ import LayerInstance from "../instance/Layer";
 import {Options as TileOptions} from "ol/layer/BaseTile";
 import {Options as VectorOptions} from "ol/layer/BaseVector";
 import VectorSource, {Options as VectorSourceOptions} from "ol/source/Vector";
+import Cluster, {Options as ClusterSourceOptions} from "ol/source/Cluster";
+import XYZ, {Options as XYZSourceOptions} from "ol/source/XYZ";
 
 export default class LayerHelper extends MapFrame {
   private readonly layerList: { [key: string]: LayerInstance } = {};
@@ -14,6 +16,8 @@ export default class LayerHelper extends MapFrame {
 
   /**
    * 创建图层
+   * @param id 图层ID
+   * @param options 图层选项
    */
   createLayer(id: string, options: TileOptions | VectorOptions) {
     if (this.layerList[id])
@@ -23,10 +27,22 @@ export default class LayerHelper extends MapFrame {
   }
 
   /**
-   * 创建矢量源
+   * 创建矢量数据源
+   * @param options 数据源选项
    */
-  createVectorSource(options: VectorSourceOptions) {
-    return new VectorSource(options)
+  createVectorSource(options: VectorSourceOptions | ClusterSourceOptions) {
+    if ('source' in options)
+      return new Cluster(options);
+    else
+      return new VectorSource(options);
+  }
+
+  /**
+   * 创建瓦片源
+   * @param options 数据源选项
+   */
+  createTileSource(options: XYZSourceOptions) {
+    return new XYZ(options);
   }
 
   /**
