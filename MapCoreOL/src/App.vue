@@ -27,9 +27,13 @@ export default class App extends Vue {
           geometry: {type: 'Point', coordinates: [11849201.99781884, 3430156.63782584]},
           properties: {id: 'test', name: 'test', clickable: true}
         });
-      feature.hide();
-      setInterval(()=>feature.show(),3000);
+      if (feature) {
+        feature.on('singleClick', () => {
+          alert('我被点了' + feature.getProperties().name)
+        });
+      }
     }
+    mapHelper.interactionHelper.customEvents.start();
   }
 }
 </script>

@@ -16,9 +16,8 @@ export default class FeatureInstance extends MapFrame {
   readonly id: string;
   //元素列表
   readonly featureList: { [key: string]: FeatureInstance };
-  //样式
+  //样式缓存（用于隐藏时缓存样式）
   styleLike?: StyleLike = undefined;
-
 
   constructor(map: Map, geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropType>, featureList: { [key: string]: FeatureInstance }, source: VectorSource) {
     super(map);
@@ -64,4 +63,14 @@ export default class FeatureInstance extends MapFrame {
   show() {
     this.nativeFeature.setStyle(this.styleLike);
   }
+
+  on(type: 'singleClick', callback: () => void): void
+  on(type: 'doubleClick', callback: () => void): void
+  on(type: 'rightClick', callback: () => void): void
+  on(type: 'mouseEnter', callback: () => void): void
+  on(type: 'mouseLeave', callback: () => void): void
+  on(type: string, callback: () => void): void {
+    this.nativeFeature.on(type, callback);
+  }
+
 }
