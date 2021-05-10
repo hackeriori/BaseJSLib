@@ -1,6 +1,11 @@
 import Map from 'ol/Map'
+import MapHelper from "./index";
 
 export class MapFrame {
-  constructor(public map: Map) {
+  mapHelper!: MapHelper
+
+  constructor(public map: Map, mapHelper?: MapHelper) {
+    if (mapHelper)
+      this.mapHelper = mapHelper;
   }
 }

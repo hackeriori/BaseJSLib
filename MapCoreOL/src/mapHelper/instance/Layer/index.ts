@@ -9,6 +9,8 @@ import Map from 'ol/Map';
 import FeatureMixin from "./FeatureMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
 import FeatureInstance from "../Feature";
+import PelInstance from "../Feature/Pel";
+import MapHelper from "../../index";
 
 class LayerInstance extends MapFrame {
   //ol原生图层
@@ -21,10 +23,12 @@ class LayerInstance extends MapFrame {
   private readonly layerList: { [key: string]: LayerInstance };
   //元素列表
   protected featureList: { [key: string]: FeatureInstance } = {};
+  //图元列表
+  protected pelList: { [key: string]: PelInstance } = {};
 
   //图层的可见性可以设置在options里面
-  constructor(map: Map, id: string, options: TileOptions | VectorOptions, layerList: { [key: string]: LayerInstance }) {
-    super(map);
+  constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions | VectorOptions, layerList: { [key: string]: LayerInstance }) {
+    super(map, mapHelper);
     this.id = id;
     this.layerList = layerList;
     if (options.source instanceof TileSource) {
@@ -47,6 +51,9 @@ class LayerInstance extends MapFrame {
       this.map.removeLayer(this.nativeLayer);
       delete this.layerList[this.id];
       this.featureList = {};
+      for (let id in this.pelList) {
+        this.pelList[id].destroy();
+      }
     } else
       console.log(`id为[${this.id}]的图层不存在，移除失败`);
   }
@@ -56,6 +63,9 @@ class LayerInstance extends MapFrame {
    */
   show() {
     this.nativeLayer.setVisible(true);
+    for (let id in this.pelList) {
+      this.pelList[id].show();
+    }
   }
 
   /**
@@ -63,13 +73,19 @@ class LayerInstance extends MapFrame {
    */
   hide() {
     this.nativeLayer.setVisible(false);
+    for (let id in this.pelList) {
+      this.pelList[id].hide();
+    }
   }
 
   /**
    * 切换图层显隐
    */
   toggleVisible() {
-    this.nativeLayer.setVisible(!this.nativeLayer.getVisible());
+    if (this.nativeLayer.getVisible())
+      this.hide();
+    else
+      this.show();
   }
 }
 

@@ -6,12 +6,13 @@ import {Options as VectorOptions} from "ol/layer/BaseVector";
 import VectorSource, {Options as VectorSourceOptions} from "ol/source/Vector";
 import Cluster, {Options as ClusterSourceOptions} from "ol/source/Cluster";
 import XYZ, {Options as XYZSourceOptions} from "ol/source/XYZ";
+import MapHelper from "../index";
 
 export default class LayerHelper extends MapFrame {
   private readonly layerList: { [key: string]: LayerInstance } = {};
 
-  constructor(map: Map) {
-    super(map);
+  constructor(map: Map, mapHelper: MapHelper) {
+    super(map, mapHelper);
   }
 
   /**
@@ -22,8 +23,11 @@ export default class LayerHelper extends MapFrame {
   createLayer(id: string, options: TileOptions | VectorOptions) {
     if (this.layerList[id])
       console.log(`图层id[${id}]重复，重复的图层未添加到地图上`);
-    else
-      return new LayerInstance(this.map, id, options, this.layerList);
+    else {
+      const layer = new LayerInstance(this.map, this.mapHelper, id, options, this.layerList);
+      layer.mapHelper = this.mapHelper;
+      return layer;
+    }
   }
 
   /**

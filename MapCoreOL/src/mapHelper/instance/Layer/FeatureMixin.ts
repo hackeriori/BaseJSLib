@@ -1,15 +1,18 @@
 import FeatureInstance from "../Feature";
-import FeaturePropType, {FeaturePropCreateType, FeatureGeoType} from "../Feature/types";
+import FeaturePropType, {FeaturePropCreateType, FeatureGeoType, PelOptionsType} from "../Feature/types";
 import SourceMixin from "./SourceMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
 import {MapFrame} from "../../MapFrame";
 import {Geometry as GeometryType, FeatureCollection} from "geojson";
 import geoJson from "../../global";
 import * as turf from '@turf/turf'
+import PelInstance from "../Feature/Pel";
 
 class FeatureMixin {
   //元素列表
   protected featureList!: { [key: string]: FeatureInstance };
+  //图元列表
+  protected pelList: { [key: string]: PelInstance } = {};
   //图层ID
   readonly id!: string;
 
@@ -18,15 +21,23 @@ class FeatureMixin {
    * @param geoJSONFeature 元素geoJSON
    */
   createFeature(geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropCreateType>) {
-    if (this.featureList[geoJSONFeature.id as string])
+    if (this.featureList[geoJSONFeature.id])
       console.log(`元素id[${geoJSONFeature.id}]重复，重复的元素未添加到图层中`);
     else {
       const source = this.getVectorSource();
       if (source) {
         const geoJSONDate = geoJSONFeature as FeatureGeoType<GeometryType, FeaturePropType>;
         geoJSONDate.properties.layerID = this.id;
-        return new FeatureInstance(this.map, geoJSONDate, this.featureList, source);
+        return new FeatureInstance(this.map, this.mapHelper, geoJSONDate, this.featureList, source);
       }
+    }
+  }
+
+  createPel(options: PelOptionsType) {
+    if (this.pelList[options.id])
+      console.log(`元素id[${options.id}]重复，重复的元素未添加到图层中`);
+    else {
+      return new PelInstance(this.map, this.mapHelper, options, this.pelList);
     }
   }
 

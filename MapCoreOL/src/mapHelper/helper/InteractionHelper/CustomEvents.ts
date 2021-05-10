@@ -6,8 +6,9 @@ import {unByKey} from "ol/Observable";
 import {NotingClick} from "./types";
 import BaseEvent from "ol/events/Event";
 import {MapFrame} from "../../MapFrame";
+import MapHelper from "../../index";
 
-export default class CustomEvents extends MapFrame{
+export default class CustomEvents extends MapFrame {
   private obRightClick?: (evt: MouseEvent) => void;
   private obSingleClick?: EventsKey;
   private obDoubleClick?: EventsKey;
@@ -15,8 +16,8 @@ export default class CustomEvents extends MapFrame{
   private highLightFeature?: Feature;
   private readonly target: HTMLElement;
 
-  constructor(map: Map) {
-    super(map);
+  constructor(map: Map, mapHelper: MapHelper) {
+    super(map, mapHelper);
     this.target = map.getTargetElement();
   }
 
@@ -68,17 +69,21 @@ export default class CustomEvents extends MapFrame{
             const leaveFeature = this.highLightFeature;
             this.highLightFeature = firstFeature;
             firstFeature.dispatchEvent('mouseEnter');
+            this.setStyle(firstFeature,false);
             leaveFeature.dispatchEvent('mouseLeave');
+            this.setStyle(leaveFeature);
           }
         } else {
           this.highLightFeature = firstFeature;
           firstFeature.dispatchEvent('mouseEnter');
+          this.setStyle(firstFeature,false);
         }
       } else {
         if (this.highLightFeature) {
           const eventFeature = this.highLightFeature;
           this.highLightFeature = undefined;
           eventFeature.dispatchEvent('mouseLeave');
+          this.setStyle(eventFeature);
         }
       }
       target.style.cursor = cursor;
@@ -91,6 +96,7 @@ export default class CustomEvents extends MapFrame{
       const eventFeature = this.highLightFeature;
       this.highLightFeature = undefined;
       eventFeature.dispatchEvent('mouseLeave');
+      this.setStyle(eventFeature);
     }
   }
 
@@ -113,6 +119,29 @@ export default class CustomEvents extends MapFrame{
     }
     if (this.obRightClick) {
       this.target.removeEventListener('contextmenu', this.obRightClick);
+    }
+  }
+
+  /**
+   * 设置GIS元素的样式
+   * @param feature
+   * @param normalStyle
+   * @private
+   */
+  private setStyle(feature: Feature, normalStyle = true) {
+    const id: string | null = feature.get('id');
+    const layerID: string | null = feature.get('layerID');
+    if (id && layerID) {
+      const layer = this.mapHelper.layer.getLayer(layerID);
+      if (layer) {
+        const feature = layer.getFeature(id);
+        if (feature) {
+          if (normalStyle)
+            feature.setNormalStyle();
+          else
+            feature.setHighLightStyle();
+        }
+      }
     }
   }
 }

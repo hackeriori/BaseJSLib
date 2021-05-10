@@ -1,4 +1,3 @@
-import {MapFrame} from "../../MapFrame";
 import Map from 'ol/Map';
 import Feature from "ol/Feature";
 import geoJson from "../../global";
@@ -6,8 +5,12 @@ import VectorSource from "ol/source/Vector";
 import FeaturePropType, {FeatureGeoType} from "./types";
 import {Geometry as GeometryType} from "geojson";
 import {StyleLike} from "ol/style/Style";
+import BaseFeature from "./BaseFeature";
+import MapHelper from "../../index";
+import {StyleMixin} from './StyleMixin';
+import applyMixins from "../../../../../Utils/applyMixins";
 
-export default class FeatureInstance extends MapFrame {
+class FeatureInstance extends BaseFeature {
   //ol原生源
   readonly nativeSource: VectorSource;
   //ol原生元素对象
@@ -17,10 +20,14 @@ export default class FeatureInstance extends MapFrame {
   //元素列表
   readonly featureList: { [key: string]: FeatureInstance };
   //样式缓存（用于隐藏时缓存样式）
-  styleLike?: StyleLike = undefined;
+  protected styleLike?: StyleLike = undefined;
+  //普通样式
+  protected normalStyle?: StyleLike = undefined;
+  //高亮样式
+  protected highLightStyle?: StyleLike = undefined;
 
-  constructor(map: Map, geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropType>, featureList: { [key: string]: FeatureInstance }, source: VectorSource) {
-    super(map);
+  constructor(map: Map, mapHelper: MapHelper, geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropType>, featureList: { [key: string]: FeatureInstance }, source: VectorSource) {
+    super(map, mapHelper);
     this.id = geoJSONFeature.id as string
     this.featureList = featureList;
     this.nativeSource = source;
@@ -61,7 +68,8 @@ export default class FeatureInstance extends MapFrame {
    * 显示元素（通过设置元素样式的方法显示）
    */
   show() {
-    this.nativeFeature.setStyle(this.styleLike);
+    if (this.styleLike)
+      this.nativeFeature.setStyle(this.styleLike);
   }
 
   on(type: 'singleClick', callback: () => void): void
@@ -72,5 +80,12 @@ export default class FeatureInstance extends MapFrame {
   on(type: string, callback: () => void): void {
     this.nativeFeature.on(type, callback);
   }
+}
+
+interface FeatureInstance extends StyleMixin {
 
 }
+
+applyMixins(FeatureInstance, [StyleMixin]);
+
+export default FeatureInstance

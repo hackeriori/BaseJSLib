@@ -24,12 +24,52 @@ export default class App extends Vue {
         {
           type: "Feature",
           id: 'test',
-          geometry: {type: 'Point', coordinates: [11849201.99781884, 3430156.63782584]},
+          geometry: {type: 'Point', coordinates: [11849201.99781884, 3430156.63782584,33]},
           properties: {id: 'test', name: 'test', clickable: true}
         });
       if (feature) {
         feature.on('singleClick', () => {
           alert('我被点了' + feature.getProperties().name)
+        });
+        feature.setNormalStyle([{
+          image:{
+            stroke:{
+              color:'red',
+              width:1,
+            },
+            fill:{color:'rgba(255,255,255,0.01)'},
+            radius:5
+          }
+        }]);
+        feature.setHighLightStyle([{
+          image:{
+            stroke:{
+              color:'yellow',
+              width:2,
+            },
+            fill:{color:'rgba(255,255,255,0.01)'},
+            radius:5
+          }
+        }]);
+      }
+      const dom = document.createElement('div');
+      dom.style.height = '32px';
+      dom.style.width = '32px';
+      dom.style.backgroundColor = 'red';
+      const pel = layer.createPel({
+        id: 'testPel',
+        options: {
+          element: dom,
+          position: [11849211.99781884, 3430166.63782584],
+          stopEvent: false
+        }
+      })
+      if(pel) {
+        pel.on('singleClick', () => {
+          alert('我被点了' + pel.id);
+        });
+        pel.on('rightClick', () => {
+          alert('我被右键点了');
         });
       }
     }

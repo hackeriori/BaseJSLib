@@ -20,8 +20,8 @@ export default class MapHelper extends MapFrame {
     preOptions = {...preOptions, ...options};
     const map = new Map(preOptions);
     super(map);
-    this.layer = new LayerHelper(map);
-    this.interactionHelper = new InteractionHelper(map);
+    this.layer = new LayerHelper(map, this);
+    this.interactionHelper = new InteractionHelper(map, this);
     //添加默认图层
     if (addDefaultLayer) {
       this.layer.createLayer('gdStreet', {
@@ -32,6 +32,7 @@ export default class MapHelper extends MapFrame {
         })
       })
     }
+    this.mapHelper = this;
   }
 
   /**
