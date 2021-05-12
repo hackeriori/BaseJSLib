@@ -7,6 +7,7 @@ import {NotingClick} from "./types";
 import BaseEvent from "ol/events/Event";
 import {MapFrame} from "../../MapFrame";
 import MapHelper from "../../index";
+import FeatureInstance from "../../instance/Feature";
 
 export default class CustomEvents extends MapFrame {
   private obRightClick?: (evt: MouseEvent) => void;
@@ -69,14 +70,14 @@ export default class CustomEvents extends MapFrame {
             const leaveFeature = this.highLightFeature;
             this.highLightFeature = firstFeature;
             firstFeature.dispatchEvent('mouseEnter');
-            this.setStyle(firstFeature,false);
+            this.setStyle(firstFeature, false);
             leaveFeature.dispatchEvent('mouseLeave');
             this.setStyle(leaveFeature);
           }
         } else {
           this.highLightFeature = firstFeature;
           firstFeature.dispatchEvent('mouseEnter');
-          this.setStyle(firstFeature,false);
+          this.setStyle(firstFeature, false);
         }
       } else {
         if (this.highLightFeature) {
@@ -135,7 +136,7 @@ export default class CustomEvents extends MapFrame {
       const layer = this.mapHelper.layer.getLayer(layerID);
       if (layer) {
         const feature = layer.getFeature(id);
-        if (feature) {
+        if (feature instanceof FeatureInstance) {
           if (normalStyle)
             feature.setNormalStyle();
           else

@@ -33,6 +33,10 @@ class FeatureMixin {
     }
   }
 
+  /**
+   * 添加图元
+   * @param options 图元对象参数
+   */
   createPel(options: PelOptionsType) {
     if (this.pelList[options.id])
       console.log(`元素id[${options.id}]重复，重复的元素未添加到图层中`);
@@ -46,7 +50,12 @@ class FeatureMixin {
    * @param id 元素ID
    */
   getFeature(id: string) {
-    return this.featureList[id] as FeatureInstance | undefined;
+    const feature = this.featureList[id] as FeatureInstance | undefined;
+    if (feature)
+      return feature
+    else {
+      return this.pelList[id] as PelInstance | undefined
+    }
   }
 
   /**

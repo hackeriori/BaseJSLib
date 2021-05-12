@@ -5,7 +5,7 @@ const {resolve} = require('path')
 
 module.exports = {
   //这里只定义一个入口，html通过index.ts带入，定义两个下面的output会错误
-  entry: resolve(__dirname, '../outLib/index.ts'),
+  entry: resolve(__dirname, '../src/mapHelper/index.ts'),
   output: {
     libraryTarget: "umd",
     library: 'MapCoreOL',

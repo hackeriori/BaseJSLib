@@ -17,6 +17,11 @@ module.exports = {
         root: 'turf',
         commonjs: 'turf',
         commonjs2: 'turf'
+      },
+      proj4:{
+        root: 'proj4',
+        commonjs: 'proj4',
+        commonjs2: 'proj4'
       }
     },
     function ({context, request}, callback) {
