@@ -69,11 +69,11 @@ export default class App extends Vue {
           alert('我被点了' + pel.id);
         });
         pel.on('rightClick', () => {
-          alert('我被右键点了');
+          console.log('我被右键点了');
         });
       }
     }
-    mapHelper.interactionHelper.customEvents.start();
+    mapHelper.interaction.customEvents.start();
   }
 }
 </script>

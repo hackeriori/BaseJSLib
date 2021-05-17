@@ -6,10 +6,12 @@ import LayerHelper from "./helper/LayerHelper";
 import {MapDropCallBack} from "./types";
 import {getOffsetX, getOffsetY} from "../../../Utils/getOffset";
 import InteractionHelper from "./helper/InteractionHelper";
+import ProjectionHelper from "./helper/ProjectionHelper";
 
 export default class MapHelper extends MapFrame {
   layer: LayerHelper
-  interactionHelper: InteractionHelper
+  interaction: InteractionHelper
+  projection: ProjectionHelper
   //X偏移量缓存
   private offsetX?: number;
   //Y偏移量缓存
@@ -21,7 +23,8 @@ export default class MapHelper extends MapFrame {
     const map = new Map(preOptions);
     super(map);
     this.layer = new LayerHelper(map, this);
-    this.interactionHelper = new InteractionHelper(map, this);
+    this.interaction = new InteractionHelper(map, this);
+    this.projection = new ProjectionHelper(map, this);
     //添加默认图层
     if (addDefaultLayer) {
       this.layer.createLayer('gdStreet', {

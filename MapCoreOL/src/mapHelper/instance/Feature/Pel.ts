@@ -24,7 +24,7 @@ export default class PelInstance extends BaseFeature {
     //添加高亮移除事件
     if (options.options.element)
       options.options.element.addEventListener('pointermove', ev => {
-        this.mapHelper.interactionHelper.customEvents.notifyLevel();
+        this.mapHelper.interaction.customEvents.notifyLevel();
         ev.preventDefault();
       })
   }
@@ -75,7 +75,7 @@ export default class PelInstance extends BaseFeature {
           //暂时不支持双击
           return
         case 'rightClick':
-          event = 'pointerdown';
+          event = 'contextmenu';
           break;
         case 'mouseEnter':
           event = 'mouseenter';
@@ -93,14 +93,12 @@ export default class PelInstance extends BaseFeature {
           else
             return;
         } else if (type === 'rightClick') {
-          if ((ev as PointerEvent).button === 2)
-            callback();
-          else
-            return;
+          callback();
         } else
           callback();
         ev.preventDefault();
         ev.stopPropagation();
+        ev.returnValue = false;
       })
     }
   }
