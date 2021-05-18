@@ -80,8 +80,8 @@ export default class PelInstance extends BaseFeature {
         case 'mouseEnter':
           event = 'mouseenter';
           break;
-        case 'mouseleave':
-          event = 'mouseLeave';
+        case 'mouseLeave':
+          event = 'mouseleave';
           break;
         default:
           return;
