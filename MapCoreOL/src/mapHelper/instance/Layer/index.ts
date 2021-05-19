@@ -40,7 +40,7 @@ class LayerInstance extends MapFrame {
       this.mapType = "vector";
       this.nativeLayer = new VectorLayer(options as VectorOptions);
     }
-    if (options.visible)
+    if (options.visible !== undefined)
       this.visibly = options.visible;
     else
       this.visibly = true;
