@@ -17,16 +17,17 @@ export default class PelInstance extends BaseFeature {
   //图元自身的显隐属性（在开关图层时决定图元是否显隐）
   private visible = true;
   //图层的可见性
-  private layerVisible: boolean;
+  private layerVisible = true;
 
   constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerVisible: boolean, pelList: { [key: string]: PelInstance }) {
     super(map, mapHelper);
     this.id = options.id;
-    this.layerVisible = layerVisible;
     this.pelList = pelList;
     this.nativeOverlay = new Overlay(options.options);
     this.pelList[this.id] = this;
     this.map.addOverlay(this.nativeOverlay);
+    if (!layerVisible)
+      this.hide(true);
     //添加高亮移除事件
     if (options.options.element)
       options.options.element.addEventListener('pointermove', ev => {
