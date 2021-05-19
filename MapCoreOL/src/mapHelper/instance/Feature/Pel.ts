@@ -12,11 +12,17 @@ export default class PelInstance extends BaseFeature {
   readonly id: string;
   //图元列表
   readonly pelList: { [key: string]: PelInstance };
+  //位置信息缓存
   private position?: Coordinate = undefined;
+  //图元自身的显隐属性（在开关图层时决定图元是否显隐）
+  private visible = true;
+  //图层的可见性
+  private layerVisible: boolean;
 
-  constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, pelList: { [key: string]: PelInstance }) {
+  constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerVisible: boolean, pelList: { [key: string]: PelInstance }) {
     super(map, mapHelper);
     this.id = options.id;
+    this.layerVisible = layerVisible;
     this.pelList = pelList;
     this.nativeOverlay = new Overlay(options.options);
     this.pelList[this.id] = this;
@@ -26,7 +32,7 @@ export default class PelInstance extends BaseFeature {
       options.options.element.addEventListener('pointermove', ev => {
         this.mapHelper.interaction.customEvents.notifyLevel();
         ev.preventDefault();
-      })
+      });
   }
 
   /**
@@ -42,18 +48,46 @@ export default class PelInstance extends BaseFeature {
 
   /**
    * 显示元素（通过设置元素样式的方法显示）
+   * @param layerFlag 是否通过图层控制显隐
    */
-  show(): void {
-    if (this.position)
+  show(layerFlag = false) {
+    let changed = false;
+    //如果图层不可见，打开了图层，那么设置图层可见
+    if (!this.layerVisible && layerFlag) {
+      this.layerVisible = true;
+      changed = true;
+    }
+    //如果元素不可见，设置元素可见，那么设置元素可见
+    if (!this.visible && !layerFlag) {
+      this.visible = true;
+      changed = true;
+    }
+    if (changed && this.position && this.layerVisible && this.visible) {
       this.nativeOverlay.setPosition(this.position);
+      this.position = undefined;
+    }
   }
 
   /**
    * 隐藏元素（通过设置元素样式的方法隐藏）
+   * @param layerFlag 是否通过图层控制显隐
    */
-  hide(): void {
-    this.position = this.nativeOverlay.getPosition();
-    this.nativeOverlay.setPosition(undefined);
+  hide(layerFlag = false) {
+    let changed = false;
+    //如果图层可见，关闭了图层，那么设置图层不可见
+    if (this.layerVisible && layerFlag) {
+      this.layerVisible = false;
+      changed = true;
+    }
+    //如果元素可见，设置元素不可见，那么设置元素不可见
+    if (this.visible && !layerFlag) {
+      this.visible = false;
+      changed = true;
+    }
+    if (changed && !this.position && (!this.layerVisible || !this.visible)) {
+      this.position = this.nativeOverlay.getPosition();
+      this.nativeOverlay.setPosition(undefined);
+    }
   }
 
   on(type: "singleClick", callback: () => void): void;

@@ -25,6 +25,8 @@ class LayerInstance extends MapFrame {
   protected featureList: { [key: string]: FeatureInstance } = {};
   //图元列表
   protected pelList: { [key: string]: PelInstance } = {};
+  //图层可见性
+  protected visibly: boolean;
 
   //图层的可见性可以设置在options里面
   constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions | VectorOptions, layerList: { [key: string]: LayerInstance }) {
@@ -38,6 +40,10 @@ class LayerInstance extends MapFrame {
       this.mapType = "vector";
       this.nativeLayer = new VectorLayer(options as VectorOptions);
     }
+    if (options.visible)
+      this.visibly = options.visible;
+    else
+      this.visibly = true;
     this.layerList[id] = this;
     this.nativeLayer.set('id', id, true);
     this.map.addLayer(this.nativeLayer);
@@ -62,9 +68,12 @@ class LayerInstance extends MapFrame {
    * 显示图层
    */
   show() {
-    this.nativeLayer.setVisible(true);
-    for (let id in this.pelList) {
-      this.pelList[id].show();
+    if (!this.visibly) {
+      this.nativeLayer.setVisible(true);
+      for (let id in this.pelList) {
+        this.pelList[id].show(true);
+      }
+      this.visibly = true;
     }
   }
 
@@ -72,9 +81,12 @@ class LayerInstance extends MapFrame {
    * 隐藏图层
    */
   hide() {
-    this.nativeLayer.setVisible(false);
-    for (let id in this.pelList) {
-      this.pelList[id].hide();
+    if (this.visibly) {
+      this.nativeLayer.setVisible(false);
+      for (let id in this.pelList) {
+        this.pelList[id].hide(true);
+      }
+      this.visibly = false;
     }
   }
 
@@ -82,7 +94,7 @@ class LayerInstance extends MapFrame {
    * 切换图层显隐
    */
   toggleVisible() {
-    if (this.nativeLayer.getVisible())
+    if (this.visibly)
       this.hide();
     else
       this.show();
