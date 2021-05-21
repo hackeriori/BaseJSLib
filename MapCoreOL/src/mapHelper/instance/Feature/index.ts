@@ -22,9 +22,9 @@ class FeatureInstance extends BaseFeature {
   //样式缓存（用于隐藏时缓存样式）
   protected styleLike?: StyleLike = undefined;
   //普通样式
-  protected normalStyle?: StyleLike = undefined;
+  normalStyle?: StyleLike = undefined;
   //高亮样式
-  protected highLightStyle?: StyleLike = undefined;
+  highLightStyle?: StyleLike = undefined;
 
   constructor(map: Map, mapHelper: MapHelper, geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropType>, featureList: { [key: string]: FeatureInstance }, source: VectorSource) {
     super(map, mapHelper);

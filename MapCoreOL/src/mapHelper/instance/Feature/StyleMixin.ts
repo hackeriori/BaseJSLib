@@ -13,9 +13,9 @@ export abstract class StyleMixin {
   //ol原生元素对象
   readonly nativeFeature!: Feature;
   //普通样式
-  protected normalStyle?: StyleLike;
+  normalStyle?: StyleLike;
   //高亮样式
-  protected highLightStyle?: StyleLike;
+  highLightStyle?: StyleLike;
 
   /**
    * 设置普通样式

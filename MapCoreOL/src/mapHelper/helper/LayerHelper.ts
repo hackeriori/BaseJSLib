@@ -7,6 +7,12 @@ import VectorSource, {Options as VectorSourceOptions} from "ol/source/Vector";
 import Cluster, {Options as ClusterSourceOptions} from "ol/source/Cluster";
 import XYZ, {Options as XYZSourceOptions} from "ol/source/XYZ";
 import MapHelper from "../index";
+import Feature from "ol/Feature";
+import BaseEvent from "ol/events/Event";
+import {getDefaultHighLightClusterStyles, getDefaultNormalClusterStyles, getFeatureInstanceByFeature} from "../global";
+import {ClusterEventType, ClusterStyles} from "./types";
+import FeatureInstance from "../instance/Feature";
+import {StyleType} from "../instance/Feature/types";
 
 export default class LayerHelper extends MapFrame {
   private readonly layerList: { [key: string]: LayerInstance } = {};
@@ -31,13 +37,77 @@ export default class LayerHelper extends MapFrame {
   }
 
   /**
-   * 创建矢量数据源
+   * 创建数据源，如果时创建聚合源，可以指定styles参数
    * @param options 数据源选项
+   * @param clusterStyles 聚合图元样式
    */
-  createVectorSource(options: VectorSourceOptions | ClusterSourceOptions) {
-    if ('source' in options)
-      return new Cluster(options);
-    else
+  createVectorSource(options: VectorSourceOptions | ClusterSourceOptions, clusterStyles?: ClusterStyles) {
+    if ('source' in options) {
+      const cluster = new Cluster(options);
+      cluster.on('addfeature', evt => {
+        const {feature} = evt;
+        const features = feature.get('features') as Feature[];
+        const featureInstances = features.map(x => getFeatureInstanceByFeature(x, this.mapHelper))
+          .filter(x => x) as FeatureInstance[];
+        const clustered = features.length > 1;
+        //设置样式
+        if (features.length === 1 && featureInstances.length === 1) {
+          //单个元素
+          feature.setStyle(featureInstances[0].nativeFeature.getStyle());
+        } else {
+          //聚合元素
+          let normalStyles: StyleType[];
+          let highLightStyles: StyleType[];
+          if (clusterStyles) {
+            normalStyles = clusterStyles.normalStyles;
+            highLightStyles = clusterStyles.highLightStyles;
+          } else {
+            normalStyles = getDefaultNormalClusterStyles();
+            highLightStyles = getDefaultHighLightClusterStyles();
+          }
+          const normalStyle = normalStyles.map(x => {
+            if (x.text)
+              x.text.text = features.length.toString();
+            return featureInstances[0].createStyle(x);
+          });
+          const highLightStyle = highLightStyles.map(x => {
+            if (x.text)
+              x.text.text = features.length.toString();
+            return featureInstances[0].createStyle(x);
+          });
+          feature.set('normalStyle', normalStyle);
+          feature.set('highLightStyle', highLightStyle);
+          feature.setStyle(normalStyle);
+        }
+        //设置事件
+        feature.set('clickable', true);
+        feature.on('singleClick', () => {
+          const baseEvent = new BaseEvent('singleClick') as ClusterEventType;
+          baseEvent.featureInstances = featureInstances;
+          baseEvent.target = feature;
+          cluster.dispatchEvent(baseEvent);
+        });
+        feature.on('rightClick', () => {
+          const baseEvent = new BaseEvent('rightClick') as ClusterEventType;
+          baseEvent.featureInstances = featureInstances;
+          baseEvent.target = feature;
+          cluster.dispatchEvent(baseEvent);
+        });
+        feature.on('mouseEnter', () => {
+          const baseEvent = new BaseEvent('mouseEnter') as ClusterEventType;
+          baseEvent.featureInstances = featureInstances;
+          baseEvent.target = feature;
+          cluster.dispatchEvent(baseEvent);
+        });
+        feature.on('mouseLeave', () => {
+          const baseEvent = new BaseEvent('mouseLeave') as ClusterEventType;
+          baseEvent.featureInstances = featureInstances;
+          baseEvent.target = feature;
+          cluster.dispatchEvent(baseEvent);
+        });
+      })
+      return cluster;
+    } else
       return new VectorSource(options);
   }
 

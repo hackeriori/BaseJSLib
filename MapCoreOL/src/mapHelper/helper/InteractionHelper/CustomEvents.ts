@@ -8,6 +8,8 @@ import BaseEvent from "ol/events/Event";
 import {MapFrame} from "../../MapFrame";
 import MapHelper from "../../index";
 import FeatureInstance from "../../instance/Feature";
+import {getFeatureInstanceByFeature} from "../../global";
+import {feature} from "@turf/turf";
 
 export default class CustomEvents extends MapFrame {
   private obRightClick?: (evt: MouseEvent) => void;
@@ -130,18 +132,28 @@ export default class CustomEvents extends MapFrame {
    * @private
    */
   private setStyle(feature: Feature, normalStyle = true) {
-    const id: string | null = feature.get('id');
-    const layerID: string | null = feature.get('layerID');
-    if (id && layerID) {
-      const layer = this.mapHelper.layer.getLayer(layerID);
-      if (layer) {
-        const feature = layer.getFeature(id);
-        if (feature instanceof FeatureInstance) {
-          if (normalStyle)
-            feature.setNormalStyle();
-          else
-            feature.setHighLightStyle();
-        }
+    const features = feature.get('features') as Feature[];
+    if (features) {
+      //聚合元素
+      if (features.length === 1) {
+        const featureInstance = getFeatureInstanceByFeature(features[0], this.mapHelper);
+        if (normalStyle && featureInstance && featureInstance.normalStyle)
+          feature.setStyle(featureInstance.normalStyle);
+        else if (featureInstance && featureInstance.highLightStyle)
+          feature.setStyle(featureInstance.highLightStyle);
+      } else {
+        if (normalStyle)
+          feature.setStyle(feature.get('normalStyle'));
+        else
+          feature.setStyle(feature.get('highLightStyle'));
+      }
+    } else {
+      const featureInstance = getFeatureInstanceByFeature(feature, this.mapHelper);
+      if (featureInstance) {
+        if (normalStyle)
+          featureInstance.setNormalStyle();
+        else
+          featureInstance.setHighLightStyle();
       }
     }
   }
