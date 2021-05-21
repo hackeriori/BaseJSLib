@@ -7,9 +7,7 @@ import {NotingClick} from "./types";
 import BaseEvent from "ol/events/Event";
 import {MapFrame} from "../../MapFrame";
 import MapHelper from "../../index";
-import FeatureInstance from "../../instance/Feature";
 import {getFeatureInstanceByFeature} from "../../global";
-import {feature} from "@turf/turf";
 
 export default class CustomEvents extends MapFrame {
   private obRightClick?: (evt: MouseEvent) => void;
