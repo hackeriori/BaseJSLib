@@ -3,6 +3,7 @@ import GeometryType from "ol/geom/GeometryType";
 import {getArea, getLength} from 'ol/sphere';
 import Map from "ol/Map";
 import MapHelper from "../../index";
+import {Coordinate} from "ol/coordinate";
 
 export default abstract class MeasureMixin {
   mapHelper!: MapHelper;
@@ -12,7 +13,9 @@ export default abstract class MeasureMixin {
   //ol原生元素对象
   readonly nativeFeature!: Feature;
 
-  //计算面积
+  /**
+   * 计算面积
+   */
   calcArea() {
     const geometry = this.nativeFeature.getGeometry();
     if (geometry && geometry.getType() === GeometryType.POLYGON) {
@@ -21,7 +24,9 @@ export default abstract class MeasureMixin {
       console.log(`ID为${this.id}的元素不是多边形，无法计算面积`);
   }
 
-  //计算长度
+  /**
+   * 计算长度
+   */
   calcLength() {
     const geometry = this.nativeFeature.getGeometry();
     if (geometry && geometry.getType() === GeometryType.LINE_STRING) {
@@ -44,6 +49,19 @@ export default abstract class MeasureMixin {
         extent[3] = c2[1];
       }
       return extent;
+    }
+  }
+
+  //获取拐点信息
+  getCoordinates(outProjection?: string) {
+    const geometry = this.nativeFeature.getGeometry();
+    if (geometry) {
+      if ((geometry as any).getCoordinates) {
+        let coordinates = (geometry as any).getCoordinates() as Coordinate | Coordinate[] | Coordinate[][];
+        if (outProjection)
+          coordinates = this.mapHelper.projection.transCoordinates(coordinates, undefined, outProjection);
+        return coordinates;
+      }
     }
   }
 }

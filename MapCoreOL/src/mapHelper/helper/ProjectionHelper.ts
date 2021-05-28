@@ -30,17 +30,32 @@ export default class ProjectionHelper extends MapFrame {
   transCoordinate(coordinate: Coordinate, inProjection?: string, outProjection?: string) {
     if (outProjection) {
       if (!inProjection)
-        inProjection = this.getDefaultProjection(outProjection);
+        inProjection = this.getOppositeProjection(outProjection);
       return proj4(inProjection, outProjection, coordinate);
     } else {
       if (inProjection) {
-        outProjection = this.getDefaultProjection(inProjection);
+        outProjection = this.getOppositeProjection(inProjection);
       } else {
         outProjection = this.defaultProjection;
-        inProjection = this.getDefaultProjection(outProjection);
+        inProjection = this.getOppositeProjection(outProjection);
       }
       return proj4(inProjection, outProjection, coordinate);
     }
+  }
+
+  /**
+   * 转换坐标或坐标数组，如果两个都没有，将点从对立坐标转到当前坐标，如果输出没有，将坐标从输入转到当前坐标，如果输入没有，将坐标从当前坐标转到输出坐标
+   * @param coordinates 点
+   * @param inProjection 输入坐标
+   * @param outProjection 输出坐标
+   */
+  transCoordinates(coordinates: Coordinate | Coordinate[] | Coordinate[][], inProjection?: string, outProjection?: string) {
+    if (typeof coordinates[0] === 'number')
+      return this.transCoordinate(coordinates as Coordinate, inProjection, outProjection);
+    else if (typeof coordinates[0][0] === "number")
+      return (coordinates as Coordinate[]).map(x1 => this.transCoordinate(x1, inProjection, outProjection));
+    else
+      return (coordinates as Coordinate[][]).map(x1 => x1.map(x2 => this.transCoordinate(x2, inProjection, outProjection)));
   }
 
   /**
@@ -48,7 +63,7 @@ export default class ProjectionHelper extends MapFrame {
    * @param inProjection
    * @private
    */
-  private getDefaultProjection(inProjection: string) {
+  private getOppositeProjection(inProjection: string) {
     let outProjection: string;
     switch (inProjection) {
       case 'EPSG:4326':
