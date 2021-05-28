@@ -1,6 +1,7 @@
 import {MapFrame} from "../../MapFrame";
 import Map from "ol/Map";
 import MapHelper from "../../index";
+import {Coordinate} from "ol/coordinate";
 
 export default abstract class BaseFeature extends MapFrame {
 
@@ -22,6 +23,12 @@ export default abstract class BaseFeature extends MapFrame {
    * 显示元素（通过设置元素样式的方法显示）
    */
   abstract show(): void
+
+  /**
+   * 获取拐点信息
+   * @param outProjection 返回结果的坐标系
+   */
+  abstract getCoordinates(outProjection?: string): Coordinate | Coordinate[] | Coordinate[][] | undefined
 
   abstract on(type: 'singleClick', callback: () => void): void
   abstract on(type: 'doubleClick', callback: () => void): void

@@ -34,7 +34,10 @@ export default abstract class MeasureMixin {
       console.log(`ID为${this.id}的元素不是折线，无法计算长度`);
   }
 
-  //计算外包矩形盒
+  /**
+   * 计算外包矩形盒
+   * @param outProjection 返回结果的坐标系
+   */
   calcExtent(outProjection?: string) {
     const geometry = this.nativeFeature.getGeometry();
     if (geometry) {
@@ -51,13 +54,16 @@ export default abstract class MeasureMixin {
     }
   }
 
-  //获取拐点信息
+  /**
+   * 获取拐点信息
+   * @param outProjection 返回结果的坐标系
+   */
   getCoordinates(outProjection?: string) {
     const geometry = this.nativeFeature.getGeometry();
     if (geometry) {
       if ((geometry as any).getCoordinates) {
-        let coordinates = (geometry as any).getCoordinates() as Coordinate | Coordinate[] | Coordinate[][];
-        if (outProjection)
+        let coordinates = (geometry as any).getCoordinates() as Coordinate | Coordinate[] | Coordinate[][] | undefined;
+        if (outProjection && coordinates)
           coordinates = this.mapHelper.projection.transCoordinates(coordinates, undefined, outProjection);
         return coordinates;
       }

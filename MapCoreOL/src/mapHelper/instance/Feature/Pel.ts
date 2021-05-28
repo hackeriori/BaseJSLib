@@ -137,4 +137,16 @@ export default class PelInstance extends BaseFeature {
       })
     }
   }
+
+  /**
+   * 获取拐点信息
+   * @param outProjection 返回结果的坐标系
+   */
+  getCoordinates(outProjection?: string): Coordinate | Coordinate[] | Coordinate[][] | undefined {
+    let outCoordinates: Coordinate | Coordinate[] | Coordinate[][] | undefined;
+    let coordinates = this.position || this.nativeOverlay.getPosition();
+    if (outProjection && coordinates)
+      outCoordinates = this.mapHelper.projection.transCoordinates(coordinates, undefined, outProjection);
+    return outCoordinates
+  }
 }
