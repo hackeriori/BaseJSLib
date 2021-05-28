@@ -9,6 +9,7 @@ import BaseFeature from "./BaseFeature";
 import MapHelper from "../../index";
 import StyleMixin from './StyleMixin';
 import applyMixins from "../../../../../Utils/applyMixins";
+import MeasureMixin from './MeasureMixin';
 
 class FeatureInstance extends BaseFeature {
   //ol原生源
@@ -82,10 +83,10 @@ class FeatureInstance extends BaseFeature {
   }
 }
 
-interface FeatureInstance extends StyleMixin {
+interface FeatureInstance extends StyleMixin, MeasureMixin {
 
 }
 
-applyMixins(FeatureInstance, [StyleMixin]);
+applyMixins(FeatureInstance, [StyleMixin, MeasureMixin]);
 
 export default FeatureInstance

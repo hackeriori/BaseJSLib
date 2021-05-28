@@ -1,5 +1,4 @@
 import Feature from "ol/Feature";
-import GeometryType from "ol/geom/GeometryType";
 import {getArea, getLength} from 'ol/sphere';
 import Map from "ol/Map";
 import MapHelper from "../../index";
@@ -18,7 +17,7 @@ export default abstract class MeasureMixin {
    */
   calcArea() {
     const geometry = this.nativeFeature.getGeometry();
-    if (geometry && geometry.getType() === GeometryType.POLYGON) {
+    if (geometry && geometry.getType() === 'Polygon') {
       return getArea(geometry, {projection: this.map.getView().getProjection()});
     } else
       console.log(`ID为${this.id}的元素不是多边形，无法计算面积`);
@@ -29,7 +28,7 @@ export default abstract class MeasureMixin {
    */
   calcLength() {
     const geometry = this.nativeFeature.getGeometry();
-    if (geometry && geometry.getType() === GeometryType.LINE_STRING) {
+    if (geometry && geometry.getType() === 'LineString') {
       return getLength(geometry, {projection: this.map.getView().getProjection()});
     } else
       console.log(`ID为${this.id}的元素不是折线，无法计算长度`);
