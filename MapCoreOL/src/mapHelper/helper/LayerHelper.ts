@@ -68,12 +68,12 @@ export default class LayerHelper extends MapFrame {
           const normalStyle = normalStyles.map(x => {
             if (x.text)
               x.text.text = features.length.toString();
-            return featureInstances[0].createStyle(x);
+            return this.mapHelper.style.createStyle(x);
           });
           const highLightStyle = highLightStyles.map(x => {
             if (x.text)
               x.text.text = features.length.toString();
-            return featureInstances[0].createStyle(x);
+            return this.mapHelper.style.createStyle(x);
           });
           feature.set('normalStyle', normalStyle);
           feature.set('highLightStyle', highLightStyle);

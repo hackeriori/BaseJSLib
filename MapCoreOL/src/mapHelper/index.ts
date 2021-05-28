@@ -8,11 +8,13 @@ import {getOffsetX, getOffsetY} from "../../../Utils/getOffset";
 import InteractionHelper from "./helper/InteractionHelper";
 import ProjectionHelper from "./helper/ProjectionHelper";
 import ViewHelper from "./helper/ViewHelper";
+import StyleHelper from "./helper/StyleHelper";
 
 export default class MapHelper extends MapFrame {
   layer: LayerHelper
   interaction: InteractionHelper
   projection: ProjectionHelper
+  style: StyleHelper
   view: ViewHelper
   //X偏移量缓存
   private offsetX?: number;
@@ -27,6 +29,7 @@ export default class MapHelper extends MapFrame {
     this.layer = new LayerHelper(map, this);
     this.interaction = new InteractionHelper(map, this);
     this.projection = new ProjectionHelper(map, this);
+    this.style = new StyleHelper(map, this);
     this.view = new ViewHelper(map, this);
     //添加默认图层
     if (addDefaultLayer) {
