@@ -7,7 +7,7 @@ import {Geometry as GeometryType} from "geojson";
 import {StyleLike} from "ol/style/Style";
 import BaseFeature from "./BaseFeature";
 import MapHelper from "../../index";
-import {StyleMixin} from './StyleMixin';
+import StyleMixin from './StyleMixin';
 import applyMixins from "../../../../../Utils/applyMixins";
 
 class FeatureInstance extends BaseFeature {

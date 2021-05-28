@@ -3,7 +3,7 @@ import Style, {StyleLike} from "ol/style/Style";
 import Feature from "ol/Feature";
 import MapHelper from "../../index";
 
-export abstract class StyleMixin {
+export default abstract class StyleMixin {
   mapHelper!: MapHelper
   //ol原生元素对象
   readonly nativeFeature!: Feature;
