@@ -4,6 +4,8 @@ import Overlay from 'ol/Overlay';
 import {PelOptionsType} from "./types";
 import {Coordinate} from "ol/coordinate";
 import MapHelper from "../../index";
+import {FitOptions} from "ol/View";
+import {Extent} from "ol/extent";
 
 export default class PelInstance extends BaseFeature {
   //原生对象
@@ -147,6 +149,24 @@ export default class PelInstance extends BaseFeature {
     let coordinates = this.position || this.nativeOverlay.getPosition();
     if (outProjection && coordinates)
       outCoordinates = this.mapHelper.projection.transCoordinates(coordinates, undefined, outProjection);
+    else
+      outCoordinates = coordinates;
     return outCoordinates
+  }
+
+  /**
+   * 缩放至元素
+   */
+  zoomTo(options?: FitOptions) {
+    const coordinate = this.getCoordinates() as Coordinate;
+    const extent: Extent = [coordinate[0], coordinate[1], coordinate[0], coordinate[1]];
+    const view = this.map.getView();
+    let fitOptions: FitOptions = {
+      duration: 300,
+      maxZoom: view.getZoom(),
+    };
+    if (options)
+      fitOptions = {...fitOptions, ...options};
+    view.fit(extent, fitOptions);
   }
 }

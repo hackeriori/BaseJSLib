@@ -2,6 +2,7 @@ import {MapFrame} from "../../MapFrame";
 import Map from "ol/Map";
 import MapHelper from "../../index";
 import {Coordinate} from "ol/coordinate";
+import {FitOptions} from "ol/View";
 
 export default abstract class BaseFeature extends MapFrame {
 
@@ -25,6 +26,11 @@ export default abstract class BaseFeature extends MapFrame {
   abstract show(): void
 
   /**
+   * 缩放至元素
+   */
+  abstract zoomTo(options?: FitOptions): void
+
+  /**
    * 获取拐点信息
    * @param outProjection 返回结果的坐标系
    */
@@ -35,5 +41,5 @@ export default abstract class BaseFeature extends MapFrame {
   abstract on(type: 'rightClick', callback: () => void): void
   abstract on(type: 'mouseEnter', callback: () => void): void
   abstract on(type: 'mouseLeave', callback: () => void): void
-  abstract on(type: string, callback: () => void): void
+  abstract on(type: string | string[], callback: () => void): void
 }

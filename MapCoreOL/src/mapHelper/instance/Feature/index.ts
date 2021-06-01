@@ -10,6 +10,8 @@ import MapHelper from "../../index";
 import StyleMixin from './StyleMixin';
 import applyMixins from "../../../../../Utils/applyMixins";
 import MeasureMixin from './MeasureMixin';
+import {FitOptions} from "ol/View";
+import {SimpleGeometry} from "ol/geom";
 
 class FeatureInstance extends BaseFeature {
   //ol原生源
@@ -80,6 +82,30 @@ class FeatureInstance extends BaseFeature {
   on(type: 'mouseLeave', callback: () => void): void
   on(type: string, callback: () => void): void {
     this.nativeFeature.on(type, callback);
+  }
+
+  /**
+   * 缩放至元素
+   */
+  zoomTo(options?: FitOptions) {
+    const geometry = this.nativeFeature.getGeometry();
+    if (geometry) {
+      const size = this.map.getSize()!;
+      const view = this.map.getView();
+      const paddingSize = 0.1;
+      const leftRight = size[0] * paddingSize;
+      const topBottom = size[1] * paddingSize;
+      let fitOptions: FitOptions = {
+        padding: [topBottom, leftRight, topBottom, leftRight],
+        duration: 300
+      };
+      if (geometry.getType() === 'Point') {
+        fitOptions.maxZoom = view.getZoom();
+      }
+      if (options)
+        fitOptions = {...fitOptions, ...options};
+      view.fit(geometry as SimpleGeometry, fitOptions);
+    }
   }
 }
 
