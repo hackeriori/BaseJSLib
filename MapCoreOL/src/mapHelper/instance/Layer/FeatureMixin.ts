@@ -10,13 +10,13 @@ import PelInstance from "../Feature/Pel";
 
 class FeatureMixin {
   //元素列表
-  protected featureList!: { [key: string]: FeatureInstance };
+  featureList!: { [key: string]: FeatureInstance };
   //图元列表
-  protected pelList: { [key: string]: PelInstance } = {};
+  pelList: { [key: string]: PelInstance } = {};
   //图层ID
   readonly id!: string;
   //图层可见性
-  protected visibly!: boolean;
+  visibly!: boolean;
 
   /**
    * 创建元素（瓦片图层不影响，如果是瓦片图层由于拿不到source，该方法会返回undefined）
@@ -43,7 +43,7 @@ class FeatureMixin {
     if (this.pelList[options.id])
       console.log(`元素id[${options.id}]重复，重复的元素未添加到图层中`);
     else {
-      return new PelInstance(this.map, this.mapHelper, options, this.visibly, this.pelList);
+      return new PelInstance(this.map, this.mapHelper, options, this as any);
     }
   }
 

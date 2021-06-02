@@ -36,10 +36,10 @@ export default abstract class BaseFeature extends MapFrame {
    */
   abstract getCoordinates(outProjection?: string): Coordinate | Coordinate[] | Coordinate[][] | undefined
 
-  abstract on(type: 'singleClick', callback: () => void): void
-  abstract on(type: 'doubleClick', callback: () => void): void
-  abstract on(type: 'rightClick', callback: () => void): void
-  abstract on(type: 'mouseEnter', callback: () => void): void
-  abstract on(type: 'mouseLeave', callback: () => void): void
-  abstract on(type: string | string[], callback: () => void): void
+  abstract on(type: 'singleClick', callback: (evt: { type: string }) => void): void
+  abstract on(type: 'doubleClick', callback: (evt: { type: string }) => void): void
+  abstract on(type: 'rightClick', callback: (evt: { type: string }) => void): void
+  abstract on(type: 'mouseEnter', callback: (evt: { type: string }) => void): void
+  abstract on(type: 'mouseLeave', callback: (evt: { type: string }) => void): void
+  abstract on(type: string | string[], callback: (evt: { type: string }) => void): void
 }

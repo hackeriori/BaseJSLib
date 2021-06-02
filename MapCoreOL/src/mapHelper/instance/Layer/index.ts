@@ -22,11 +22,11 @@ class LayerInstance extends MapFrame {
   //图层列表
   private readonly layerList: { [key: string]: LayerInstance };
   //元素列表
-  protected featureList: { [key: string]: FeatureInstance } = {};
+  featureList: { [key: string]: FeatureInstance } = {};
   //图元列表
-  protected pelList: { [key: string]: PelInstance } = {};
+  pelList: { [key: string]: PelInstance } = {};
   //图层可见性
-  protected visibly: boolean;
+  visibly: boolean;
 
   //图层的可见性可以设置在options里面
   constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions | VectorOptions, layerList: { [key: string]: LayerInstance }) {
@@ -50,7 +50,7 @@ class LayerInstance extends MapFrame {
   }
 
   /**
-   * 移除图层
+   * 移除图层（内置提示）
    */
   destroy() {
     if (this.layerList[this.id]) {

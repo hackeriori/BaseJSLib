@@ -6,30 +6,34 @@ import {Coordinate} from "ol/coordinate";
 import MapHelper from "../../index";
 import {FitOptions} from "ol/View";
 import {Extent} from "ol/extent";
+import {flashPoint} from "./command";
+import LayerInstance from "../Layer";
 
 export default class PelInstance extends BaseFeature {
   //原生对象
   readonly nativeOverlay: Overlay;
   //元素ID
   readonly id: string;
-  //图元列表
-  readonly pelList: { [key: string]: PelInstance };
+  //所属图层示例
+  readonly layerInstance: LayerInstance;
   //位置信息缓存
   private position?: Coordinate = undefined;
   //图元自身的显隐属性（在开关图层时决定图元是否显隐）
   private visible = true;
-  //图层的可见性
-  private layerVisible = true;
 
-  constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerVisible: boolean, pelList: { [key: string]: PelInstance }) {
+  constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerInstance: LayerInstance) {
     super(map, mapHelper);
     this.id = options.id;
-    this.pelList = pelList;
+    this.layerInstance = layerInstance;
+    //如果图层不可见，那么缓存位置
+    if (!layerInstance.visibly) {
+      this.position = options.options.position;
+      options.options.position = undefined;
+    }
     this.nativeOverlay = new Overlay(options.options);
-    this.pelList[this.id] = this;
+    this.layerInstance.pelList[this.id] = this;
     this.map.addOverlay(this.nativeOverlay);
-    if (!layerVisible)
-      this.hide(true);
+
     //添加高亮移除事件
     if (options.options.element)
       options.options.element.addEventListener('pointermove', ev => {
@@ -39,12 +43,12 @@ export default class PelInstance extends BaseFeature {
   }
 
   /**
-   * 移除元素
+   * 移除元素（内置提示）
    */
   destroy(): void {
-    if (this.pelList[this.id]) {
+    if (this.layerInstance.pelList[this.id]) {
       this.map.removeOverlay(this.nativeOverlay);
-      delete this.pelList[this.id];
+      delete this.layerInstance.pelList[this.id];
     } else
       console.log(`id为[${this.id}]的元素不存在，移除失败`);
   }
@@ -55,17 +59,17 @@ export default class PelInstance extends BaseFeature {
    */
   show(layerFlag = false) {
     let changed = false;
-    //如果图层不可见，打开了图层，那么设置图层可见
-    if (!this.layerVisible && layerFlag) {
-      this.layerVisible = true;
+    //如果打开了图层，并且元素可见，那么显示
+    if (layerFlag && !this.layerInstance.visibly && this.visible)
       changed = true;
-    }
-    //如果元素不可见，设置元素可见，那么设置元素可见
-    if (!this.visible && !layerFlag) {
+    //如果打开了元素
+    else if (!layerFlag && !this.visible) {
       this.visible = true;
-      changed = true;
+      //图层可见的情况下显示
+      if (this.layerInstance.visibly)
+        changed = true;
     }
-    if (changed && this.position && this.layerVisible && this.visible) {
+    if (changed) {
       this.nativeOverlay.setPosition(this.position);
       this.position = undefined;
     }
@@ -77,28 +81,32 @@ export default class PelInstance extends BaseFeature {
    */
   hide(layerFlag = false) {
     let changed = false;
-    //如果图层可见，关闭了图层，那么设置图层不可见
-    if (this.layerVisible && layerFlag) {
-      this.layerVisible = false;
+    //如果关闭了图层，那么设置隐藏
+    if (layerFlag && this.layerInstance.visibly)
       changed = true;
-    }
-    //如果元素可见，设置元素不可见，那么设置元素不可见
-    if (this.visible && !layerFlag) {
+    //如果关闭了元素，那么设置隐藏
+    else if (!layerFlag && this.visible) {
       this.visible = false;
       changed = true;
     }
-    if (changed && !this.position && (!this.layerVisible || !this.visible)) {
+    if (changed && !this.position) {
       this.position = this.nativeOverlay.getPosition();
       this.nativeOverlay.setPosition(undefined);
     }
   }
 
-  on(type: "singleClick", callback: () => void): void;
-  on(type: "doubleClick", callback: () => void): void;
-  on(type: "rightClick", callback: () => void): void;
-  on(type: "mouseEnter", callback: () => void): void;
-  on(type: "mouseLeave", callback: () => void): void;
-  on(type: string, callback: () => void): void {
+  on(type: "singleClick", callback: (evt: { type: string }) => void): void;
+  on(type: "doubleClick", callback: (evt: { type: string }) => void): void;
+  on(type: "rightClick", callback: (evt: { type: string }) => void): void;
+  on(type: "mouseEnter", callback: (evt: { type: string }) => void): void;
+  on(type: "mouseLeave", callback: (evt: { type: string }) => void): void;
+  on(type: string | string[], callback: (evt: { type: string }) => void): void {
+    if (Array.isArray(type)) {
+      for (let i = 0; i < type.length; i++) {
+        this.on(type[i] as any, callback)
+      }
+      return;
+    }
     //注册事件
     const element = this.nativeOverlay.getElement();
     if (element) {
@@ -126,13 +134,11 @@ export default class PelInstance extends BaseFeature {
       element.addEventListener(event, ev => {
         if (type === 'singleClick') {
           if ((ev as PointerEvent).button === 0)
-            callback();
+            callback({type: (type)});
           else
             return;
-        } else if (type === 'rightClick') {
-          callback();
         } else
-          callback();
+          callback({type: type});
         ev.preventDefault();
         ev.stopPropagation();
         ev.returnValue = false;
@@ -168,5 +174,9 @@ export default class PelInstance extends BaseFeature {
     if (options)
       fitOptions = {...fitOptions, ...options};
     view.fit(extent, fitOptions);
+  }
+
+  flash() {
+
   }
 }

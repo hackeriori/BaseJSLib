@@ -75,12 +75,12 @@ class FeatureInstance extends BaseFeature {
       this.nativeFeature.setStyle(this.styleLike);
   }
 
-  on(type: 'singleClick', callback: () => void): void
-  on(type: 'doubleClick', callback: () => void): void
-  on(type: 'rightClick', callback: () => void): void
-  on(type: 'mouseEnter', callback: () => void): void
-  on(type: 'mouseLeave', callback: () => void): void
-  on(type: string, callback: () => void): void {
+  on(type: 'singleClick', callback: (evt: { type: string }) => void): void
+  on(type: 'doubleClick', callback: (evt: { type: string }) => void): void
+  on(type: 'rightClick', callback: (evt: { type: string }) => void): void
+  on(type: 'mouseEnter', callback: (evt: { type: string }) => void): void
+  on(type: 'mouseLeave', callback: (evt: { type: string }) => void): void
+  on(type: string| string[], callback: (evt: { type: string }) => void): void {
     this.nativeFeature.on(type, callback);
   }
 
