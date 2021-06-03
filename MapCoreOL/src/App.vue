@@ -18,7 +18,9 @@ export default class App extends Vue {
   @Ref() readonly mapView!: MapView;
 
   mapLoaded(mapHelper: MapHelper) {
-    const layer = mapHelper.layer.createLayer('test', {source: mapHelper.layer.createVectorSource({})});
+    const layer = mapHelper.layer.createLayer('test', {
+      source: mapHelper.layer.createVectorSource({}),
+    });
     if (layer) {
       const feature = layer.createFeature(
         {
@@ -62,7 +64,7 @@ export default class App extends Vue {
           },
           properties: {id: 'test1', name: 'test', clickable: true}
         });
-      if(feature1) {
+      if (feature1) {
         feature1.setNormalStyle([{
           fill: {
             color: 'red'

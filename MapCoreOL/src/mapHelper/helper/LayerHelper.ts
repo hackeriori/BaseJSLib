@@ -15,7 +15,7 @@ import FeatureInstance from "../instance/Feature";
 import {StyleType} from "../instance/Feature/types";
 
 export default class LayerHelper extends MapFrame {
-  private readonly layerList: { [key: string]: LayerInstance } = {};
+  readonly layerList: { [key: string]: LayerInstance } = {};
 
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
@@ -30,9 +30,7 @@ export default class LayerHelper extends MapFrame {
     if (this.layerList[id])
       console.log(`图层id[${id}]重复，重复的图层未添加到地图上`);
     else {
-      const layer = new LayerInstance(this.map, this.mapHelper, id, options, this.layerList);
-      layer.mapHelper = this.mapHelper;
-      return layer;
+      return new LayerInstance(this.map, this.mapHelper, id, options, this.layerList);
     }
   }
 

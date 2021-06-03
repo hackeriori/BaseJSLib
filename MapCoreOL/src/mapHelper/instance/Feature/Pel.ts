@@ -53,7 +53,7 @@ export default class PelInstance extends BaseFeature {
       }
     }));
     //如果图层不可见，那么缓存位置
-    if (!layerInstance.visibly) {
+    if (!layerInstance.visibly || !layerInstance.zoomVisibly) {
       this.position = options.options.position;
       options.options.position = undefined;
     }
@@ -88,7 +88,7 @@ export default class PelInstance extends BaseFeature {
   show(layerFlag = false) {
     let changed = false;
     //如果打开了图层，并且元素可见，那么显示
-    if (layerFlag && !this.layerInstance.visibly && this.visible)
+    if (layerFlag && this.layerInstance.visibly && this.layerInstance.zoomVisibly && this.visible)
       changed = true;
     //如果打开了元素
     else if (!layerFlag && !this.visible) {
@@ -98,7 +98,7 @@ export default class PelInstance extends BaseFeature {
         this.styleLike = undefined;
       }
       //图层可见的情况下显示
-      if (this.layerInstance.visibly)
+      if (this.layerInstance.visibly && this.layerInstance.zoomVisibly)
         changed = true;
     }
     if (changed) {
@@ -114,7 +114,7 @@ export default class PelInstance extends BaseFeature {
   hide(layerFlag = false) {
     let changed = false;
     //如果关闭了图层，那么设置隐藏
-    if (layerFlag && this.layerInstance.visibly)
+    if (layerFlag && (!this.layerInstance.visibly || !this.layerInstance.zoomVisibly))
       changed = true;
     //如果关闭了元素，那么设置隐藏
     else if (!layerFlag && this.visible) {

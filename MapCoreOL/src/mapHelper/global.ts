@@ -58,3 +58,21 @@ export function getDefaultHighLightClusterStyles() {
     }
   }] as StyleType[]
 }
+
+export function zoomLevelChanged(mapHelper: MapHelper) {
+  const zoom = mapHelper.map.getView().getZoom();
+  if (zoom) {
+    for (const key in mapHelper.layer.layerList) {
+      const layerInstance = mapHelper.layer.layerList[key];
+      const maxZoom = layerInstance.nativeLayer.getMaxZoom();
+      const minZoom = layerInstance.nativeLayer.getMinZoom();
+      const zoomVisibly = zoom > minZoom && zoom < maxZoom;
+      if (zoomVisibly !== layerInstance.zoomVisibly) {
+        if (zoomVisibly)
+          layerInstance.show(true);
+        else
+          layerInstance.hide(true);
+      }
+    }
+  }
+}

@@ -11,6 +11,7 @@ import applyMixins from "../../../../../Utils/applyMixins";
 import FeatureInstance from "../Feature";
 import PelInstance from "../Feature/Pel";
 import MapHelper from "../../index";
+import {zoomLevelChanged} from "../../global";
 
 class LayerInstance extends MapFrame {
   //ol原生图层
@@ -27,6 +28,8 @@ class LayerInstance extends MapFrame {
   pelList: { [key: string]: PelInstance } = {};
   //图层可见性
   visibly: boolean;
+  //图层因缩放层级限制的可见性
+  zoomVisibly: boolean;
 
   //图层的可见性可以设置在options里面
   constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions | VectorOptions, layerList: { [key: string]: LayerInstance }) {
@@ -44,6 +47,7 @@ class LayerInstance extends MapFrame {
       this.visibly = options.visible;
     else
       this.visibly = true;
+    this.zoomVisibly = this.map.getView().getZoom()! > this.nativeLayer.getMinZoom() && this.map.getView().getZoom()! < this.nativeLayer.getMaxZoom();
     this.layerList[id] = this;
     this.nativeLayer.set('id', id, true);
     this.map.addLayer(this.nativeLayer);
@@ -66,27 +70,43 @@ class LayerInstance extends MapFrame {
 
   /**
    * 显示图层
+   * @param zoomFlag 因缩放层级导致，外部调用不要传此参数
    */
-  show() {
-    if (!this.visibly) {
+  show(zoomFlag = false) {
+    let changed = false;
+    if (!this.visibly && !zoomFlag) {
+      this.visibly = true;
       this.nativeLayer.setVisible(true);
+      changed = true;
+    } else if (!this.zoomVisibly && zoomFlag) {
+      this.zoomVisibly = true;
+      changed = true;
+    }
+    if (changed) {
       for (let id in this.pelList) {
         this.pelList[id].show(true);
       }
-      this.visibly = true;
     }
   }
 
   /**
    * 隐藏图层
+   * @param zoomFlag 因缩放层级导致，外部调用不要传此参数
    */
-  hide() {
-    if (this.visibly) {
+  hide(zoomFlag = false) {
+    let changed = false;
+    if (this.visibly && !zoomFlag) {
+      this.visibly = false;
       this.nativeLayer.setVisible(false);
+      changed = true;
+    } else if (this.zoomVisibly && zoomFlag) {
+      this.zoomVisibly = false;
+      changed = true;
+    }
+    if (changed) {
       for (let id in this.pelList) {
         this.pelList[id].hide(true);
       }
-      this.visibly = false;
     }
   }
 
@@ -98,6 +118,24 @@ class LayerInstance extends MapFrame {
       this.hide();
     else
       this.show();
+  }
+
+  /**
+   * 设置图层最大缩放层级
+   * @param zoom
+   */
+  setMaxZoom(zoom: number) {
+    this.nativeLayer.setMaxZoom(zoom);
+    zoomLevelChanged(this.mapHelper);
+  }
+
+  /**
+   * 设置图层最小缩放层级
+   * @param zoom
+   */
+  setMinZoom(zoom: number) {
+    this.nativeLayer.setMinZoom(zoom);
+    zoomLevelChanged(this.mapHelper);
   }
 }
 
