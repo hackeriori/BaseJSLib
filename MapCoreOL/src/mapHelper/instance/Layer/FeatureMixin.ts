@@ -30,7 +30,7 @@ class FeatureMixin {
       if (source) {
         const geoJSONDate = geoJSONFeature as FeatureGeoType<GeometryType, FeaturePropType>;
         geoJSONDate.properties.layerID = this.id;
-        return new FeatureInstance(this.map, this.mapHelper, geoJSONDate, this.featureList, source);
+        return new FeatureInstance(this.map, this.mapHelper, geoJSONDate, this as any, source);
       }
     }
   }
@@ -43,7 +43,9 @@ class FeatureMixin {
     if (this.pelList[options.id])
       console.log(`元素id[${options.id}]重复，重复的元素未添加到图层中`);
     else {
-      return new PelInstance(this.map, this.mapHelper, options, this as any);
+      const source = this.getVectorSource();
+      if (source)
+        return new PelInstance(this.map, this.mapHelper, options, this as any, source);
     }
   }
 

@@ -1,17 +1,24 @@
 import BaseFeature from "./BaseFeature";
 import Map from "ol/Map";
 import Overlay from 'ol/Overlay';
-import {PelOptionsType} from "./types";
+import {FlashPointParamsType, PelOptionsType} from "./types";
 import {Coordinate} from "ol/coordinate";
 import MapHelper from "../../index";
 import {FitOptions} from "ol/View";
 import {Extent} from "ol/extent";
 import {flashPoint} from "./command";
 import LayerInstance from "../Layer";
+import {Point} from "ol/geom";
+import VectorLayer from "ol/layer/Vector";
+import Feature from "ol/Feature";
+import VectorSource from "ol/source/Vector";
+import {StyleLike} from "ol/style/Style";
 
 export default class PelInstance extends BaseFeature {
   //原生对象
   readonly nativeOverlay: Overlay;
+  //ol原生元素对象，此对象设置为始终不可见
+  readonly nativeFeature: Feature;
   //元素ID
   readonly id: string;
   //所属图层示例
@@ -20,11 +27,31 @@ export default class PelInstance extends BaseFeature {
   private position?: Coordinate = undefined;
   //图元自身的显隐属性（在开关图层时决定图元是否显隐）
   private visible = true;
+  //ol原生源
+  readonly nativeSource: VectorSource;
+  //样式缓存（用于隐藏时缓存样式）
+  protected styleLike?: StyleLike = undefined;
 
-  constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerInstance: LayerInstance) {
+  constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerInstance: LayerInstance, source: VectorSource) {
     super(map, mapHelper);
     this.id = options.id;
     this.layerInstance = layerInstance;
+    this.nativeSource = source;
+    this.nativeFeature = new Feature({
+      geometry: new Point(options.options.position!),
+      id: options.id,
+      name: '',
+      clickable: false,
+      layerID: this.layerInstance.id
+    });
+    this.nativeFeature.setStyle(this.mapHelper.style.createStyle({
+      image: {
+        radius: 5,
+        stroke: {
+          color: 'rgba(255,255,255,0)'
+        }
+      }
+    }));
     //如果图层不可见，那么缓存位置
     if (!layerInstance.visibly) {
       this.position = options.options.position;
@@ -32,8 +59,8 @@ export default class PelInstance extends BaseFeature {
     }
     this.nativeOverlay = new Overlay(options.options);
     this.layerInstance.pelList[this.id] = this;
+    this.nativeSource.addFeature(this.nativeFeature);
     this.map.addOverlay(this.nativeOverlay);
-
     //添加高亮移除事件
     if (options.options.element)
       options.options.element.addEventListener('pointermove', ev => {
@@ -48,6 +75,7 @@ export default class PelInstance extends BaseFeature {
   destroy(): void {
     if (this.layerInstance.pelList[this.id]) {
       this.map.removeOverlay(this.nativeOverlay);
+      this.nativeSource.removeFeature(this.nativeFeature);
       delete this.layerInstance.pelList[this.id];
     } else
       console.log(`id为[${this.id}]的元素不存在，移除失败`);
@@ -65,6 +93,10 @@ export default class PelInstance extends BaseFeature {
     //如果打开了元素
     else if (!layerFlag && !this.visible) {
       this.visible = true;
+      if (this.styleLike) {
+        this.nativeFeature.setStyle(this.styleLike);
+        this.styleLike = undefined;
+      }
       //图层可见的情况下显示
       if (this.layerInstance.visibly)
         changed = true;
@@ -87,6 +119,10 @@ export default class PelInstance extends BaseFeature {
     //如果关闭了元素，那么设置隐藏
     else if (!layerFlag && this.visible) {
       this.visible = false;
+      if (!this.styleLike) {
+        this.styleLike = this.nativeFeature.getStyle();
+        this.nativeFeature.setStyle(() => []);
+      }
       changed = true;
     }
     if (changed && !this.position) {
@@ -176,7 +212,24 @@ export default class PelInstance extends BaseFeature {
     view.fit(extent, fitOptions);
   }
 
-  flash() {
-
+  /**
+   * 闪动动画
+   * @param options 动画参数
+   */
+  async flash(options?: Partial<FlashPointParamsType>) {
+    if (!this.visible || !this.layerInstance.visibly)
+      return;
+    const coordinate = this.getCoordinates();
+    if (coordinate) {
+      const preOptions: FlashPointParamsType = {
+        duration: 800,
+        color: 'red',
+        maxRadius: 30,
+        minRadius: 5,
+        outToIn: true
+      }
+      const _options: FlashPointParamsType = {...preOptions, ...options};
+      await flashPoint(this.layerInstance.nativeLayer as VectorLayer, coordinate as Coordinate, this.map, _options);
+    }
   }
 }

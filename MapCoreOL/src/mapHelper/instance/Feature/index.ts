@@ -12,6 +12,7 @@ import applyMixins from "../../../../../Utils/applyMixins";
 import MeasureMixin from './MeasureMixin';
 import {FitOptions} from "ol/View";
 import {SimpleGeometry} from "ol/geom";
+import LayerInstance from "../Layer";
 
 class FeatureInstance extends BaseFeature {
   //ol原生源
@@ -21,7 +22,7 @@ class FeatureInstance extends BaseFeature {
   //元素ID
   readonly id: string;
   //元素列表
-  readonly featureList: { [key: string]: FeatureInstance };
+  readonly layerInstance: LayerInstance;
   //样式缓存（用于隐藏时缓存样式）
   protected styleLike?: StyleLike = undefined;
   //普通样式
@@ -29,23 +30,23 @@ class FeatureInstance extends BaseFeature {
   //高亮样式
   highLightStyle?: StyleLike = undefined;
 
-  constructor(map: Map, mapHelper: MapHelper, geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropType>, featureList: { [key: string]: FeatureInstance }, source: VectorSource) {
+  constructor(map: Map, mapHelper: MapHelper, geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropType>, layerInstance: LayerInstance, source: VectorSource) {
     super(map, mapHelper);
     this.id = geoJSONFeature.id as string
-    this.featureList = featureList;
+    this.layerInstance = layerInstance;
     this.nativeSource = source;
     this.nativeFeature = geoJson.readFeature(geoJSONFeature);
-    this.featureList[this.id] = this;
+    this.layerInstance.featureList[this.id] = this;
     this.nativeSource.addFeature(this.nativeFeature);
   }
 
   /**
-   * 移除元素
+   * 移除元素（内置错误提示）
    */
   destroy() {
-    if (this.featureList[this.id]) {
+    if (this.layerInstance.featureList[this.id]) {
       this.nativeSource.removeFeature(this.nativeFeature);
-      delete this.featureList[this.id];
+      delete this.layerInstance.featureList[this.id];
     } else
       console.log(`id为[${this.id}]的元素不存在，移除失败`);
   }
@@ -63,16 +64,20 @@ class FeatureInstance extends BaseFeature {
    * 隐藏元素（通过设置元素样式的方法隐藏）
    */
   hide() {
-    this.styleLike = this.nativeFeature.getStyle();
-    this.nativeFeature.setStyle(() => []);
+    if (!this.styleLike) {
+      this.styleLike = this.nativeFeature.getStyle();
+      this.nativeFeature.setStyle(() => []);
+    }
   }
 
   /**
    * 显示元素（通过设置元素样式的方法显示）
    */
   show() {
-    if (this.styleLike)
+    if (this.styleLike) {
       this.nativeFeature.setStyle(this.styleLike);
+      this.styleLike = undefined;
+    }
   }
 
   on(type: 'singleClick', callback: (evt: { type: string }) => void): void
@@ -80,7 +85,7 @@ class FeatureInstance extends BaseFeature {
   on(type: 'rightClick', callback: (evt: { type: string }) => void): void
   on(type: 'mouseEnter', callback: (evt: { type: string }) => void): void
   on(type: 'mouseLeave', callback: (evt: { type: string }) => void): void
-  on(type: string| string[], callback: (evt: { type: string }) => void): void {
+  on(type: string | string[], callback: (evt: { type: string }) => void): void {
     this.nativeFeature.on(type, callback);
   }
 

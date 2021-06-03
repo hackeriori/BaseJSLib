@@ -24,7 +24,7 @@ export default class App extends Vue {
         {
           type: "Feature",
           id: 'test',
-          geometry: {type: 'Point', coordinates: [11849201.99781884, 3430156.63782584,33]},
+          geometry: {type: 'Point', coordinates: [11849201.99781884, 3430156.63782584, 33]},
           properties: {id: 'test', name: 'test', clickable: true}
         });
       if (feature) {
@@ -32,23 +32,23 @@ export default class App extends Vue {
           alert('我被点了' + feature.getProperties().name)
         });
         feature.setNormalStyle([{
-          image:{
-            stroke:{
-              color:'red',
-              width:1,
+          image: {
+            stroke: {
+              color: 'red',
+              width: 1,
             },
-            fill:{color:'rgba(255,255,255,0.01)'},
-            radius:5
+            fill: {color: 'rgba(255,255,255,0.01)'},
+            radius: 5
           }
         }]);
         feature.setHighLightStyle([{
-          image:{
-            stroke:{
-              color:'yellow',
-              width:2,
+          image: {
+            stroke: {
+              color: 'yellow',
+              width: 2,
             },
-            fill:{color:'rgba(255,255,255,0.01)'},
-            radius:5
+            fill: {color: 'rgba(255,255,255,0.01)'},
+            radius: 5
           }
         }]);
       }
@@ -64,13 +64,14 @@ export default class App extends Vue {
           stopEvent: false
         }
       })
-      if(pel) {
+      if (pel) {
         pel.on('singleClick', () => {
           alert('我被点了' + pel.id);
         });
         pel.on('rightClick', () => {
           console.log('我被右键点了');
         });
+        window.pel = pel;
       }
     }
     mapHelper.interaction.customEvents.start();
