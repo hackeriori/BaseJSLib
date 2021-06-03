@@ -131,14 +131,14 @@ export async function flashGeom(layer: VectorLayer, feature: Feature, map: Map, 
   }
 
   const arrColor = rgba(param.color);
-  if (!arrColor) {
+  if (!arrColor || (arrColor as number[]).length === 0) {
     console.log('颜色值无效');
     return
   }
   arrColor.pop();
 
   const transitionColor = rgba(param.transitionColor);
-  if (!transitionColor) {
+  if (!transitionColor || (transitionColor as number[]).length === 0) {
     console.log('过渡色无效');
     return
   }

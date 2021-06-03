@@ -72,7 +72,7 @@ export default class App extends Vue {
           fill: {
             color: 'yellow'
           }
-        }])
+        }]);
       }
       const dom = document.createElement('div');
       dom.style.height = '32px';
