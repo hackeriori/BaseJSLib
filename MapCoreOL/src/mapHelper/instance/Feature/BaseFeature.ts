@@ -3,6 +3,7 @@ import Map from "ol/Map";
 import MapHelper from "../../index";
 import {Coordinate} from "ol/coordinate";
 import {FitOptions} from "ol/View";
+import {FlashPointParamsType} from "./types";
 
 export default abstract class BaseFeature extends MapFrame {
 
@@ -42,4 +43,6 @@ export default abstract class BaseFeature extends MapFrame {
   abstract on(type: 'mouseEnter', callback: (evt: { type: string }) => void): void
   abstract on(type: 'mouseLeave', callback: (evt: { type: string }) => void): void
   abstract on(type: string | string[], callback: (evt: { type: string }) => void): void
+
+  abstract async flash(options?: Partial<FlashPointParamsType>): Promise<void>
 }

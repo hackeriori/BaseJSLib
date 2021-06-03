@@ -2,7 +2,7 @@ import Map from 'ol/Map';
 import Feature from "ol/Feature";
 import geoJson from "../../global";
 import VectorSource from "ol/source/Vector";
-import FeaturePropType, {FeatureGeoType} from "./types";
+import FeaturePropType, {FeatureGeoType, FlashPointParamsType} from "./types";
 import {Geometry as GeometryType} from "geojson";
 import {StyleLike} from "ol/style/Style";
 import BaseFeature from "./BaseFeature";
@@ -11,8 +11,10 @@ import StyleMixin from './StyleMixin';
 import applyMixins from "../../../../../Utils/applyMixins";
 import MeasureMixin from './MeasureMixin';
 import {FitOptions} from "ol/View";
-import {SimpleGeometry} from "ol/geom";
+import {Point, SimpleGeometry} from "ol/geom";
 import LayerInstance from "../Layer";
+import {flashGeom, flashPoint, getPreFlashPointParams} from "./command";
+import VectorLayer from "ol/layer/Vector";
 
 class FeatureInstance extends BaseFeature {
   //ol原生源
@@ -35,6 +37,15 @@ class FeatureInstance extends BaseFeature {
     this.id = geoJSONFeature.id as string
     this.layerInstance = layerInstance;
     this.nativeSource = source;
+    if (geoJSONFeature.geometry.type === 'Polygon') {
+      //如果是多边形，需要闭合
+      for (let i = 0; i < geoJSONFeature.geometry.coordinates.length; i++) {
+        const ring = geoJSONFeature.geometry.coordinates[i];
+        if (ring[0].toString() !== ring[ring.length - 1].toString())
+          ring.push([ring[0][0], ring[0][1]]);
+        ring[0][0] += 1;
+      }
+    }
     this.nativeFeature = geoJson.readFeature(geoJSONFeature);
     this.layerInstance.featureList[this.id] = this;
     this.nativeSource.addFeature(this.nativeFeature);
@@ -64,7 +75,7 @@ class FeatureInstance extends BaseFeature {
    * 隐藏元素（通过设置元素样式的方法隐藏）
    */
   hide() {
-    if (!this.styleLike) {
+    if (this.styleLike === undefined) {
       this.styleLike = this.nativeFeature.getStyle();
       this.nativeFeature.setStyle(() => []);
     }
@@ -74,7 +85,7 @@ class FeatureInstance extends BaseFeature {
    * 显示元素（通过设置元素样式的方法显示）
    */
   show() {
-    if (this.styleLike) {
+    if (this.styleLike !== undefined) {
       this.nativeFeature.setStyle(this.styleLike);
       this.styleLike = undefined;
     }
@@ -110,6 +121,30 @@ class FeatureInstance extends BaseFeature {
       if (options)
         fitOptions = {...fitOptions, ...options};
       view.fit(geometry as SimpleGeometry, fitOptions);
+    }
+  }
+
+  async flash(options?: Partial<FlashPointParamsType>) {
+    if (this.styleLike || !this.layerInstance.visibly)
+      return;
+    const preOptions = getPreFlashPointParams();
+    const _options: FlashPointParamsType = {...preOptions, ...options};
+    const geometry = this.nativeFeature.getGeometry();
+    if (geometry) {
+      const type = geometry.getType();
+      switch (type) {
+        case 'Point':
+          await flashPoint(this.layerInstance.nativeLayer as VectorLayer, geometry as Point, this.map, _options);
+          break;
+        case 'Polygon':
+        case 'MultiPolygon':
+        case 'LineString':
+        case 'MultiLineString':
+          await flashGeom(this.layerInstance.nativeLayer as VectorLayer, this.nativeFeature, this.map, _options)
+          break;
+        default:
+          return;
+      }
     }
   }
 }

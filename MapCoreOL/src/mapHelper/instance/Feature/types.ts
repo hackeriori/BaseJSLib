@@ -64,10 +64,12 @@ export interface FlashPointParamsType {
   duration: number,
   //颜色，不要使用rgba格式，默认红色
   color: string,
-  //圈由外向内扩散,默认true
+  //圈由外向内扩散，默认true
   outToIn: boolean,
   //圈的最大半径，默认30
   maxRadius: number,
   //圈的最小半径，默认5
   minRadius: number,
+  //过渡色，默认白色
+  transitionColor: string,
 }

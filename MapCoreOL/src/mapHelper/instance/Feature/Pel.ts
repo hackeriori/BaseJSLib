@@ -6,7 +6,7 @@ import {Coordinate} from "ol/coordinate";
 import MapHelper from "../../index";
 import {FitOptions} from "ol/View";
 import {Extent} from "ol/extent";
-import {flashPoint} from "./command";
+import {flashPoint, getPreFlashPointParams} from "./command";
 import LayerInstance from "../Layer";
 import {Point} from "ol/geom";
 import VectorLayer from "ol/layer/Vector";
@@ -221,13 +221,7 @@ export default class PelInstance extends BaseFeature {
       return;
     const coordinate = this.getCoordinates();
     if (coordinate) {
-      const preOptions: FlashPointParamsType = {
-        duration: 800,
-        color: 'red',
-        maxRadius: 30,
-        minRadius: 5,
-        outToIn: true
-      }
+      const preOptions = getPreFlashPointParams();
       const _options: FlashPointParamsType = {...preOptions, ...options};
       await flashPoint(this.layerInstance.nativeLayer as VectorLayer, coordinate as Coordinate, this.map, _options);
     }
