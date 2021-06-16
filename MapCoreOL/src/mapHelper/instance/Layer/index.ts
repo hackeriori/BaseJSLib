@@ -12,6 +12,7 @@ import FeatureInstance from "../Feature";
 import PelInstance from "../Feature/Pel";
 import MapHelper from "../../index";
 import {zoomLevelChanged} from "../../global";
+import DrawFeatureMixin from "./DrawFeatureMixin";
 
 class LayerInstance extends MapFrame {
   //ol原生图层
@@ -139,10 +140,10 @@ class LayerInstance extends MapFrame {
   }
 }
 
-interface LayerInstance extends FeatureMixin {
+interface LayerInstance extends FeatureMixin, DrawFeatureMixin {
 
 }
 
-applyMixins(LayerInstance, [FeatureMixin]);
+applyMixins(LayerInstance, [FeatureMixin, DrawFeatureMixin]);
 
 export default LayerInstance

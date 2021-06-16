@@ -98,6 +98,7 @@ export default class App extends Vue {
       }
     }
     mapHelper.interaction.customEvents.start(x => console.log(x));
+    window.mapHelper = mapHelper;
   }
 }
 </script>

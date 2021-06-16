@@ -56,9 +56,9 @@ class FeatureMixin {
   getFeature(id: string) {
     const feature = this.featureList[id] as FeatureInstance | undefined;
     if (feature)
-      return feature
+      return feature;
     else {
-      return this.pelList[id] as PelInstance | undefined
+      return this.pelList[id] as PelInstance | undefined;
     }
   }
 
