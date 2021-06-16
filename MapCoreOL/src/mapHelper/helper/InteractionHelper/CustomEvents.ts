@@ -23,6 +23,7 @@ export default class CustomEvents extends MapFrame {
   }
 
   start(callback?: NotingClick) {
+    this.mapHelper.interaction.stopAll();
     const target = this.target;
     this.obSingleClick = this.map.on('singleclick', evt => {
       const features = this.map.getFeaturesAtPixel(evt.pixel).filter(x => x.get('clickable'));
