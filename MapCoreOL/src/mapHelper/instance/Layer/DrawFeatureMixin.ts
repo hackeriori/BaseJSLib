@@ -4,7 +4,7 @@ import Snap from "ol/interaction/Snap";
 import Map from 'ol/Map';
 import FeatureMixin from "./FeatureMixin";
 import {getUid} from "ol";
-import {Circle, Polygon} from "ol/geom";
+import {Circle} from "ol/geom";
 import {fromCircle} from "ol/geom/Polygon";
 import SourceMixin from "./SourceMixin";
 import MapHelper from "../../index";
