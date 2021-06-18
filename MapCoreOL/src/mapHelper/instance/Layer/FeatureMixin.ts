@@ -76,6 +76,15 @@ class FeatureMixin {
   }
 
   /**
+   * 移除所有元素
+   */
+  clearFeature(){
+    for (const featureListKey in this.featureList) {
+      this.featureList[featureListKey].destroy();
+    }
+  }
+
+  /**
    * 获取图层的BBox(extent)，如果图层不包含元素，则返回undefined
    */
   getBBox() {
