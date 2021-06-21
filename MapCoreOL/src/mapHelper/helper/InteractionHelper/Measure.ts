@@ -145,11 +145,11 @@ export default class Measure extends MapFrame {
     });
 
     this.draw.on('drawend', evt => {
-      if (callBack)
-        callBack(measureResult, measureUnit, evt.feature);
       evt.feature.setStyle(getMeasureFeatureStyle(output, tooltipCoordinate, options.type === 'LineString'));
       if (listener)
         unByKey(listener);
+      if (callBack)
+        callBack(measureResult, measureUnit, evt.feature);
     });
 
     this.map.addInteraction(this.draw);

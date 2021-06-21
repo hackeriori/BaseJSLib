@@ -52,13 +52,13 @@ export default class DrawFeatureMixin {
         },
         properties: {id: id, name: '', clickable: true}
       });
-      if (featureInstance)
-        callBack(featureInstance);
       setTimeout(() => {
         const source = this.getVectorSource();
         if (source)
           source.removeFeature(evt.feature);
       });
+      if (featureInstance)
+        callBack(featureInstance);
     });
     this.map.addInteraction(this.nativeDraw);
     this.nativeSnap = new Snap({source: options.source});
