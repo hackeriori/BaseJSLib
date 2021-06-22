@@ -37,7 +37,7 @@ export default class MapHelper extends MapFrame {
       this.layer.createLayer('gdStreet', {
         source: this.layer.createTileSource({
           url: "http://webrd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8",
-          crossOrigin: 'anonymous',
+          crossOrigin: "Anonymous",
           maxZoom: 18
         })
       })
