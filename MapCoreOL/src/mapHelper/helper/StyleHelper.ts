@@ -9,8 +9,13 @@ import Icon, {Options as IconOptions} from "ol/style/Icon";
 import CircleStyle from "ol/style/Circle";
 import Map from "ol/Map";
 import MapHelper from "../index";
+import loadImg from '../../../../Utils/loadImg';
+import resizeImg from '../../../../Utils/resizeImg';
 
 export default class StyleHelper extends MapFrame{
+  readonly loadImg = loadImg;
+  readonly resizeImg = resizeImg;
+
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
   }
