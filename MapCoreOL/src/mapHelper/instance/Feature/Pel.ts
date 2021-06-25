@@ -27,6 +27,8 @@ export default class PelInstance extends BaseFeature {
   private position?: Coordinate = undefined;
   //图元自身的显隐属性（在开关图层时决定图元是否显隐）
   private visible = true;
+  //是否处于聚合状态
+  private _isCluster = false;
   //ol原生源
   readonly nativeSource: VectorSource;
   //样式缓存（用于隐藏时缓存样式）
@@ -69,6 +71,22 @@ export default class PelInstance extends BaseFeature {
       });
   }
 
+  get isCluster() {
+    return this._isCluster;
+  }
+  //在设置和获取聚合状态时，不用考虑图层，因为隐藏的图层无法触发。
+  set isCluster(value) {
+    const changed = this._isCluster !== value;
+    this._isCluster = value;
+    if (value && changed && !this.position) {
+      this.position = this.nativeOverlay.getPosition();
+      this.nativeOverlay.setPosition(undefined);
+    } else if (!value && changed && this.visible) {
+      this.nativeOverlay.setPosition(this.position);
+      this.position = undefined;
+    }
+  }
+
   /**
    * 移除元素（内置提示）
    */
@@ -87,8 +105,8 @@ export default class PelInstance extends BaseFeature {
    */
   show(layerFlag = false) {
     let changed = false;
-    //如果打开了图层，并且元素可见，那么显示
-    if (layerFlag && this.layerInstance.visibly && this.layerInstance.zoomVisibly && this.visible)
+    //如果打开了图层，并且元素可见，并且没有聚合，那么显示
+    if (layerFlag && this.layerInstance.visibly && this.layerInstance.zoomVisibly && this.visible && !this.isCluster)
       changed = true;
     //如果打开了元素
     else if (!layerFlag && !this.visible) {
@@ -97,8 +115,8 @@ export default class PelInstance extends BaseFeature {
         this.nativeFeature.setStyle(this.styleLike);
         this.styleLike = undefined;
       }
-      //图层可见的情况下显示
-      if (this.layerInstance.visibly && this.layerInstance.zoomVisibly)
+      //图层可见的情况下，并且没有聚合显示
+      if (this.layerInstance.visibly && this.layerInstance.zoomVisibly && !this.isCluster)
         changed = true;
     }
     if (changed) {

@@ -19,7 +19,9 @@ export default class App extends Vue {
 
   mapLoaded(mapHelper: MapHelper) {
     const layer = mapHelper.layer.createLayer('test', {
-      source: mapHelper.layer.createVectorSource({}),
+      source: mapHelper.layer.createVectorSource({
+        source:mapHelper.layer.createVectorSource({})
+      }),
     });
     if (layer) {
       const feature = layer.createFeature(
@@ -51,28 +53,6 @@ export default class App extends Vue {
             },
             fill: {color: 'rgba(255,255,255,0.01)'},
             radius: 5
-          }
-        }]);
-      }
-      const feature1 = layer.createFeature(
-        {
-          type: "Feature",
-          id: 'test1',
-          geometry: {
-            type: 'Polygon',
-            coordinates: [[[11849039.569133734, 3429868.8046412035], [11848920.136277039, 3429708.7646132316], [11849254.548275786, 3429694.432670428]]]
-          },
-          properties: {id: 'test1', name: 'test', clickable: true}
-        });
-      if (feature1) {
-        feature1.setNormalStyle([{
-          fill: {
-            color: 'red'
-          }
-        }]);
-        feature1.setHighLightStyle([{
-          fill: {
-            color: 'yellow'
           }
         }]);
       }

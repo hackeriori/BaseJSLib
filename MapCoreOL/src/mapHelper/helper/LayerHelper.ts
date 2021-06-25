@@ -9,10 +9,16 @@ import XYZ, {Options as XYZSourceOptions} from "ol/source/XYZ";
 import MapHelper from "../index";
 import Feature from "ol/Feature";
 import BaseEvent from "ol/events/Event";
-import {getDefaultHighLightClusterStyles, getDefaultNormalClusterStyles, getFeatureInstanceByFeature} from "../global";
+import {
+  getDefaultHighLightClusterStyles,
+  getDefaultNormalClusterStyles,
+  getFeatureInstanceByFeature,
+  getPelInstanceByFeature
+} from "../global";
 import {ClusterEventType, ClusterStyles} from "./types";
 import FeatureInstance from "../instance/Feature";
 import {StyleType} from "../instance/Feature/types";
+import PelInstance from '../instance/Feature/Pel';
 
 export default class LayerHelper extends MapFrame {
   readonly layerList: { [key: string]: LayerInstance } = {};
@@ -47,12 +53,19 @@ export default class LayerHelper extends MapFrame {
         const features = feature.get('features') as Feature[];
         const featureInstances = features.map(x => getFeatureInstanceByFeature(x, this.mapHelper))
           .filter(x => x) as FeatureInstance[];
-        const clustered = features.length > 1;
+        const pelInstances = features.map(x => getPelInstanceByFeature(x, this.mapHelper))
+          .filter(x => x) as PelInstance[];
         //设置样式
-        if (features.length === 1 && featureInstances.length === 1) {
+        if (features.length === 1) {
           //单个元素
-          feature.setStyle(featureInstances[0].nativeFeature.getStyle());
+          if (featureInstances.length === 1) {
+            feature.setStyle(featureInstances[0].nativeFeature.getStyle());
+          } else if (pelInstances.length === 1) {
+            feature.setStyle(pelInstances[0].nativeFeature.getStyle()); //此步非常坑爹，如果不设置，样式会采用默认样式
+            pelInstances[0].isCluster = false;
+          }
         } else {
+          pelInstances.forEach(x => x.isCluster = true);
           //聚合元素
           let normalStyles: StyleType[];
           let highLightStyles: StyleType[];
