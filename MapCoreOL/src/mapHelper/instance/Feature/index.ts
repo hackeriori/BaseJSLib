@@ -43,7 +43,6 @@ class FeatureInstance extends BaseFeature {
         const ring = geoJSONFeature.geometry.coordinates[i];
         if (ring[0].toString() !== ring[ring.length - 1].toString())
           ring.push([ring[0][0], ring[0][1]]);
-        ring[0][0] += 1;
       }
     }
     this.nativeFeature = geoJson.readFeature(geoJSONFeature);
