@@ -1,14 +1,17 @@
-import {Vue} from "vue/types/vue";
 import ToResult from "./ToResult";
 import GetInfoFunType from "./ToResult/types";
 
 export default class To {
-  private readonly vue;
+  private readonly messenger: any = undefined;
   private readonly getInfoFun;
 
-  constructor(vueInstance?: Vue, getInfoFunInstance?: GetInfoFunType) {
-    this.vue = vueInstance;
+  constructor(getInfoFunInstance?: GetInfoFunType) {
     this.getInfoFun = getInfoFunInstance;
+    if ((window as any).ElementPlus) {
+      this.messenger = (window as any).ElementPlus.ElMessage.error
+    } else if ((window as any).ELEMENT) {
+      this.messenger = (window as any).ELEMENT.Message.error;
+    }
   }
 
   async<T>(promise: Promise<T>, silence = false) {
@@ -39,13 +42,8 @@ export default class To {
   }
 
   showMessage(message: string) {
-    if (this.vue) {
-      if (this.vue.$message)
-        this.vue.$message(message);
-      else if (this.vue.$toast)
-        this.vue.$toast(message);
-      else
-        console.log(message);
+    if (this.messenger) {
+      this.messenger(message);
     }
   }
 }
