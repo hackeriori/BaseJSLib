@@ -15,6 +15,7 @@ import {Point, SimpleGeometry} from "ol/geom";
 import LayerInstance from "../Layer";
 import {flashGeom, flashPoint, getPreFlashPointParams} from "./command";
 import VectorLayer from "ol/layer/Vector";
+import TopologyMixin from "./TopologyMixin";
 
 class FeatureInstance extends BaseFeature {
   //ol原生源
@@ -148,10 +149,10 @@ class FeatureInstance extends BaseFeature {
   }
 }
 
-interface FeatureInstance extends StyleMixin, MeasureMixin {
+interface FeatureInstance extends StyleMixin, MeasureMixin, TopologyMixin {
 
 }
 
-applyMixins(FeatureInstance, [StyleMixin, MeasureMixin]);
+applyMixins(FeatureInstance, [StyleMixin, MeasureMixin, TopologyMixin]);
 
 export default FeatureInstance
