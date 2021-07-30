@@ -1,9 +1,9 @@
 import {MapFrame} from "../MapFrame";
 import Map from "ol/Map";
 import MapHelper from "../index";
-import { ViewerInfo } from "./types";
+import {ViewerInfo} from "./types";
 
-export default class ViewHelper extends MapFrame{
+export default class ViewHelper extends MapFrame {
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
   }
@@ -41,6 +41,22 @@ export default class ViewHelper extends MapFrame{
         view.setZoom(viewerInfo.zoom);
       else if (viewerInfo.resolution)
         view.setResolution(viewerInfo.resolution)
+    }
+  }
+
+  /**
+   * 截取当前屏幕
+   */
+  screenShot() {
+    let canvas = this.map.getTargetElement().querySelector<HTMLCanvasElement>('.ol-layer canvas');
+    if (canvas) {
+      let url;
+      try {
+        url = canvas.toDataURL();
+      } catch {
+        console.log('截图失败');
+      }
+      return url;
     }
   }
 
