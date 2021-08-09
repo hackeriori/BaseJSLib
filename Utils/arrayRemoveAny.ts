@@ -3,9 +3,12 @@
  * @param array 数组
  * @param fun 表达式
  */
-export function arrayRemoveAny<T>(array: T[], fun: (item: T) => boolean) {
+export function arrayRemoveAny<T>(array: T[], fun: (item: T) => boolean, firstOnly = false) {
   for (let i = array.length - 1; i >= 0; i--) {
-    if (fun(array[i]))
+    if (fun(array[i])) {
       array.splice(i, 1);
+      if (firstOnly)
+        break;
+    }
   }
 }
