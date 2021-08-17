@@ -44,5 +44,8 @@ export default abstract class BaseFeature extends MapFrame {
   abstract on(type: 'mouseLeave', callback: (evt: { type: string }) => void): void
   abstract on(type: string | string[], callback: (evt: { type: string }) => void): void
 
+  /**
+   * 闪烁动画
+   */
   abstract async flash(options?: Partial<FlashPointParamsType>): Promise<void>
 }

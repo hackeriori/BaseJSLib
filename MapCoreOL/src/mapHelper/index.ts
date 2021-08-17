@@ -57,6 +57,7 @@ export default class MapHelper extends MapFrame {
     const el = this.map.getTargetElement();
     el.ondragover = ev => ev.preventDefault();
     el.ondrop = ev => {
+      ev.preventDefault();
       if (this.offsetX === undefined)
         this.offsetX = getOffsetX(el);
       if (this.offsetY === undefined)

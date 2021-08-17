@@ -2,7 +2,7 @@ import Map from 'ol/Map';
 import Feature from "ol/Feature";
 import geoJson from "../../global";
 import VectorSource from "ol/source/Vector";
-import FeaturePropType, {FeatureGeoType, FlashPointParamsType} from "./types";
+import FeaturePropType, {FeatureGeoType} from "./types";
 import {Geometry as GeometryType} from "geojson";
 import {StyleLike} from "ol/style/Style";
 import BaseFeature from "./BaseFeature";
@@ -11,11 +11,11 @@ import StyleMixin from './StyleMixin';
 import applyMixins from "../../../../../Utils/applyMixins";
 import MeasureMixin from './MeasureMixin';
 import {FitOptions} from "ol/View";
-import {Point, SimpleGeometry} from "ol/geom";
+import {SimpleGeometry} from "ol/geom";
 import LayerInstance from "../Layer";
-import {flashGeom, flashPoint, getPreFlashPointParams} from "./command";
-import VectorLayer from "ol/layer/Vector";
 import TopologyMixin from "./TopologyMixin";
+import AnimationMixin from './AnimationMixin';
+import {hideStyle} from "./command";
 
 class FeatureInstance extends BaseFeature {
   //ol原生源
@@ -24,7 +24,7 @@ class FeatureInstance extends BaseFeature {
   readonly nativeFeature: Feature;
   //元素ID
   readonly id: string;
-  //元素列表
+  //图层实例
   readonly layerInstance: LayerInstance;
   //样式缓存（用于隐藏时缓存样式）
   protected styleLike?: StyleLike = undefined;
@@ -32,6 +32,10 @@ class FeatureInstance extends BaseFeature {
   normalStyle?: StyleLike = undefined;
   //高亮样式
   highLightStyle?: StyleLike = undefined;
+  //是否正在播放动画
+  protected isPlayAnimation = false;
+  //元素动画是否可见
+  protected animationVisible = true;
 
   constructor(map: Map, mapHelper: MapHelper, geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropType>, layerInstance: LayerInstance, source: VectorSource) {
     super(map, mapHelper);
@@ -56,6 +60,7 @@ class FeatureInstance extends BaseFeature {
    */
   destroy() {
     if (this.layerInstance.featureList[this.id]) {
+      this.stopAnimations();
       this.nativeSource.removeFeature(this.nativeFeature);
       delete this.layerInstance.featureList[this.id];
     } else
@@ -75,9 +80,13 @@ class FeatureInstance extends BaseFeature {
    * 隐藏元素（通过设置元素样式的方法隐藏）
    */
   hide() {
-    if (this.styleLike === undefined) {
-      this.styleLike = this.nativeFeature.getStyle();
-      this.nativeFeature.setStyle(() => []);
+    if (this.isPlayAnimation)
+      this.animationVisible = false;
+    else {
+      if (this.styleLike === undefined) {
+        this.styleLike = this.nativeFeature.getStyle();
+        this.nativeFeature.setStyle(hideStyle);
+      }
     }
   }
 
@@ -85,9 +94,15 @@ class FeatureInstance extends BaseFeature {
    * 显示元素（通过设置元素样式的方法显示）
    */
   show() {
-    if (this.styleLike !== undefined) {
-      this.nativeFeature.setStyle(this.styleLike);
-      this.styleLike = undefined;
+    if (this.isPlayAnimation) {
+      this.animationVisible = true;
+      this.map.render();
+    }
+    else {
+      if (this.styleLike !== undefined) {
+        this.nativeFeature.setStyle(this.styleLike);
+        this.styleLike = undefined;
+      }
     }
   }
 
@@ -123,36 +138,12 @@ class FeatureInstance extends BaseFeature {
       view.fit(geometry as SimpleGeometry, fitOptions);
     }
   }
-
-  async flash(options?: Partial<FlashPointParamsType>) {
-    if (this.styleLike || !this.layerInstance.visibly)
-      return;
-    const preOptions = getPreFlashPointParams();
-    const _options: FlashPointParamsType = {...preOptions, ...options};
-    const geometry = this.nativeFeature.getGeometry();
-    if (geometry) {
-      const type = geometry.getType();
-      switch (type) {
-        case 'Point':
-          await flashPoint(this.layerInstance.nativeLayer as VectorLayer, geometry as Point, this.map, _options);
-          break;
-        case 'Polygon':
-        case 'MultiPolygon':
-        case 'LineString':
-        case 'MultiLineString':
-          await flashGeom(this.layerInstance.nativeLayer as VectorLayer, this.nativeFeature, this.map, _options)
-          break;
-        default:
-          return;
-      }
-    }
-  }
 }
 
-interface FeatureInstance extends StyleMixin, MeasureMixin, TopologyMixin {
+interface FeatureInstance extends StyleMixin, MeasureMixin, TopologyMixin, AnimationMixin {
 
 }
 
-applyMixins(FeatureInstance, [StyleMixin, MeasureMixin, TopologyMixin]);
+applyMixins(FeatureInstance, [StyleMixin, MeasureMixin, TopologyMixin, AnimationMixin]);
 
 export default FeatureInstance

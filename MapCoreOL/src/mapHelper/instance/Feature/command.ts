@@ -202,3 +202,20 @@ export async function flashGeom(layer: VectorLayer, feature: Feature, map: Map, 
   });
 
 }
+
+export const hideStyle = new Style({
+  image: new Circle({
+    radius: 1,
+    stroke: new Stroke({
+      width: 1,
+      color: 'rgba(0,0,0,0)'
+    })
+  }),
+  stroke: new Stroke({
+    width: 1,
+    color: 'rgba(0,0,0,0)'
+  }),
+  fill: new Fill({
+    color: 'rgba(0,0,0,0)'
+  })
+});

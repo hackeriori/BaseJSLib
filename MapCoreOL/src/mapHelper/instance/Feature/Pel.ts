@@ -6,7 +6,7 @@ import {Coordinate} from "ol/coordinate";
 import MapHelper from "../../index";
 import {FitOptions} from "ol/View";
 import {Extent} from "ol/extent";
-import {flashPoint, getPreFlashPointParams} from "./command";
+import {flashPoint, getPreFlashPointParams, hideStyle} from "./command";
 import LayerInstance from "../Layer";
 import {Point} from "ol/geom";
 import VectorLayer from "ol/layer/Vector";
@@ -139,7 +139,7 @@ export default class PelInstance extends BaseFeature {
       this.visible = false;
       if (!this.styleLike) {
         this.styleLike = this.nativeFeature.getStyle();
-        this.nativeFeature.setStyle(() => []);
+        this.nativeFeature.setStyle(hideStyle);
       }
       changed = true;
     }
