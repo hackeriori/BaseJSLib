@@ -1,5 +1,5 @@
 import VectorLayer from "ol/layer/Vector";
-import Style from "ol/style/Style";
+import Style, {StyleLike} from "ol/style/Style";
 import Stroke from "ol/style/Stroke";
 import {Circle} from "ol/style";
 import RenderEvent from "ol/render/Event";
@@ -219,3 +219,45 @@ export const hideStyle = new Style({
     color: 'rgba(0,0,0,0)'
   })
 });
+
+export function getHideButClickableStyle(normalStyle?: StyleLike) {
+  let lineWidth = 1;
+
+  //使得隐藏的线和动画宽度一致
+  function getWidthFromStyle(item: Style) {
+    const stroke = item.getStroke();
+    if (stroke) {
+      const width = stroke.getWidth();
+      if (width && width > lineWidth)
+        lineWidth = width;
+    }
+  }
+
+  if (normalStyle) {
+    if (Array.isArray(normalStyle)) {
+      normalStyle.forEach(getWidthFromStyle);
+    } else if (typeof normalStyle !== 'function') {
+      getWidthFromStyle(normalStyle);
+    }
+  }
+
+  return new Style({
+    image: new Circle({
+      radius: 5,
+      stroke: new Stroke({
+        width: 1,
+        color: 'rgba(0,0,0,0.01)'
+      }),
+      fill: new Fill({
+        color: 'rgba(0,0,0,0.01)'
+      })
+    }),
+    stroke: new Stroke({
+      width: lineWidth,
+      color: 'rgba(0,0,0,0.01)'
+    }),
+    fill: new Fill({
+      color: 'rgba(0,0,0,0.01)'
+    })
+  });
+}

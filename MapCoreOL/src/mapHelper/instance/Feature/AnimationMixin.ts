@@ -1,5 +1,5 @@
 import {FlashPointParamsType} from "./types";
-import {flashGeom, flashPoint, getPreFlashPointParams, hideStyle} from "./command";
+import {flashGeom, flashPoint, getPreFlashPointParams, getHideButClickableStyle} from "./command";
 import VectorLayer from "ol/layer/Vector";
 import {Point} from "ol/geom";
 import Style, {StyleLike} from "ol/style/Style";
@@ -13,13 +13,13 @@ import {EventsKey} from "ol/events";
 import {unByKey} from "ol/Observable";
 
 export default abstract class AnimationMixin {
+  map!: Map;
   //图层实例
   readonly layerInstance!: LayerInstance;
   //样式缓存（用于隐藏时缓存样式）
   protected styleLike?: StyleLike;
   //ol原生元素对象
   readonly nativeFeature!: Feature;
-  public map!: Map;
   //是否正在播放动画
   protected isPlayAnimation!: Boolean;
   //线动画key
@@ -28,6 +28,8 @@ export default abstract class AnimationMixin {
   protected animationVisible!: boolean;
   //样式缓存（用于播放动画时缓存样式）
   private playStyleLike?: StyleLike = undefined;
+  //普通样式
+  normalStyle?: StyleLike = undefined;
 
   hide!: () => void;
   show!: () => void;
@@ -82,7 +84,7 @@ export default abstract class AnimationMixin {
 
     this.isPlayAnimation = true;
     this.playStyleLike = this.nativeFeature.getStyle();
-    this.nativeFeature.setStyle(hideStyle);
+    this.nativeFeature.setStyle(getHideButClickableStyle(this.normalStyle));
 
     const duration = Math.abs(durationTime);
     const direction = durationTime > 0;
@@ -143,5 +145,12 @@ export default abstract class AnimationMixin {
       this.nativeFeature.setStyle(this.playStyleLike);
     this.isPlayAnimation = false;
     this.show();
+  }
+
+  /**
+   * 获取播放动画状态，是否正在播放动画
+   */
+  getPlayState(){
+    return this.isPlayAnimation;
   }
 }

@@ -136,10 +136,12 @@ export default class CustomEvents extends MapFrame {
       //聚合元素
       if (features.length === 1) {
         const featureInstance = getFeatureInstanceByFeature(features[0], this.mapHelper);
-        if (normalStyle && featureInstance && featureInstance.normalStyle)
-          feature.setStyle(featureInstance.normalStyle);
-        else if (featureInstance && featureInstance.highLightStyle)
-          feature.setStyle(featureInstance.highLightStyle);
+        if(featureInstance && !featureInstance.getPlayState()) {
+          if (normalStyle && featureInstance.normalStyle)
+            feature.setStyle(featureInstance.normalStyle);
+          else if (featureInstance.highLightStyle)
+            feature.setStyle(featureInstance.highLightStyle);
+        }
       } else {
         if (normalStyle)
           feature.setStyle(feature.get('normalStyle'));
@@ -148,7 +150,7 @@ export default class CustomEvents extends MapFrame {
       }
     } else {
       const featureInstance = getFeatureInstanceByFeature(feature, this.mapHelper);
-      if (featureInstance) {
+      if (featureInstance && !featureInstance.getPlayState()) {
         if (normalStyle)
           featureInstance.setNormalStyle();
         else
