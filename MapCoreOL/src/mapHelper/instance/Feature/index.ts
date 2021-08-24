@@ -15,7 +15,6 @@ import {SimpleGeometry} from "ol/geom";
 import LayerInstance from "../Layer";
 import TopologyMixin from "./TopologyMixin";
 import AnimationMixin from './AnimationMixin';
-import {hideStyle} from "./command";
 
 class FeatureInstance extends BaseFeature {
   //ol原生源
@@ -85,7 +84,7 @@ class FeatureInstance extends BaseFeature {
     else {
       if (this.styleLike === undefined) {
         this.styleLike = this.nativeFeature.getStyle();
-        this.nativeFeature.setStyle(hideStyle);
+        this.nativeFeature.setStyle(()=>[]);
       }
     }
   }
