@@ -78,7 +78,7 @@ export default abstract class AnimationMixin {
     const geometry = this.nativeFeature.getGeometry()!;
     //不是线，退出
     if (geometry.getType() !== 'LineString') {
-      console.log('播放线流动动画的元素不是线类型')
+      console.log('播放线流动动画的元素不是线类型');
       return;
     }
 
