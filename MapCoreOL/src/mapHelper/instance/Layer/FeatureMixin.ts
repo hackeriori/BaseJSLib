@@ -3,9 +3,7 @@ import FeaturePropType, {FeaturePropCreateType, FeatureGeoType, PelOptionsType} 
 import SourceMixin from "./SourceMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
 import {MapFrame} from "../../MapFrame";
-import {Geometry as GeometryType, FeatureCollection} from "geojson";
-import geoJson from "../../global";
-import * as turf from '@turf/turf'
+import {Geometry as GeometryType} from "geojson";
 import PelInstance from "../Feature/Pel";
 
 class FeatureMixin {
@@ -78,7 +76,7 @@ class FeatureMixin {
   /**
    * 移除所有元素
    */
-  clearFeature(){
+  clearFeature() {
     for (const featureListKey in this.featureList) {
       this.featureList[featureListKey].destroy();
     }
@@ -88,15 +86,7 @@ class FeatureMixin {
    * 获取图层的BBox(extent)，如果图层不包含元素，则返回undefined
    */
   getBBox() {
-    const geoCollection: FeatureCollection = {
-      type: 'FeatureCollection',
-      features: []
-    };
-    for (let id in this.featureList) {
-      geoCollection.features.push(geoJson.writeFeatureObject(this.featureList[id].nativeFeature));
-    }
-    if (geoCollection.features.length > 0)
-      return turf.bbox(geoCollection);
+    return this.getVectorSource()!.getExtent();
   }
 }
 
