@@ -10,15 +10,17 @@ export default abstract class SourceMixin {
 
   /**
    * 获取几何源
+   * @param log 是否打印错误信息，默认是
    */
-  getVectorSource() {
+  getVectorSource(log = true) {
     if (this.nativeLayer instanceof VectorLayer) {
       const source = this.nativeLayer.getSource();
       if (source instanceof Cluster)
         return source.getSource();
       return source;
     } else {
-      console.log(`id为[${this.id}]的图层不是几何类型图层`);
+      if (log)
+        console.log(`id为[${this.id}]的图层不是几何类型图层`);
     }
   }
 }

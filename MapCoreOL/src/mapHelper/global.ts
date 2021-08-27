@@ -4,36 +4,32 @@ import FeatureInstance from "./instance/Feature";
 import MapHelper from "./index";
 import {StyleType} from "./instance/Feature/types";
 import PelInstance from "./instance/Feature/Pel";
+import {feature} from "@turf/turf";
 
 const geoJson = new GeoJSON();
 export default geoJson;
 
 export function getFeatureInstanceByFeature(feature: Feature, mapHelper: MapHelper) {
+  const featureInner = getBaseFeatureInstanceByFeature(feature,mapHelper);
+  if(featureInner && featureInner instanceof FeatureInstance)
+    return featureInner;
+}
+
+export function getBaseFeatureInstanceByFeature(feature: Feature, mapHelper: MapHelper) {
   const id: string | null = feature.get('id');
   const layerID: string | null = feature.get('layerID');
   if (id && layerID) {
     const layer = mapHelper.layer.getLayer(layerID);
     if (layer) {
-      const feature = layer.getFeature(id);
-      if (feature instanceof FeatureInstance) {
-        return feature;
-      }
+      return layer.getFeature(id);
     }
   }
 }
 
 export function getPelInstanceByFeature(feature: Feature, mapHelper: MapHelper) {
-  const id: string | null = feature.get('id');
-  const layerID: string | null = feature.get('layerID');
-  if (id && layerID) {
-    const layer = mapHelper.layer.getLayer(layerID);
-    if (layer) {
-      const feature = layer.getFeature(id);
-      if (feature instanceof PelInstance) {
-        return feature;
-      }
-    }
-  }
+  const featureInner = getBaseFeatureInstanceByFeature(feature,mapHelper);
+  if(featureInner && featureInner instanceof PelInstance)
+    return featureInner;
 }
 
 export function getDefaultNormalClusterStyles() {

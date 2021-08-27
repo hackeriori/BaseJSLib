@@ -14,6 +14,8 @@ import rgba from 'color-rgba';
 import {easeOut, inAndOut} from "ol/easing";
 import Feature from "ol/Feature";
 import Fill from "ol/style/Fill";
+import FeatureInstance from "./index";
+import BaseFeature from "./BaseFeature";
 
 export async function flashPoint(layer: VectorLayer, point: Feature<Point> | Point | Coordinate, map: Map, param: FlashPointParamsType) {
   let listenerKey: EventsKey | undefined;
@@ -260,4 +262,25 @@ export function getHideButClickableStyle(normalStyle?: StyleLike) {
       color: 'rgba(0,0,0,0.01)'
     })
   });
+}
+
+/**
+ * 获取目标元素的包络矩形中的其他元素（不包含自身）
+ * @param targetFeature
+ */
+export function getInExtentFeatures(targetFeature: BaseFeature) {
+  const extent = targetFeature.nativeFeature.getGeometry()!.getExtent();
+  const outFeatures = [];
+  for (const layerListKey in targetFeature.mapHelper.layer.layerList) {
+    const layer = targetFeature.mapHelper.layer.layerList[layerListKey];
+    const source = layer.getVectorSource(false);
+    if (source) {
+      const features = source.getFeaturesInExtent(extent);
+      for (let i = 0; i < features.length; i++) {
+        if (features[i].get('id') !== targetFeature.id)
+          outFeatures.push(features[i]);
+      }
+    }
+  }
+  return outFeatures;
 }

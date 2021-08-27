@@ -1,7 +1,9 @@
 import Feature from "ol/Feature";
 import {LineString, MultiLineString, MultiPoint, Point, Polygon} from "ol/geom";
-import geoJson from "../../global";
+import geoJson, {getBaseFeatureInstanceByFeature} from "../../global";
 import {booleanContains, booleanCrosses, feature} from "@turf/turf";
+import MapHelper from "../../index";
+import {getInExtentFeatures} from "./command";
 
 /**
  * 判断featureIn是否被featureOut所包含
@@ -53,9 +55,21 @@ function isCrossAB(featureOut: Feature, featureIn: Feature) {
   }
 }
 
+const message = '指定图形不是面类型，无法计算';
+
 export default abstract class TopologyMixin {
   //ol原生元素对象
   readonly nativeFeature!: Feature;
+  //元素ID
+  readonly id!: string;
+  mapHelper!: MapHelper
+
+  /**
+   * 获取包络矩形
+   */
+  getBBox() {
+    return this.nativeFeature.getGeometry()!.getExtent();
+  }
 
   /**
    * 判断是否包含目标元素
@@ -64,7 +78,7 @@ export default abstract class TopologyMixin {
     if (this.nativeFeature.getGeometry()!.getType() === 'Polygon')
       return isContainAB(this.nativeFeature, featureIn);
     else {
-      console.log('指定图形不是面类型，无法计算');
+      console.log(message);
       return false;
     }
   }
@@ -76,7 +90,7 @@ export default abstract class TopologyMixin {
     if (featureOut.getGeometry()!.getType() === 'Polygon')
       return isContainAB(featureOut, this.nativeFeature);
     else {
-      console.log('目标图形不是面类型，无法计算');
+      console.log(message);
       return false;
     }
   }
@@ -97,6 +111,25 @@ export default abstract class TopologyMixin {
     }
     console.log('无法计算是否相交');
     return false;
+  }
+
+  /**
+   * 获取在多边形中的元素
+   */
+  getContainFeatures() {
+    const geometry = this.nativeFeature.getGeometry();
+    if (geometry && geometry.getType() === 'Polygon') {
+      return getInExtentFeatures(this as any).filter(x => this.isContain(x)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper));
+    } else {
+      console.log(message)
+    }
+  }
+
+  /**
+   * 获取包含此元素的所有元素
+   */
+  getBeContainFeatures() {
+    return getInExtentFeatures(this as any).filter(x => this.isBeContain(x)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper));
   }
 }
 

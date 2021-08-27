@@ -4,12 +4,19 @@ import MapHelper from "../../index";
 import {Coordinate} from "ol/coordinate";
 import {FitOptions} from "ol/View";
 import {FlashPointParamsType} from "./types";
+import Feature from "ol/Feature";
+import TopologyMixin from "./TopologyMixin";
 
-export default abstract class BaseFeature extends MapFrame {
+abstract class BaseFeature extends MapFrame {
 
   protected constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
   }
+
+  //元素ID
+  abstract readonly id: string
+  //ol原生元素对象
+  abstract readonly nativeFeature: Feature;
 
   /**
    * 移除元素
@@ -49,3 +56,9 @@ export default abstract class BaseFeature extends MapFrame {
    */
   abstract async flash(options?: Partial<FlashPointParamsType>): Promise<void>
 }
+
+interface BaseFeature extends TopologyMixin {
+
+}
+
+export default BaseFeature

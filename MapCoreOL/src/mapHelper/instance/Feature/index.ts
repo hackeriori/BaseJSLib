@@ -84,7 +84,7 @@ class FeatureInstance extends BaseFeature {
     else {
       if (this.styleLike === undefined) {
         this.styleLike = this.nativeFeature.getStyle();
-        this.nativeFeature.setStyle(()=>[]);
+        this.nativeFeature.setStyle(() => []);
       }
     }
   }
@@ -96,8 +96,7 @@ class FeatureInstance extends BaseFeature {
     if (this.isPlayAnimation) {
       this.animationVisible = true;
       this.map.render();
-    }
-    else {
+    } else {
       if (this.styleLike !== undefined) {
         this.nativeFeature.setStyle(this.styleLike);
         this.styleLike = undefined;

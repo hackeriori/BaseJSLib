@@ -59,12 +59,12 @@ class LayerInstance extends MapFrame {
    */
   destroy() {
     if (this.layerList[this.id]) {
-      this.map.removeLayer(this.nativeLayer);
-      delete this.layerList[this.id];
       this.featureList = {};
+      delete this.layerList[this.id];
       for (let id in this.pelList) {
         this.pelList[id].destroy();
       }
+      this.map.removeLayer(this.nativeLayer);
     } else
       console.log(`id为[${this.id}]的图层不存在，移除失败`);
   }

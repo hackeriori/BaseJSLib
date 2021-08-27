@@ -13,8 +13,10 @@ import VectorLayer from "ol/layer/Vector";
 import Feature from "ol/Feature";
 import VectorSource from "ol/source/Vector";
 import {StyleLike} from "ol/style/Style";
+import TopologyMixin from "./TopologyMixin";
+import applyMixins from "../../../../../Utils/applyMixins";
 
-export default class PelInstance extends BaseFeature {
+class PelInstance extends BaseFeature {
   //原生对象
   readonly nativeOverlay: Overlay;
   //ol原生元素对象，此对象设置为始终不可见
@@ -244,4 +246,19 @@ export default class PelInstance extends BaseFeature {
       await flashPoint(this.layerInstance.nativeLayer as VectorLayer, coordinate as Coordinate, this.map, _options);
     }
   }
+
+  /**
+   * 获取包络矩形
+   */
+  getBBox(){
+    return this.nativeFeature.getGeometry()!.getExtent();
+  }
 }
+
+interface PelInstance extends TopologyMixin{
+
+}
+
+applyMixins(PelInstance,[TopologyMixin]);
+
+export default PelInstance
