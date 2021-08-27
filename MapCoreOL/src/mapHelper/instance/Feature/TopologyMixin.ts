@@ -4,6 +4,7 @@ import geoJson, {getBaseFeatureInstanceByFeature} from "../../global";
 import {booleanContains, booleanCrosses} from "@turf/turf";
 import MapHelper from "../../index";
 import {getInExtentFeatures} from "./command";
+import BaseFeature from "./BaseFeature";
 
 /**
  * 判断featureIn是否被featureOut所包含
@@ -119,9 +120,9 @@ export default abstract class TopologyMixin {
   getContainFeatures() {
     const geometry = this.nativeFeature.getGeometry();
     if (geometry && geometry.getType() === 'Polygon') {
-      return getInExtentFeatures(this as any).filter(x => this.isContain(x)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper));
+      return getInExtentFeatures(this as any).filter(x => this.isContain(x)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
     } else {
-      console.log(message)
+      console.log(message);
     }
   }
 
@@ -129,7 +130,7 @@ export default abstract class TopologyMixin {
    * 获取包含此元素的所有元素
    */
   getBeContainFeatures() {
-    return getInExtentFeatures(this as any).filter(x => this.isBeContain(x)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper));
+    return getInExtentFeatures(this as any).filter(x => this.isBeContain(x)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
   }
 }
 

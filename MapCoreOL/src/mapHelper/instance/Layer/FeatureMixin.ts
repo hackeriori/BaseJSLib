@@ -5,6 +5,7 @@ import applyMixins from "../../../../../Utils/applyMixins";
 import {MapFrame} from "../../MapFrame";
 import {Geometry as GeometryType} from "geojson";
 import PelInstance from "../Feature/Pel";
+import BaseFeature from "../Feature/BaseFeature";
 
 class FeatureMixin {
   //元素列表
@@ -51,7 +52,7 @@ class FeatureMixin {
    * 按元素ID获取元素实例
    * @param id 元素ID
    */
-  getFeature(id: string) {
+  getFeature(id: string): BaseFeature | undefined {
     const feature = this.featureList[id] as FeatureInstance | undefined;
     if (feature)
       return feature;

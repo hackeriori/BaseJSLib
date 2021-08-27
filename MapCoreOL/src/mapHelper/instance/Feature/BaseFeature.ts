@@ -6,6 +6,7 @@ import {FitOptions} from "ol/View";
 import {FlashPointParamsType} from "./types";
 import Feature from "ol/Feature";
 import TopologyMixin from "./TopologyMixin";
+import LayerInstance from "../Layer";
 
 abstract class BaseFeature extends MapFrame {
 
@@ -17,6 +18,8 @@ abstract class BaseFeature extends MapFrame {
   abstract readonly id: string
   //ol原生元素对象
   abstract readonly nativeFeature: Feature;
+  //所属图层示例
+  abstract readonly layerInstance: LayerInstance;
 
   /**
    * 移除元素
