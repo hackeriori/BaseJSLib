@@ -4,7 +4,6 @@ import FeatureInstance from "./instance/Feature";
 import MapHelper from "./index";
 import {StyleType} from "./instance/Feature/types";
 import PelInstance from "./instance/Feature/Pel";
-import {feature} from "@turf/turf";
 
 const geoJson = new GeoJSON();
 export default geoJson;

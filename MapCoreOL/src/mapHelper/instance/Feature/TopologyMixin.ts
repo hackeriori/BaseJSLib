@@ -1,7 +1,7 @@
 import Feature from "ol/Feature";
 import {LineString, MultiLineString, MultiPoint, Point, Polygon} from "ol/geom";
 import geoJson, {getBaseFeatureInstanceByFeature} from "../../global";
-import {booleanContains, booleanCrosses, feature} from "@turf/turf";
+import {booleanContains, booleanCrosses} from "@turf/turf";
 import MapHelper from "../../index";
 import {getInExtentFeatures} from "./command";
 
