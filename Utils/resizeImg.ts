@@ -27,8 +27,8 @@ export default function resizeImg(img: HTMLImageElement, width: number, height: 
         targetY = Math.round((height - targetHeight) / 2)
       }
     }
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
+    canvas.width = width;
+    canvas.height = height;
     // 图片绘制
     context.drawImage(img, targetX, targetY, targetWidth, targetHeight);
     return canvas.toDataURL();
