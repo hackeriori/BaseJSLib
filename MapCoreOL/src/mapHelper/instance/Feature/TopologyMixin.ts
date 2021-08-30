@@ -132,7 +132,6 @@ export default abstract class TopologyMixin {
    * 获取包含此元素的所有元素
    */
   getBeContainFeatures() {
-    debugger
     return getInExtentFeatures(this as any).filter(x => this.isBeContain(x, false)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
   }
 }
