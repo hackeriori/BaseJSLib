@@ -75,11 +75,12 @@ export default abstract class TopologyMixin {
   /**
    * 判断是否包含目标元素
    */
-  isContain(featureIn: Feature) {
+  isContain(featureIn: Feature, logError = true) {
     if (this.nativeFeature.getGeometry()!.getType() === 'Polygon')
       return isContainAB(this.nativeFeature, featureIn);
     else {
-      console.log(message);
+      if (logError)
+        console.log(message);
       return false;
     }
   }
@@ -87,20 +88,20 @@ export default abstract class TopologyMixin {
   /**
    * 判断是否被目标元素包含
    */
-  isBeContain(featureOut: Feature) {
+  isBeContain(featureOut: Feature, logError = true) {
     if (featureOut.getGeometry()!.getType() === 'Polygon')
       return isContainAB(featureOut, this.nativeFeature);
     else {
-      console.log(message);
+      if (logError)
+        console.log(message);
       return false;
     }
   }
 
   /**
    * 判断是否与目标元素相交
-   * @param targetFeature
    */
-  isCross(targetFeature: Feature) {
+  isCross(targetFeature: Feature, logError = true) {
     const type = this.nativeFeature.getGeometry()!.getType();
     const typeTarget = targetFeature.getGeometry()!.getType();
     if (type === 'Polygon' || type === 'LineString') {
@@ -110,7 +111,8 @@ export default abstract class TopologyMixin {
         return isCrossAB(targetFeature, this.nativeFeature);
       }
     }
-    console.log('无法计算是否相交');
+    if (logError)
+      console.log('无法计算是否相交');
     return false;
   }
 
@@ -120,7 +122,7 @@ export default abstract class TopologyMixin {
   getContainFeatures() {
     const geometry = this.nativeFeature.getGeometry();
     if (geometry && geometry.getType() === 'Polygon') {
-      return getInExtentFeatures(this as any).filter(x => this.isContain(x)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
+      return getInExtentFeatures(this as any).filter(x => this.isContain(x, false)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
     } else {
       console.log(message);
     }
@@ -130,7 +132,8 @@ export default abstract class TopologyMixin {
    * 获取包含此元素的所有元素
    */
   getBeContainFeatures() {
-    return getInExtentFeatures(this as any).filter(x => this.isBeContain(x)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
+    debugger
+    return getInExtentFeatures(this as any).filter(x => this.isBeContain(x, false)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
   }
 }
 
