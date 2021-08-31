@@ -69,13 +69,14 @@ class PelInstance extends BaseFeature {
     if (options.options.element)
       options.options.element.addEventListener('pointermove', ev => {
         this.mapHelper.interaction.customEvents.notifyLevel();
-        ev.preventDefault();
+        ev.stopPropagation();
       });
   }
 
   get isCluster() {
     return this._isCluster;
   }
+
   //在设置和获取聚合状态时，不用考虑图层，因为隐藏的图层无法触发。
   set isCluster(value) {
     const changed = this._isCluster !== value;
@@ -141,7 +142,7 @@ class PelInstance extends BaseFeature {
       this.visible = false;
       if (!this.styleLike) {
         this.styleLike = this.nativeFeature.getStyle();
-        this.nativeFeature.setStyle(()=>[]);
+        this.nativeFeature.setStyle(() => []);
       }
       changed = true;
     }
@@ -188,13 +189,9 @@ class PelInstance extends BaseFeature {
           return;
       }
       element.addEventListener(event, ev => {
-        if (type === 'singleClick') {
-          if ((ev as PointerEvent).button === 0)
-            callback({type: (type)});
-          else
-            return;
-        } else
-          callback({type: type});
+        if (type === 'singleClick' && (ev as PointerEvent).button !== 0)
+          return;
+        callback({type: type});
         ev.preventDefault();
         ev.stopPropagation();
         ev.returnValue = false;
@@ -250,15 +247,15 @@ class PelInstance extends BaseFeature {
   /**
    * 获取包络矩形
    */
-  getBBox(){
+  getBBox() {
     return this.nativeFeature.getGeometry()!.getExtent();
   }
 }
 
-interface PelInstance extends TopologyMixin{
+interface PelInstance extends TopologyMixin {
 
 }
 
-applyMixins(PelInstance,[TopologyMixin]);
+applyMixins(PelInstance, [TopologyMixin]);
 
 export default PelInstance

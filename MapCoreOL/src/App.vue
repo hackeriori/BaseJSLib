@@ -75,20 +75,24 @@ export default class App extends Vue {
         });
         window.pel = pel;
       }
-      const featureTest2 = layer.createFeature(
-        {
-          type: "Feature",
-          id: 'test2',
-          geometry: {type: 'Polygon', coordinates: [[[11849204.386475971, 3430265.321725432],[11849102.271383498, 3430086.1724403882],[11849305.307239879, 3430067.6603476005]]]},
-          properties: {id: 'test2', name: 'test1', clickable: true}
-        });
       const featureArea = layer.createFeature(
         {
           type: "Feature",
           id: 'test1',
-          geometry: {type: 'Polygon', coordinates: [[[11849211.658841887, 3430205.789059935],[11849146.568775414, 3430115.0430548517],[11849273.42313854, 3430107.4412952634]]]},
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[11849211.658841887, 3430205.789059935], [11849146.568775414, 3430115.0430548517], [11849273.42313854, 3430107.4412952634]]]
+          },
           properties: {id: 'test1', name: 'test1', clickable: true}
         });
+      if (featureArea) {
+        featureArea.setNormalStyle([{
+          fill: {color: 'rgba(255,0,0,0.3)',}
+        }]);
+        featureArea.setHighLightStyle([{
+          fill: {color: 'rgba(255,0,0,0.5)',}
+        }]);
+      }
     }
     mapHelper.interaction.customEvents.start(x => console.log(x));
     window.mapHelper = mapHelper;
