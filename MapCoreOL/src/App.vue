@@ -10,6 +10,7 @@
 import {Component, Ref, Vue} from 'vue-property-decorator';
 import MapView from "./components/MapView.vue";
 import MapHelper from "./mapHelper";
+import VectorLayer from "ol/layer/Vector";
 
 @Component({
   components: {MapView}
@@ -74,24 +75,6 @@ export default class App extends Vue {
           console.log('我被右键点了');
         });
         window.pel = pel;
-      }
-      const featureArea = layer.createFeature(
-        {
-          type: "Feature",
-          id: 'test1',
-          geometry: {
-            type: 'Polygon',
-            coordinates: [[[11849211.658841887, 3430205.789059935], [11849146.568775414, 3430115.0430548517], [11849273.42313854, 3430107.4412952634]]]
-          },
-          properties: {id: 'test1', name: 'test1', clickable: true}
-        });
-      if (featureArea) {
-        featureArea.setNormalStyle([{
-          fill: {color: 'rgba(255,0,0,0.3)',}
-        }]);
-        featureArea.setHighLightStyle([{
-          fill: {color: 'rgba(255,0,0,0.5)',}
-        }]);
       }
     }
     mapHelper.interaction.customEvents.start(x => console.log(x));

@@ -11,8 +11,8 @@ import MapHelper from "../../index";
 import GeometryType from "ol/geom/GeometryType";
 
 export default class DrawFeatureMixin {
-  nativeDraw?: Draw;
-  nativeSnap?: Snap;
+  private nativeDraw?: Draw;
+  private nativeSnap?: Snap;
   map!: Map;
   mapHelper!: MapHelper;
   createFeature!: FeatureMixin['createFeature'];
@@ -61,6 +61,7 @@ export default class DrawFeatureMixin {
         callBack(featureInstance);
     });
     this.map.addInteraction(this.nativeDraw);
+    //todo:nativeSnap好像没捕捉呢？
     this.nativeSnap = new Snap({source: options.source});
     this.map.addInteraction(this.nativeSnap);
     this.mapHelper.interaction.drawLayer = this as any;
