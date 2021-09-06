@@ -35,6 +35,12 @@ class FeatureInstance extends BaseFeature {
   protected isPlayAnimation = false;
   //元素动画是否可见
   protected animationVisible = true;
+  //注册的事件
+  singleClickEvents:((evt: { type: string }) => void)[] = [];
+  doubleClickEvents:((evt: { type: string }) => void)[] = [];
+  rightClickEvents:((evt: { type: string }) => void)[] = [];
+  mouseEnterEvents:((evt: { type: string }) => void)[] = [];
+  mouseLeaveEvents:((evt: { type: string }) => void)[] = [];
 
   constructor(map: Map, mapHelper: MapHelper, geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropType>, layerInstance: LayerInstance, source: VectorSource) {
     super(map, mapHelper);
@@ -110,6 +116,12 @@ class FeatureInstance extends BaseFeature {
   on(type: 'mouseEnter', callback: (evt: { type: string }) => void): void
   on(type: 'mouseLeave', callback: (evt: { type: string }) => void): void
   on(type: string | string[], callback: (evt: { type: string }) => void): void {
+    if (Array.isArray(type)) {
+      type.forEach(x => {
+        (this as any)[x + 'Events'].push(callback);
+      })
+    } else
+      (this as any)[type + 'Events'].push(callback);
     this.nativeFeature.on(type, callback);
   }
 

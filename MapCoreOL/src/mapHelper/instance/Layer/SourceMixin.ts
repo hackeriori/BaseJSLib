@@ -3,7 +3,6 @@ import VectorLayer from "ol/layer/Vector";
 import Cluster from "ol/source/Cluster";
 import FeatureInstance from "../Feature";
 import MapHelper from "../../index";
-import VectorSource from "ol/source/Vector";
 import {ClusterStyles} from "../../helper/types";
 
 export default abstract class SourceMixin {
@@ -28,6 +27,17 @@ export default abstract class SourceMixin {
       if (log)
         console.log(`id为[${this.id}]的图层不是几何类型图层`);
     }
+  }
+
+  /**
+   * 返回图层是否为聚合图层
+   */
+  isCluster() {
+    if (this.nativeLayer instanceof VectorLayer) {
+      const source = this.nativeLayer.getSource();
+      return source instanceof Cluster;
+    } else
+      return false;
   }
 
   /**

@@ -93,28 +93,48 @@ export default class LayerHelper extends MapFrame {
         //设置事件
         feature.set('clickable', true);
         feature.on('singleClick', () => {
-          const baseEvent = new BaseEvent('singleClick') as ClusterEventType;
-          baseEvent.featureInstances = featureInstances;
-          baseEvent.target = feature;
-          cluster.dispatchEvent(baseEvent);
+          if (features.length === 1 && featureInstances.length === 1)
+            featureInstances[0].singleClickEvents.forEach(x => x({type: 'singleClick'}));
+          else {
+            const baseEvent = new BaseEvent('singleClick') as ClusterEventType;
+            baseEvent.featureInstances = featureInstances;
+            baseEvent.pelInstances = pelInstances;
+            baseEvent.target = feature;
+            cluster.dispatchEvent(baseEvent);
+          }
         });
         feature.on('rightClick', () => {
-          const baseEvent = new BaseEvent('rightClick') as ClusterEventType;
-          baseEvent.featureInstances = featureInstances;
-          baseEvent.target = feature;
-          cluster.dispatchEvent(baseEvent);
+          if (features.length === 1 && featureInstances.length === 1)
+            featureInstances[0].rightClickEvents.forEach(x => x({type: 'rightClick'}));
+          else {
+            const baseEvent = new BaseEvent('rightClick') as ClusterEventType;
+            baseEvent.featureInstances = featureInstances;
+            baseEvent.pelInstances = pelInstances;
+            baseEvent.target = feature;
+            cluster.dispatchEvent(baseEvent);
+          }
         });
         feature.on('mouseEnter', () => {
-          const baseEvent = new BaseEvent('mouseEnter') as ClusterEventType;
-          baseEvent.featureInstances = featureInstances;
-          baseEvent.target = feature;
-          cluster.dispatchEvent(baseEvent);
+          if (features.length === 1 && featureInstances.length === 1)
+            featureInstances[0].mouseEnterEvents.forEach(x => x({type: 'mouseEnter'}));
+          else {
+            const baseEvent = new BaseEvent('mouseEnter') as ClusterEventType;
+            baseEvent.featureInstances = featureInstances;
+            baseEvent.pelInstances = pelInstances;
+            baseEvent.target = feature;
+            cluster.dispatchEvent(baseEvent);
+          }
         });
         feature.on('mouseLeave', () => {
-          const baseEvent = new BaseEvent('mouseLeave') as ClusterEventType;
-          baseEvent.featureInstances = featureInstances;
-          baseEvent.target = feature;
-          cluster.dispatchEvent(baseEvent);
+          if (features.length === 1 && featureInstances.length === 1)
+            featureInstances[0].mouseLeaveEvents.forEach(x => x({type: 'mouseLeave'}));
+          else {
+            const baseEvent = new BaseEvent('mouseLeave') as ClusterEventType;
+            baseEvent.featureInstances = featureInstances;
+            baseEvent.pelInstances = pelInstances;
+            baseEvent.target = feature;
+            cluster.dispatchEvent(baseEvent);
+          }
         });
       })
       return cluster;
