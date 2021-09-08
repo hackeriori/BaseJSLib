@@ -12,12 +12,21 @@ export interface ClusterEventType extends BaseEvent {
 }
 
 export interface ClusterStyles {
-  normalStyles: StyleType[],
-  highLightStyles: StyleType[],
+  normalStyles: ClusterStyle[],
+  highLightStyles: ClusterStyle[],
 }
 
 export interface ViewerInfo {
   center: Coordinate;
   zoom: number;
   resolution: number;
+}
+
+export interface ClusterStyle extends StyleType {
+  //是否自动增长
+  autoIncrease: true,
+  //自动增长的契机
+  increaseNumber: 10,
+  //增长值
+  increaseBy: 1
 }

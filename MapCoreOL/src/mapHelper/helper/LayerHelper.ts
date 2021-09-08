@@ -15,10 +15,10 @@ import {
   getFeatureInstanceByFeature,
   getPelInstanceByFeature
 } from "../global";
-import {ClusterEventType, ClusterStyles} from "./types";
+import {ClusterEventType, ClusterStyle, ClusterStyles} from "./types";
 import FeatureInstance from "../instance/Feature";
-import {StyleType} from "../instance/Feature/types";
 import PelInstance from '../instance/Feature/Pel';
+import CircleStyle from "ol/style/Circle";
 
 export default class LayerHelper extends MapFrame {
   readonly layerList: { [key: string]: LayerInstance } = {};
@@ -46,6 +46,17 @@ export default class LayerHelper extends MapFrame {
    * @param clusterStyles 聚合图元样式
    */
   createVectorSource(options: VectorSourceOptions | ClusterSourceOptions, clusterStyles?: ClusterStyles) {
+    const dealStyle = (x: ClusterStyle, length: number) => {
+      const style = this.mapHelper.style.createStyle(x);
+      if (x.text)
+        style.getText().setText(x.text.text?.replace('${num}', length.toString()));
+      if (clusterStyles && x.autoIncrease && x.image && 'radius' in x.image) {
+        const circle = style.getImage() as CircleStyle;
+        circle.setRadius(circle.getRadius() + Math.floor(length / x.increaseNumber) * x.increaseBy);
+      }
+      return style;
+    }
+
     if ('source' in options) {
       const cluster = new Cluster(options);
       cluster.on('addfeature', evt => {
@@ -67,8 +78,8 @@ export default class LayerHelper extends MapFrame {
         } else {
           pelInstances.forEach(x => x.isCluster = true);
           //聚合元素
-          let normalStyles: StyleType[];
-          let highLightStyles: StyleType[];
+          let normalStyles: ClusterStyle[];
+          let highLightStyles: ClusterStyle[];
           if (clusterStyles) {
             normalStyles = clusterStyles.normalStyles;
             highLightStyles = clusterStyles.highLightStyles;
@@ -76,16 +87,8 @@ export default class LayerHelper extends MapFrame {
             normalStyles = getDefaultNormalClusterStyles();
             highLightStyles = getDefaultHighLightClusterStyles();
           }
-          const normalStyle = normalStyles.map(x => {
-            if (x.text)
-              x.text.text = features.length.toString();
-            return this.mapHelper.style.createStyle(x);
-          });
-          const highLightStyle = highLightStyles.map(x => {
-            if (x.text)
-              x.text.text = features.length.toString();
-            return this.mapHelper.style.createStyle(x);
-          });
+          const normalStyle = normalStyles.map(x => dealStyle(x, features.length));
+          const highLightStyle = highLightStyles.map(x => dealStyle(x, features.length));
           feature.set('normalStyle', normalStyle);
           feature.set('highLightStyle', highLightStyle);
           feature.setStyle(normalStyle);

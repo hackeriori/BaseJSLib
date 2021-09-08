@@ -4,13 +4,14 @@ import FeatureInstance from "./instance/Feature";
 import MapHelper from "./index";
 import {StyleType} from "./instance/Feature/types";
 import PelInstance from "./instance/Feature/Pel";
+import {ClusterStyle} from "./helper/types";
 
 const geoJson = new GeoJSON();
 export default geoJson;
 
 export function getFeatureInstanceByFeature(feature: Feature, mapHelper: MapHelper) {
-  const featureInner = getBaseFeatureInstanceByFeature(feature,mapHelper);
-  if(featureInner && featureInner instanceof FeatureInstance)
+  const featureInner = getBaseFeatureInstanceByFeature(feature, mapHelper);
+  if (featureInner && featureInner instanceof FeatureInstance)
     return featureInner;
 }
 
@@ -26,8 +27,8 @@ export function getBaseFeatureInstanceByFeature(feature: Feature, mapHelper: Map
 }
 
 export function getPelInstanceByFeature(feature: Feature, mapHelper: MapHelper) {
-  const featureInner = getBaseFeatureInstanceByFeature(feature,mapHelper);
-  if(featureInner && featureInner instanceof PelInstance)
+  const featureInner = getBaseFeatureInstanceByFeature(feature, mapHelper);
+  if (featureInner && featureInner instanceof PelInstance)
     return featureInner;
 }
 
@@ -45,9 +46,16 @@ export function getDefaultNormalClusterStyles() {
       font: '14px sans-serif',
       fill: {
         color: '#3399CC'
-      }
-    }
-  }] as StyleType[]
+      },
+      text: '${num}',
+    },
+    //是否自动增长
+    autoIncrease: true,
+    //自动增长的契机
+    increaseNumber: 10,
+    //增长值
+    increaseBy: 1
+  }] as ClusterStyle[]
 }
 
 export function getDefaultHighLightClusterStyles() {
@@ -64,9 +72,16 @@ export function getDefaultHighLightClusterStyles() {
       font: '14px sans-serif',
       fill: {
         color: '#3399CC'
-      }
-    }
-  }] as StyleType[]
+      },
+      text: '${num}',
+    },
+    //是否自动增长
+    autoIncrease: true,
+    //自动增长的契机
+    increaseNumber: 10,
+    //增长值
+    increaseBy: 1
+  }] as ClusterStyle[]
 }
 
 export function zoomLevelChanged(mapHelper: MapHelper) {

@@ -43,14 +43,15 @@ export default abstract class SourceMixin {
   /**
    * 设置聚合
    * @param cluster 是否聚合
+   * @param clusterStyles 聚合样式
    */
   setCluster(cluster: boolean, clusterStyles?: ClusterStyles) {
     if (this.nativeLayer instanceof VectorLayer) {
       const layer = this.nativeLayer
-      const source = layer.getSource();
+      let source = layer.getSource();
       const isCluster = source instanceof Cluster
       if (cluster && isCluster)
-        return;
+        source = this.getVectorSource()!
       if (!cluster && !isCluster)
         return;
       if (cluster) {
