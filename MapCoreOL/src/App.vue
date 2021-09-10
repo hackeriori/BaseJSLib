@@ -10,7 +10,6 @@
 import {Component, Ref, Vue} from 'vue-property-decorator';
 import MapView from "./components/MapView.vue";
 import MapHelper from "./mapHelper";
-import VectorLayer from "ol/layer/Vector";
 
 @Component({
   components: {MapView}
@@ -32,7 +31,7 @@ export default class App extends Vue {
         });
       if (feature) {
         feature.on('singleClick', () => {
-          alert('我被点了' + feature.getProperties().name)
+          console.log('我被点了' + feature.getProperties().name)
         });
         feature.setNormalStyle([{
           image: {
@@ -41,7 +40,10 @@ export default class App extends Vue {
               width: 1,
             },
             fill: {color: 'rgba(255,255,255,0.01)'},
-            radius: 5
+            radius: 5,
+          },
+          text:{
+            text:'你好'
           }
         }]);
         feature.setHighLightStyle([{
@@ -52,9 +54,32 @@ export default class App extends Vue {
             },
             fill: {color: 'rgba(255,255,255,0.01)'},
             radius: 5
+          },
+          text:{
+            text:'你好'
           }
         }]);
       }
+      layer.createFeature(
+        {
+          type: "Feature",
+          id: 'test1',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[11849049.123762269, 3429890.3025554083], [11848762.484906198, 3429613.218327875], [11849383.535761015, 3429496.174128313]]]
+          },
+          properties: {id: 'test1', name: 'test1', clickable: true}
+        });
+      layer.createFeature(
+        {
+          type: "Feature",
+          id: 'test2',
+          geometry: {
+            type: 'LineString',
+            coordinates: [[11849481.470703507, 3429761.3150701774], [11850011.752587235, 3429758.9264130434]]
+          },
+          properties: {id: 'test2', name: 'test2', clickable: true}
+        });
       const dom = document.createElement('div');
       dom.style.height = '32px';
       dom.style.width = '32px';
@@ -66,10 +91,10 @@ export default class App extends Vue {
           position: [11849211.99781884, 3430166.63782584],
           stopEvent: false
         }
-      })
+      });
       if (pel) {
         pel.on('singleClick', () => {
-          alert('我被点了' + pel.id);
+          console.log('我被点了' + pel.id);
         });
         pel.on('rightClick', () => {
           console.log('我被右键点了');
@@ -78,6 +103,9 @@ export default class App extends Vue {
       }
     }
     mapHelper.interaction.customEvents.start(x => console.log(x));
+    // mapHelper.interaction.rotateAndZoom.start(['rotate'] , x => console.log(x.id));
+    // mapHelper.interaction.move.start();
+    mapHelper.interaction.modify.start();
     window.mapHelper = mapHelper;
   }
 }

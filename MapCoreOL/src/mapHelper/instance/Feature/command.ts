@@ -14,7 +14,6 @@ import rgba from 'color-rgba';
 import {easeOut, inAndOut} from "ol/easing";
 import Feature from "ol/Feature";
 import Fill from "ol/style/Fill";
-import FeatureInstance from "./index";
 import BaseFeature from "./BaseFeature";
 
 export async function flashPoint(layer: VectorLayer, point: Feature<Point> | Point | Coordinate, map: Map, param: FlashPointParamsType) {

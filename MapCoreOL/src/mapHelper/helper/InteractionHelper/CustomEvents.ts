@@ -29,7 +29,8 @@ export default class CustomEvents extends MapFrame {
       const features = this.map.getFeaturesAtPixel(evt.pixel).filter(x => x.get('clickable'));
       if (features.length > 0) {
         const firstFeature = features[0] as Feature;
-        firstFeature.dispatchEvent('singleClick');
+        if (!this.mapHelper.interaction.interactionType)
+          firstFeature.dispatchEvent('singleClick');
         return;
       }
       if (callback) {
@@ -40,7 +41,8 @@ export default class CustomEvents extends MapFrame {
       const features = this.map.getFeaturesAtPixel(evt.pixel);
       if (features.length > 0) {
         const firstFeature = features[0] as Feature;
-        firstFeature.dispatchEvent('doubleClick');
+        if (!this.mapHelper.interaction.interactionType)
+          firstFeature.dispatchEvent('doubleClick');
       }
     });
     this.obRightClick = evt => {
@@ -52,7 +54,8 @@ export default class CustomEvents extends MapFrame {
           evt.preventDefault();
           const event = new BaseEvent('rightClick');
           event.target = this.map.getCoordinateFromPixel(pixel);
-          firstFeature.dispatchEvent(event);
+          if (!this.mapHelper.interaction.interactionType)
+            firstFeature.dispatchEvent(event);
           return;
         }
       }
@@ -70,21 +73,29 @@ export default class CustomEvents extends MapFrame {
           if (getUid(this.highLightFeature) !== getUid(firstFeature)) {
             const leaveFeature = this.highLightFeature;
             this.highLightFeature = firstFeature;
-            firstFeature.dispatchEvent('mouseEnter');
+            if (!this.mapHelper.interaction.interactionType)
+              firstFeature.dispatchEvent('mouseEnter');
+            this.mapHelper.interaction.addToCollection(firstFeature);
             this.setStyle(firstFeature, false);
-            leaveFeature.dispatchEvent('mouseLeave');
+            if (!this.mapHelper.interaction.interactionType)
+              leaveFeature.dispatchEvent('mouseLeave');
+            this.mapHelper.interaction.moveCollectionFeature(leaveFeature);
             this.setStyle(leaveFeature);
           }
         } else {
           this.highLightFeature = firstFeature;
-          firstFeature.dispatchEvent('mouseEnter');
+          if (!this.mapHelper.interaction.interactionType)
+            firstFeature.dispatchEvent('mouseEnter');
+          this.mapHelper.interaction.addToCollection(firstFeature);
           this.setStyle(firstFeature, false);
         }
       } else {
         if (this.highLightFeature) {
           const eventFeature = this.highLightFeature;
           this.highLightFeature = undefined;
-          eventFeature.dispatchEvent('mouseLeave');
+          if (!this.mapHelper.interaction.interactionType)
+            eventFeature.dispatchEvent('mouseLeave');
+          this.mapHelper.interaction.moveCollectionFeature(eventFeature);
           this.setStyle(eventFeature);
         }
       }
@@ -136,7 +147,7 @@ export default class CustomEvents extends MapFrame {
       //聚合元素
       if (features.length === 1) {
         const featureInstance = getFeatureInstanceByFeature(features[0], this.mapHelper);
-        if(featureInstance && !featureInstance.getPlayState()) {
+        if (featureInstance && !featureInstance.getPlayState()) {
           if (normalStyle && featureInstance.normalStyle)
             feature.setStyle(featureInstance.normalStyle);
           else if (featureInstance.highLightStyle)

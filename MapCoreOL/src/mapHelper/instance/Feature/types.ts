@@ -73,3 +73,5 @@ export interface FlashPointParamsType {
   //过渡色，默认白色
   transitionColor: string,
 }
+
+export type InteractionType = 'move' | 'rotate' | 'zoom' | 'modify'

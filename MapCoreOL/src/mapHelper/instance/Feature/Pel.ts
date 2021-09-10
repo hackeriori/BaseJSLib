@@ -1,7 +1,7 @@
 import BaseFeature from "./BaseFeature";
 import Map from "ol/Map";
 import Overlay from 'ol/Overlay';
-import {FlashPointParamsType, PelOptionsType} from "./types";
+import {FlashPointParamsType, InteractionType, PelOptionsType} from "./types";
 import {Coordinate} from "ol/coordinate";
 import MapHelper from "../../index";
 import {FitOptions} from "ol/View";
@@ -65,12 +65,44 @@ class PelInstance extends BaseFeature {
     this.layerInstance.pelList[this.id] = this;
     this.nativeSource.addFeature(this.nativeFeature);
     this.map.addOverlay(this.nativeOverlay);
-    //添加高亮移除事件
-    if (options.options.element)
+    if (options.options.element) {      //添加高亮移除事件
       options.options.element.addEventListener('pointermove', ev => {
         this.mapHelper.interaction.customEvents.notifyLevel();
         ev.stopPropagation();
       });
+      //添加交互事件
+      options.options.element.addEventListener('pointerdown', ev => {
+        if (this.mapHelper.interaction.interactionType === "move") {
+          if (ev.button !== 0)
+            return
+          const pixel = this.mapHelper.map.getPixelFromCoordinate(
+            this.nativeOverlay.getPosition()!
+          );
+          const featureOffsetX = ev.clientX - pixel[0];
+          const featureOffsetY = ev.clientY - pixel[1];
+          const handler = (event: MouseEvent) => {
+            const coordinate = this.mapHelper.map.getCoordinateFromPixel([
+              event.clientX - featureOffsetX,
+              event.clientY - featureOffsetY,
+            ]);
+            this.setPosition(coordinate)
+          };
+          // 鼠标移动的时候不停的修改div的left和top值
+          document.addEventListener('mousemove', handler);
+          document.addEventListener('mouseup', () => {
+            document.removeEventListener('mousemove', handler);
+            if (this.mapHelper.interaction.move.callback) {
+              this.mapHelper.interaction.move.callback(this);
+            }
+          }, {once: true});
+
+          ev.stopPropagation();
+        }
+      })
+      options.options.element.addEventListener('mouseenter',ev => {
+
+      });
+    }
   }
 
   get isCluster() {
@@ -191,7 +223,8 @@ class PelInstance extends BaseFeature {
       element.addEventListener(event, ev => {
         if (type === 'singleClick' && (ev as PointerEvent).button !== 0)
           return;
-        callback({type: type});
+        if (!this.mapHelper.interaction.interactionType)
+          callback({type: type});
         ev.preventDefault();
         ev.stopPropagation();
         ev.returnValue = false;
@@ -227,6 +260,14 @@ class PelInstance extends BaseFeature {
     if (options)
       fitOptions = {...fitOptions, ...options};
     view.fit(extent, fitOptions);
+  }
+
+  setPosition(coordinate: Coordinate, projection ?: string) {
+    let coordinateInner = coordinate;
+    if (projection)
+      coordinateInner = this.mapHelper.projection.transCoordinate(coordinate, projection);
+    (this.nativeFeature.getGeometry() as Point).setCoordinates(coordinateInner);
+    this.nativeOverlay.setPosition(coordinateInner);
   }
 
   /**
