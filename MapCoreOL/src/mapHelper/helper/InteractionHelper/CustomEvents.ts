@@ -142,6 +142,8 @@ export default class CustomEvents extends MapFrame {
    * @private
    */
   private setStyle(feature: Feature, normalStyle = true) {
+    if (this.mapHelper.interaction.interactionType)
+      return
     const features = feature.get('features') as Feature[];
     if (features) {
       //聚合元素

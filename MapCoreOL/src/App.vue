@@ -103,9 +103,9 @@ export default class App extends Vue {
       }
     }
     mapHelper.interaction.customEvents.start(x => console.log(x));
-    // mapHelper.interaction.rotateAndZoom.start(['rotate'] , x => console.log(x.id));
+    mapHelper.interaction.rotateAndZoom.start(['rotate'] , x => console.log(x.id));
     // mapHelper.interaction.move.start();
-    mapHelper.interaction.modify.start();
+    // mapHelper.interaction.modify.start();
     window.mapHelper = mapHelper;
   }
 }

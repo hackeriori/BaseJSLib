@@ -35,7 +35,11 @@ export default class InteractionHelper extends MapFrame {
 
   addToCollection(feature: Feature) {
     if (this.interactionType) {
-      if (this.interactionType != 'move') {
+      if (this.interactionType === 'move') {
+        //聚合元素不能移动
+        if (feature.get('features') && feature.get('features').length > 1)
+          return;
+      } else {
         if (feature.getGeometry()!.getType() === 'Point')
           return
         else {

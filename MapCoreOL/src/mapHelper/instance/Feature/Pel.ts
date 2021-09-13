@@ -1,7 +1,7 @@
 import BaseFeature from "./BaseFeature";
 import Map from "ol/Map";
 import Overlay from 'ol/Overlay';
-import {FlashPointParamsType, InteractionType, PelOptionsType} from "./types";
+import {FlashPointParamsType, PelOptionsType} from "./types";
 import {Coordinate} from "ol/coordinate";
 import MapHelper from "../../index";
 import {FitOptions} from "ol/View";
@@ -95,13 +95,9 @@ class PelInstance extends BaseFeature {
               this.mapHelper.interaction.move.callback(this);
             }
           }, {once: true});
-
           ev.stopPropagation();
         }
       })
-      options.options.element.addEventListener('mouseenter',ev => {
-
-      });
     }
   }
 
@@ -223,8 +219,9 @@ class PelInstance extends BaseFeature {
       element.addEventListener(event, ev => {
         if (type === 'singleClick' && (ev as PointerEvent).button !== 0)
           return;
-        if (!this.mapHelper.interaction.interactionType)
-          callback({type: type});
+        if (this.mapHelper.interaction.interactionType)
+          return;
+        callback({type: type});
         ev.preventDefault();
         ev.stopPropagation();
         ev.returnValue = false;
