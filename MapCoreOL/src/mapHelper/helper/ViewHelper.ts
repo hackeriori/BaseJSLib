@@ -60,4 +60,22 @@ export default class ViewHelper extends MapFrame {
     }
   }
 
+  /**
+   * 获取当前视野包络矩形
+   * @param outProjection 输出坐标系
+   */
+  getBBox(outProjection?: string){
+    const extent = this.map.getView().calculateExtent(this.map.getSize());
+    if(outProjection){
+      const coordinate1 = [extent[0],extent[1]];
+      const coordinate2 = [extent[2],extent[3]];
+      const translatedCoordinate1 = this.mapHelper.projection.transCoordinate(coordinate1,undefined,outProjection);
+      const translatedCoordinate2 = this.mapHelper.projection.transCoordinate(coordinate2,undefined,outProjection);
+      extent[0] = translatedCoordinate1[0];
+      extent[1] = translatedCoordinate1[1];
+      extent[2] = translatedCoordinate2[0];
+      extent[3] = translatedCoordinate2[1];
+    }
+    return extent
+  }
 }
