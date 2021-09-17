@@ -74,7 +74,7 @@ const style = new Style({
   }),
 });
 
-export default function setRotateStyle(feature: Feature) {
+export default function setRotateStyle(feature: Feature<Geometry>) {
   feature.setStyle(function (feature) {
     const styles = [style];
     const modifyGeometry = feature.get('modifyGeometry');

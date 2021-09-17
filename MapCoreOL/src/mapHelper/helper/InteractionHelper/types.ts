@@ -4,7 +4,7 @@ import {Geometry} from "ol/geom";
 
 export type NotingClick = (coordinate: Coordinate) => void;
 
-export type MeasureResult = (result: number, unit: string, feature: Feature) => void;
+export type MeasureResult = (result: number, unit: string, feature: Feature<Geometry>) => void;
 
 export interface ModifyGeometryType {
   geometry: Geometry,

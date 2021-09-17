@@ -12,6 +12,7 @@ import {InteractionType} from "../../instance/Feature/types";
 import setRotateStyle from "./shared";
 import {getFeatureInstanceByFeature} from "../../global";
 import ModifyAction from "./ModifyAction";
+import {Geometry} from "ol/geom";
 
 export default class InteractionHelper extends MapFrame {
   customEvents: CustomEvents;
@@ -20,7 +21,7 @@ export default class InteractionHelper extends MapFrame {
   move: Move;
   rotateAndZoom: RotateAndZoom;
   interactionType?: InteractionType;
-  collection: Collection<Feature>;
+  collection: Collection<Feature<Geometry>>;
   modify: ModifyAction;
 
   constructor(map: Map, mapHelper: MapHelper) {
@@ -33,7 +34,7 @@ export default class InteractionHelper extends MapFrame {
     this.modify = new ModifyAction(map, this.mapHelper);
   }
 
-  addToCollection(feature: Feature) {
+  addToCollection(feature: Feature<Geometry>) {
     if (this.interactionType) {
       if (this.interactionType === 'move') {
         //聚合元素不能移动
@@ -50,7 +51,7 @@ export default class InteractionHelper extends MapFrame {
     }
   }
 
-  moveCollectionFeature(feature: Feature) {
+  moveCollectionFeature(feature: Feature<Geometry>) {
     if (this.interactionType) {
       if (this.interactionType != 'move') {
         if (feature.getGeometry()!.getType() === 'Point')

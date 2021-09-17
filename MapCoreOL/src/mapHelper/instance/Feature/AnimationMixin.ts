@@ -134,6 +134,10 @@ export default abstract class AnimationMixin {
     this.map.render();
   }
 
+  trackPlay(){
+
+  }
+
   /**
    * 停止所有动画
    */

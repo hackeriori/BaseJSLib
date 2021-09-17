@@ -9,6 +9,7 @@ import Feature from "ol/Feature";
 import {Coordinate} from "ol/coordinate";
 import {ModifyGeometryType} from "./types";
 import {getFeatureInstanceByFeature} from "../../global";
+import {Geometry} from "ol/geom";
 
 export default class RotateAndZoom extends MapFrame {
   modify?: Modify
@@ -26,7 +27,7 @@ export default class RotateAndZoom extends MapFrame {
       insertVertexCondition: never,
       features: collection,
       style: function (feature, level) {
-        feature.get('features').forEach(function (modifyFeature: Feature) {
+        feature.get('features').forEach(function (modifyFeature: Feature<Geometry>) {
           const modifyGeometry: ModifyGeometryType | undefined = modifyFeature.get('modifyGeometry');
           if (modifyGeometry) {
             const point = (feature.getGeometry()! as any).getCoordinates() as Coordinate;
@@ -70,18 +71,18 @@ export default class RotateAndZoom extends MapFrame {
     });
     this.modify.on('modifystart', function (event) {
       event.features.forEach(function (feature) {
-        feature.set('modifyGeometry', {geometry: feature.getGeometry()!.clone()}, true);
+        (feature as Feature<Geometry>).set('modifyGeometry', {geometry: (feature as Feature<Geometry>).getGeometry()!.clone()}, true);
       });
     });
     this.modify.on('modifyend', event => {
       event.features.forEach(feature => {
         const modifyGeometry = feature.get('modifyGeometry');
         if (modifyGeometry) {
-          feature.setGeometry(modifyGeometry.geometry);
-          feature.unset('modifyGeometry', true);
+          (feature as Feature<Geometry>).setGeometry(modifyGeometry.geometry);
+          (feature as Feature<Geometry>).unset('modifyGeometry', true);
         }
         if (callback)
-          callback(getFeatureInstanceByFeature(feature, this.mapHelper)!)
+          callback(getFeatureInstanceByFeature(feature as Feature<Geometry>, this.mapHelper)!)
       });
     });
     this.map.addInteraction(this.modify);

@@ -8,13 +8,14 @@ import BaseEvent from "ol/events/Event";
 import {MapFrame} from "../../MapFrame";
 import MapHelper from "../../index";
 import {getFeatureInstanceByFeature} from "../../global";
+import {Geometry} from "ol/geom";
 
 export default class CustomEvents extends MapFrame {
   private obRightClick?: (evt: MouseEvent) => void;
   private obSingleClick?: EventsKey;
   private obDoubleClick?: EventsKey;
   private obPointerMove?: EventsKey;
-  private highLightFeature?: Feature;
+  private highLightFeature?: Feature<Geometry>;
   private readonly target: HTMLElement;
 
   constructor(map: Map, mapHelper: MapHelper) {
@@ -28,7 +29,7 @@ export default class CustomEvents extends MapFrame {
     this.obSingleClick = this.map.on('singleclick', evt => {
       const features = this.map.getFeaturesAtPixel(evt.pixel).filter(x => x.get('clickable'));
       if (features.length > 0) {
-        const firstFeature = features[0] as Feature;
+        const firstFeature = features[0] as Feature<Geometry>;
         if (!this.mapHelper.interaction.interactionType)
           firstFeature.dispatchEvent('singleClick');
         return;
@@ -36,20 +37,20 @@ export default class CustomEvents extends MapFrame {
       if (callback) {
         callback(evt.coordinate);
       }
-    });
+    }) as EventsKey;
     this.obDoubleClick = this.map.on('dblclick', evt => {
       const features = this.map.getFeaturesAtPixel(evt.pixel);
       if (features.length > 0) {
-        const firstFeature = features[0] as Feature;
+        const firstFeature = features[0] as Feature<Geometry>;
         if (!this.mapHelper.interaction.interactionType)
           firstFeature.dispatchEvent('doubleClick');
       }
-    });
+    }) as EventsKey;
     this.obRightClick = evt => {
       const pixel = [evt.clientX, evt.clientY];
       const features = this.map.getFeaturesAtPixel(pixel);
       if (features.length > 0) {
-        const firstFeature = features[0] as Feature;
+        const firstFeature = features[0] as Feature<Geometry>;
         if (firstFeature.get('clickable')) {
           evt.preventDefault();
           const event = new BaseEvent('rightClick');
@@ -67,7 +68,7 @@ export default class CustomEvents extends MapFrame {
       const features = this.map.getFeaturesAtPixel(evt.pixel).filter(x => x.get('clickable'));
       let cursor = 'auto';
       if (features.length > 0) {
-        const firstFeature = features[0] as Feature;
+        const firstFeature = features[0] as Feature<Geometry>;
         cursor = 'pointer';
         if (this.highLightFeature) {
           if (getUid(this.highLightFeature) !== getUid(firstFeature)) {
@@ -100,7 +101,7 @@ export default class CustomEvents extends MapFrame {
         }
       }
       target.style.cursor = cursor;
-    });
+    }) as EventsKey;
   }
 
   notifyLevel() {
@@ -141,10 +142,10 @@ export default class CustomEvents extends MapFrame {
    * @param normalStyle
    * @private
    */
-  private setStyle(feature: Feature, normalStyle = true) {
+  private setStyle(feature: Feature<Geometry>, normalStyle = true) {
     if (this.mapHelper.interaction.interactionType)
       return
-    const features = feature.get('features') as Feature[];
+    const features = feature.get('features') as Feature<Geometry>[];
     if (features) {
       //聚合元素
       if (features.length === 1) {
