@@ -5,17 +5,18 @@ import MapHelper from "./index";
 import {StyleType} from "./instance/Feature/types";
 import PelInstance from "./instance/Feature/Pel";
 import {ClusterStyle} from "./helper/types";
+import {Geometry} from "ol/geom";
 
 const geoJson = new GeoJSON();
 export default geoJson;
 
-export function getFeatureInstanceByFeature(feature: Feature, mapHelper: MapHelper) {
+export function getFeatureInstanceByFeature(feature: Feature<Geometry>, mapHelper: MapHelper) {
   const featureInner = getBaseFeatureInstanceByFeature(feature, mapHelper);
   if (featureInner && featureInner instanceof FeatureInstance)
     return featureInner;
 }
 
-export function getBaseFeatureInstanceByFeature(feature: Feature, mapHelper: MapHelper) {
+export function getBaseFeatureInstanceByFeature(feature: Feature<Geometry>, mapHelper: MapHelper) {
   const id: string | null = feature.get('id');
   const layerID: string | null = feature.get('layerID');
   if (id && layerID) {
@@ -26,7 +27,7 @@ export function getBaseFeatureInstanceByFeature(feature: Feature, mapHelper: Map
   }
 }
 
-export function getPelInstanceByFeature(feature: Feature, mapHelper: MapHelper) {
+export function getPelInstanceByFeature(feature: Feature<Geometry>, mapHelper: MapHelper) {
   const featureInner = getBaseFeatureInstanceByFeature(feature, mapHelper);
   if (featureInner && featureInner instanceof PelInstance)
     return featureInner;

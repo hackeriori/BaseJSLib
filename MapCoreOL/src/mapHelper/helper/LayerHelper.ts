@@ -19,6 +19,8 @@ import {ClusterEventType, ClusterStyle, ClusterStyles} from "./types";
 import FeatureInstance from "../instance/Feature";
 import PelInstance from '../instance/Feature/Pel';
 import CircleStyle from "ol/style/Circle";
+import {Tile, Vector} from "ol/source";
+import {Geometry} from "ol/geom";
 
 export default class LayerHelper extends MapFrame {
   readonly layerList: { [key: string]: LayerInstance } = {};
@@ -32,7 +34,7 @@ export default class LayerHelper extends MapFrame {
    * @param id 图层ID
    * @param options 图层选项
    */
-  createLayer(id: string, options: TileOptions | VectorOptions) {
+  createLayer(id: string, options: TileOptions<Tile> | VectorOptions<Vector<Geometry>>) {
     if (this.layerList[id])
       console.log(`图层id[${id}]重复，重复的图层未添加到地图上`);
     else {
@@ -60,8 +62,8 @@ export default class LayerHelper extends MapFrame {
     if ('source' in options) {
       const cluster = new Cluster(options);
       cluster.on('addfeature', evt => {
-        const {feature} = evt;
-        const features = feature.get('features') as Feature[];
+        const feature = evt.feature! ;
+        const features = feature.get('features') as Feature<Geometry>[];
         const featureInstances = features.map(x => getFeatureInstanceByFeature(x, this.mapHelper))
           .filter(x => x) as FeatureInstance[];
         const pelInstances = features.map(x => getPelInstanceByFeature(x, this.mapHelper))
@@ -95,7 +97,7 @@ export default class LayerHelper extends MapFrame {
         }
         //设置事件
         feature.set('clickable', true);
-        feature.on('singleClick', () => {
+        feature.on('singleClick' as any, () => {
           if (features.length === 1 && featureInstances.length === 1)
             featureInstances[0].singleClickEvents.forEach(x => x({type: 'singleClick'}));
           else {
@@ -106,7 +108,7 @@ export default class LayerHelper extends MapFrame {
             cluster.dispatchEvent(baseEvent);
           }
         });
-        feature.on('rightClick', () => {
+        feature.on('rightClick' as any, () => {
           if (features.length === 1 && featureInstances.length === 1)
             featureInstances[0].rightClickEvents.forEach(x => x({type: 'rightClick'}));
           else {
@@ -117,7 +119,7 @@ export default class LayerHelper extends MapFrame {
             cluster.dispatchEvent(baseEvent);
           }
         });
-        feature.on('mouseEnter', () => {
+        feature.on('mouseEnter' as any, () => {
           if (features.length === 1 && featureInstances.length === 1)
             featureInstances[0].mouseEnterEvents.forEach(x => x({type: 'mouseEnter'}));
           else {
@@ -128,7 +130,7 @@ export default class LayerHelper extends MapFrame {
             cluster.dispatchEvent(baseEvent);
           }
         });
-        feature.on('mouseLeave', () => {
+        feature.on('mouseLeave' as any, () => {
           if (features.length === 1 && featureInstances.length === 1)
             featureInstances[0].mouseLeaveEvents.forEach(x => x({type: 'mouseLeave'}));
           else {

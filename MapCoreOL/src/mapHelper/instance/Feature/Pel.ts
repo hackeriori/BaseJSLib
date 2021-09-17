@@ -8,7 +8,7 @@ import {FitOptions} from "ol/View";
 import {Extent} from "ol/extent";
 import {flashPoint, getPreFlashPointParams} from "./command";
 import LayerInstance from "../Layer";
-import {Point} from "ol/geom";
+import {Geometry, Point} from "ol/geom";
 import VectorLayer from "ol/layer/Vector";
 import Feature from "ol/Feature";
 import VectorSource from "ol/source/Vector";
@@ -20,7 +20,7 @@ class PelInstance extends BaseFeature {
   //原生对象
   readonly nativeOverlay: Overlay;
   //ol原生元素对象，此对象设置为始终不可见
-  readonly nativeFeature: Feature;
+  readonly nativeFeature: Feature<Geometry>;
   //元素ID
   readonly id: string;
   //所属图层示例
@@ -32,11 +32,11 @@ class PelInstance extends BaseFeature {
   //是否处于聚合状态
   private _isCluster = false;
   //ol原生源
-  readonly nativeSource: VectorSource;
+  readonly nativeSource: VectorSource<Geometry>;
   //样式缓存（用于隐藏时缓存样式）
   protected styleLike?: StyleLike = undefined;
 
-  constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerInstance: LayerInstance, source: VectorSource) {
+  constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerInstance: LayerInstance, source: VectorSource<Geometry>) {
     super(map, mapHelper);
     this.id = options.id;
     this.layerInstance = layerInstance;
@@ -278,7 +278,7 @@ class PelInstance extends BaseFeature {
     if (coordinate) {
       const preOptions = getPreFlashPointParams();
       const _options: FlashPointParamsType = {...preOptions, ...options};
-      await flashPoint(this.layerInstance.nativeLayer as VectorLayer, coordinate as Coordinate, this.map, _options);
+      await flashPoint(this.layerInstance.nativeLayer as VectorLayer<VectorSource<Geometry>>, coordinate as Coordinate, this.map, _options);
     }
   }
 

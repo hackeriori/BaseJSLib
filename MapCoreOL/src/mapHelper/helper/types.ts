@@ -4,9 +4,10 @@ import Feature from "ol/Feature";
 import {StyleType} from "../instance/Feature/types";
 import {Coordinate} from "ol/coordinate";
 import PelInstance from "../instance/Feature/Pel";
+import {Geometry} from "ol/geom";
 
 export interface ClusterEventType extends BaseEvent {
-  target: Feature,
+  target: Feature<Geometry>,
   featureInstances: FeatureInstance[],
   pelInstances: PelInstance[],
 }

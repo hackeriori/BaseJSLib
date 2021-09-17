@@ -1,7 +1,7 @@
 import {FlashPointParamsType} from "./types";
 import {flashGeom, flashPoint, getPreFlashPointParams, getHideButClickableStyle} from "./command";
 import VectorLayer from "ol/layer/Vector";
-import {Point} from "ol/geom";
+import {Geometry, Point} from "ol/geom";
 import Style, {StyleLike} from "ol/style/Style";
 import LayerInstance from "../Layer";
 import Feature from "ol/Feature";
@@ -11,6 +11,7 @@ import RenderEvent from "ol/render/Event";
 import {getVectorContext} from "ol/render";
 import {EventsKey} from "ol/events";
 import {unByKey} from "ol/Observable";
+import VectorSource from "ol/source/Vector";
 
 export default abstract class AnimationMixin {
   map!: Map;
@@ -19,7 +20,7 @@ export default abstract class AnimationMixin {
   //样式缓存（用于隐藏时缓存样式）
   protected styleLike?: StyleLike;
   //ol原生元素对象
-  readonly nativeFeature!: Feature;
+  readonly nativeFeature!: Feature<Geometry>;
   //是否正在播放动画
   protected isPlayAnimation!: Boolean;
   //线动画key
@@ -47,13 +48,13 @@ export default abstract class AnimationMixin {
       const type = geometry.getType();
       switch (type) {
         case 'Point':
-          await flashPoint(this.layerInstance.nativeLayer as VectorLayer, geometry as Point, this.map, _options);
+          await flashPoint(this.layerInstance.nativeLayer as VectorLayer<VectorSource<Geometry>>, geometry as Point, this.map, _options);
           break;
         case 'Polygon':
         case 'MultiPolygon':
         case 'LineString':
         case 'MultiLineString':
-          await flashGeom(this.layerInstance.nativeLayer as VectorLayer, this.nativeFeature, this.map, _options)
+          await flashGeom(this.layerInstance.nativeLayer as VectorLayer<VectorSource<Geometry>>, this.nativeFeature, this.map, _options)
           break;
         default:
           return;
@@ -110,7 +111,7 @@ export default abstract class AnimationMixin {
     const animate = (event: RenderEvent) => {
       if (this.animationVisible) {
         const vectorContext = getVectorContext(event);
-        const frameState = event.frameState;
+        const frameState = event.frameState!;
         let elapsed = frameState.time - startTime;
         if (elapsed > duration) {
           startTime = new Date().getTime();
@@ -129,7 +130,7 @@ export default abstract class AnimationMixin {
       }
     }
 
-    this.lineFlowAnimationKey = this.layerInstance.nativeLayer.on('postrender', animate) as EventsKey;
+    this.lineFlowAnimationKey = (this.layerInstance.nativeLayer as VectorLayer<VectorSource<Geometry>>).on('postrender', animate) as EventsKey;
     this.map.render();
   }
 

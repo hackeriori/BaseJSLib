@@ -3,6 +3,7 @@ import {getArea, getLength} from 'ol/sphere';
 import Map from "ol/Map";
 import MapHelper from "../../index";
 import {Coordinate} from "ol/coordinate";
+import {Geometry} from "ol/geom";
 
 export default abstract class MeasureMixin {
   mapHelper!: MapHelper;
@@ -10,7 +11,7 @@ export default abstract class MeasureMixin {
   //元素ID
   readonly id!: string;
   //ol原生元素对象
-  readonly nativeFeature!: Feature;
+  readonly nativeFeature!: Feature<Geometry>;
 
   /**
    * 计算面积

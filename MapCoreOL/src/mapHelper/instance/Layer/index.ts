@@ -13,6 +13,8 @@ import PelInstance from "../Feature/Pel";
 import MapHelper from "../../index";
 import {zoomLevelChanged} from "../../global";
 import DrawFeatureMixin from "./DrawFeatureMixin";
+import {Tile, Vector} from "ol/source";
+import {Geometry} from "ol/geom";
 
 class LayerInstance extends MapFrame {
   //ol原生图层
@@ -33,16 +35,16 @@ class LayerInstance extends MapFrame {
   zoomVisibly: boolean;
 
   //图层的可见性可以设置在options里面
-  constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions | VectorOptions, layerList: { [key: string]: LayerInstance }) {
+  constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions<Tile> | VectorOptions<Vector<Geometry>>, layerList: { [key: string]: LayerInstance }) {
     super(map, mapHelper);
     this.id = id;
     this.layerList = layerList;
     if (options.source instanceof TileSource) {
       this.mapType = "tile";
-      this.nativeLayer = new TileLayer(options as TileOptions);
+      this.nativeLayer = new TileLayer(options as TileOptions<Tile>);
     } else {
       this.mapType = "vector";
-      this.nativeLayer = new VectorLayer(options as VectorOptions);
+      this.nativeLayer = new VectorLayer(options as VectorOptions<Vector<Geometry>>);
     }
     if (options.visible !== undefined)
       this.visibly = options.visible;

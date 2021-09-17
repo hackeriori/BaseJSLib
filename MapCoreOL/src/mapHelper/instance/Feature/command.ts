@@ -4,7 +4,7 @@ import Stroke from "ol/style/Stroke";
 import {Circle} from "ol/style";
 import RenderEvent from "ol/render/Event";
 import {getVectorContext} from "ol/render";
-import {Point, Polygon} from "ol/geom";
+import {Geometry, Point, Polygon} from "ol/geom";
 import Map from 'ol/Map';
 import {Coordinate} from "ol/coordinate";
 import {FlashPointParamsType} from "./types";
@@ -15,8 +15,9 @@ import {easeOut, inAndOut} from "ol/easing";
 import Feature from "ol/Feature";
 import Fill from "ol/style/Fill";
 import BaseFeature from "./BaseFeature";
+import VectorSource from "ol/source/Vector";
 
-export async function flashPoint(layer: VectorLayer, point: Feature<Point> | Point | Coordinate, map: Map, param: FlashPointParamsType) {
+export async function flashPoint(layer: VectorLayer<VectorSource<Geometry>>, point: Feature<Point> | Point | Coordinate, map: Map, param: FlashPointParamsType) {
   let listenerKey: EventsKey | undefined;
   let sfn: (() => void) | undefined;
   const fx = (elapsed: number) => {
@@ -51,7 +52,7 @@ export async function flashPoint(layer: VectorLayer, point: Feature<Point> | Poi
   const start = new Date().getTime();
   const animate = (event: RenderEvent) => {
     const vectorContext = getVectorContext(event);
-    const frameState = event.frameState;
+    const frameState = event.frameState!;
     const elapsed = frameState.time - start;
     if (elapsed > param.duration && listenerKey) {
       unByKey(listenerKey);
@@ -71,7 +72,7 @@ export async function flashPoint(layer: VectorLayer, point: Feature<Point> | Poi
     vectorContext.drawGeometry(rPoint);
     map.render()
   }
-  listenerKey = layer.on('postrender', animate);
+  listenerKey = layer.on('postrender', animate) as EventsKey;
   map.render();
   return new Promise<void>(_sfn => {
     sfn = _sfn;
@@ -103,7 +104,7 @@ export function getPreFlashPointParams() {
   return preOptions;
 }
 
-export async function flashGeom(layer: VectorLayer, feature: Feature, map: Map, param: FlashPointParamsType) {
+export async function flashGeom(layer: VectorLayer<VectorSource<Geometry>>, feature: Feature<Geometry>, map: Map, param: FlashPointParamsType) {
   const halfDuration = param.duration / 2;
   let listenerKey: EventsKey | undefined;
   let sfn: (() => void) | undefined;
@@ -177,7 +178,7 @@ export async function flashGeom(layer: VectorLayer, feature: Feature, map: Map, 
   let start = new Date().getTime();
   const animate = (event: RenderEvent) => {
     const vectorContext = getVectorContext(event);
-    const frameState = event.frameState;
+    const frameState = event.frameState!;
     let elapsed = frameState.time - start;
     if (elapsed > param.duration && listenerKey) {
       unByKey(listenerKey);
@@ -196,7 +197,7 @@ export async function flashGeom(layer: VectorLayer, feature: Feature, map: Map, 
     map.render();
   }
 
-  listenerKey = layer.on('postrender', animate);
+  listenerKey = layer.on('postrender', animate) as EventsKey;
   map.render();
   return await new Promise<void>(_sfn => {
     sfn = _sfn;

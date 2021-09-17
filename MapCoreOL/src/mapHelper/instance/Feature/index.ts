@@ -3,7 +3,6 @@ import Feature from "ol/Feature";
 import geoJson from "../../global";
 import VectorSource from "ol/source/Vector";
 import FeaturePropType, {FeatureGeoType} from "./types";
-import {Geometry as GeometryType} from "geojson";
 import {StyleLike} from "ol/style/Style";
 import BaseFeature from "./BaseFeature";
 import MapHelper from "../../index";
@@ -11,16 +10,16 @@ import StyleMixin from './StyleMixin';
 import applyMixins from "../../../../../Utils/applyMixins";
 import MeasureMixin from './MeasureMixin';
 import {FitOptions} from "ol/View";
-import {SimpleGeometry} from "ol/geom";
+import {Geometry, SimpleGeometry} from "ol/geom";
 import LayerInstance from "../Layer";
 import TopologyMixin from "./TopologyMixin";
 import AnimationMixin from './AnimationMixin';
 
 class FeatureInstance extends BaseFeature {
   //ol原生源
-  readonly nativeSource: VectorSource;
+  readonly nativeSource: VectorSource<Geometry>;
   //ol原生元素对象
-  readonly nativeFeature: Feature;
+  readonly nativeFeature: Feature<Geometry>;
   //元素ID
   readonly id: string;
   //图层实例
@@ -36,13 +35,13 @@ class FeatureInstance extends BaseFeature {
   //元素动画是否可见
   protected animationVisible = true;
   //注册的事件
-  singleClickEvents:((evt: { type: string }) => void)[] = [];
-  doubleClickEvents:((evt: { type: string }) => void)[] = [];
-  rightClickEvents:((evt: { type: string }) => void)[] = [];
-  mouseEnterEvents:((evt: { type: string }) => void)[] = [];
-  mouseLeaveEvents:((evt: { type: string }) => void)[] = [];
+  singleClickEvents: ((evt: { type: string }) => void)[] = [];
+  doubleClickEvents: ((evt: { type: string }) => void)[] = [];
+  rightClickEvents: ((evt: { type: string }) => void)[] = [];
+  mouseEnterEvents: ((evt: { type: string }) => void)[] = [];
+  mouseLeaveEvents: ((evt: { type: string }) => void)[] = [];
 
-  constructor(map: Map, mapHelper: MapHelper, geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropType>, layerInstance: LayerInstance, source: VectorSource) {
+  constructor(map: Map, mapHelper: MapHelper, geoJSONFeature: FeatureGeoType, layerInstance: LayerInstance, source: VectorSource<Geometry>) {
     super(map, mapHelper);
     this.id = geoJSONFeature.id as string
     this.layerInstance = layerInstance;
@@ -122,7 +121,7 @@ class FeatureInstance extends BaseFeature {
       })
     } else
       (this as any)[type + 'Events'].push(callback);
-    this.nativeFeature.on(type, callback);
+    this.nativeFeature.on(type as any, callback);
   }
 
   /**

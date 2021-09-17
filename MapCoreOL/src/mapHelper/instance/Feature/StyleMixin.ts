@@ -2,11 +2,12 @@ import {StyleType} from "./types";
 import Style, {StyleLike} from "ol/style/Style";
 import Feature from "ol/Feature";
 import MapHelper from "../../index";
+import {Geometry} from "ol/geom";
 
 export default abstract class StyleMixin {
   mapHelper!: MapHelper
   //ol原生元素对象
-  readonly nativeFeature!: Feature;
+  readonly nativeFeature!: Feature<Geometry>;
   //普通样式
   normalStyle?: StyleLike;
   //高亮样式

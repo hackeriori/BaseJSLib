@@ -1,5 +1,5 @@
 import Feature from "ol/Feature";
-import {LineString, MultiLineString, MultiPoint, Point, Polygon} from "ol/geom";
+import {Geometry, LineString, MultiLineString, MultiPoint, Point, Polygon} from "ol/geom";
 import geoJson, {getBaseFeatureInstanceByFeature} from "../../global";
 import {booleanContains, booleanCrosses} from "@turf/turf";
 import MapHelper from "../../index";
@@ -11,7 +11,7 @@ import BaseFeature from "./BaseFeature";
  * @param featureOut 面类型
  * @param featureIn
  */
-function isContainAB(featureOut: Feature, featureIn: Feature) {
+function isContainAB(featureOut: Feature<Geometry>, featureIn: Feature<Geometry>) {
   if (featureIn.getGeometry()!.getType() === 'MultiLineString') {
     const lineStrings = (featureIn as Feature<MultiLineString>).getGeometry()!.getLineStrings();
     let contains = true;
@@ -29,7 +29,7 @@ function isContainAB(featureOut: Feature, featureIn: Feature) {
  * @param featureOut 可以是线或者面
  * @param featureIn 见代码
  */
-function isCrossAB(featureOut: Feature, featureIn: Feature) {
+function isCrossAB(featureOut: Feature<Geometry>, featureIn: Feature<Geometry>) {
   const geometry = featureIn.getGeometry()!.getType();
   if (geometry === 'LineString') {
     const geoFeatureOut = geoJson.writeFeatureObject(featureOut);
@@ -60,7 +60,7 @@ const message = '指定图形不是面类型，无法计算';
 
 export default abstract class TopologyMixin {
   //ol原生元素对象
-  readonly nativeFeature!: Feature;
+  readonly nativeFeature!: Feature<Geometry>;
   //元素ID
   readonly id!: string;
   mapHelper!: MapHelper
@@ -75,7 +75,7 @@ export default abstract class TopologyMixin {
   /**
    * 判断是否包含目标元素
    */
-  isContain(featureIn: Feature, logError = true) {
+  isContain(featureIn: Feature<Geometry>, logError = true) {
     if (this.nativeFeature.getGeometry()!.getType() === 'Polygon')
       return isContainAB(this.nativeFeature, featureIn);
     else {
@@ -88,7 +88,7 @@ export default abstract class TopologyMixin {
   /**
    * 判断是否被目标元素包含
    */
-  isBeContain(featureOut: Feature, logError = true) {
+  isBeContain(featureOut: Feature<Geometry>, logError = true) {
     if (featureOut.getGeometry()!.getType() === 'Polygon')
       return isContainAB(featureOut, this.nativeFeature);
     else {
@@ -101,7 +101,7 @@ export default abstract class TopologyMixin {
   /**
    * 判断是否与目标元素相交
    */
-  isCross(targetFeature: Feature, logError = true) {
+  isCross(targetFeature: Feature<Geometry>, logError = true) {
     const type = this.nativeFeature.getGeometry()!.getType();
     const typeTarget = targetFeature.getGeometry()!.getType();
     if (type === 'Polygon' || type === 'LineString') {

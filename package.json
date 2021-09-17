@@ -13,11 +13,11 @@
   "dependencies": {
     "@turf/turf": "^6.3.0",
     "@types/color-rgba": "^2.1.0",
-    "@types/ol": "^6.4.2",
+    "@types/geojson": "^7946.0.8",
     "@types/proj4": "^2.5.0",
     "color-rgba": "^2.2.3",
     "element-ui": "^2.14.0",
-    "ol": "^6.5.0",
+    "ol": "^6.7.0",
     "proj4": "^2.6.2",
     "vue": "^2.6.12",
     "vue-class-component": "^7.2.6",

@@ -21,14 +21,14 @@ class FeatureMixin {
    * 创建元素（瓦片图层不影响，如果是瓦片图层由于拿不到source，该方法会返回undefined）
    * @param geoJSONFeature 元素geoJSON
    */
-  createFeature(geoJSONFeature: FeatureGeoType<GeometryType, FeaturePropCreateType>) {
+  createFeature(geoJSONFeature: FeatureGeoType) {
     if (this.featureList[geoJSONFeature.id])
       console.log(`元素id[${geoJSONFeature.id}]重复，重复的元素未添加到图层中`);
     else {
       const source = this.getVectorSource();
       if (source) {
-        const geoJSONDate = geoJSONFeature as FeatureGeoType<GeometryType, FeaturePropType>;
-        geoJSONDate.properties.layerID = this.id;
+        const geoJSONDate = geoJSONFeature as FeatureGeoType;
+        geoJSONDate.properties!.layerID = this.id;
         return new FeatureInstance(this.map, this.mapHelper, geoJSONDate, this as any, source);
       }
     }

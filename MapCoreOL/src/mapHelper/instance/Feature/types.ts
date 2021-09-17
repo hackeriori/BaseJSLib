@@ -1,8 +1,7 @@
-import {Feature, GeoJsonProperties, Geometry} from "geojson";
+import {GeoJSONFeature} from "ol/format/GeoJSON";
 import {Options as OverlayOptions} from 'ol/Overlay';
 import {Options as FillOptions} from "ol/style/Fill";
 import {Options as StrokeOptions} from "ol/style/Stroke";
-import TextPlacement from "ol/style/TextPlacement";
 import {Options as IconOptions} from "ol/style/Icon";
 
 export interface FeaturePropCreateType {
@@ -15,7 +14,7 @@ export default interface FeaturePropType extends FeaturePropCreateType {
   layerID: string;
 }
 
-export interface FeatureGeoType<G extends Geometry | null = Geometry, P = GeoJsonProperties> extends Feature<G, P> {
+export interface FeatureGeoType extends GeoJSONFeature {
   id: string;
 }
 
@@ -38,7 +37,7 @@ export interface StyleText {
   offsetX?: number;
   offsetY?: number;
   overflow?: boolean;
-  placement?: TextPlacement;
+  placement?: any;
   scale?: number;
   rotateWithView?: boolean;
   rotation?: number;

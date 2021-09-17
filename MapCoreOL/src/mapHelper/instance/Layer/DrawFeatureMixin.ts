@@ -8,7 +8,6 @@ import {Circle} from "ol/geom";
 import {fromCircle} from "ol/geom/Polygon";
 import SourceMixin from "./SourceMixin";
 import MapHelper from "../../index";
-import GeometryType from "ol/geom/GeometryType";
 
 export default class DrawFeatureMixin {
   private nativeDraw?: Draw;
@@ -24,7 +23,7 @@ export default class DrawFeatureMixin {
    * @param callBack 回调函数
    * @param drawOptions 绘制选项
    */
-  startDraw(geometryType: GeometryType, callBack: OneFeatureCallBack, drawOptions?: DrawOptions) {
+  startDraw(geometryType: any, callBack: OneFeatureCallBack, drawOptions?: DrawOptions) {
     this.mapHelper.interaction.stopAll();
     let options: DrawOptions = {
       type: geometryType,
