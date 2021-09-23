@@ -7,7 +7,7 @@ import {getArea, getLength} from 'ol/sphere';
 import {EventsKey} from "ol/events";
 import {unByKey} from "ol/Observable";
 import {MeasureResult} from "./types";
-import {Circle, Point} from "ol/geom";
+import {Circle, Geometry, Point} from "ol/geom";
 import {MapFrame} from "../../MapFrame";
 import MapHelper from "../../index";
 import Style from "ol/style/Style";
@@ -19,7 +19,7 @@ import VectorLayer from "ol/layer/Vector";
 
 export default class Measure extends MapFrame {
   private draw?: Draw;
-  private readonly source: VectorSource;
+  private readonly source: VectorSource<Geometry>;
 
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
@@ -120,7 +120,7 @@ export default class Measure extends MapFrame {
 
       sketch.setStyle(() => getMeasureFeatureStyle(output, tooltipCoordinate, options.type === 'LineString'));
 
-      listener = sketch.getGeometry()!.on('change', cEvt => {
+      listener = sketch.getGeometry()!.on('change', (cEvt:any) => {
         const geom = cEvt.target;
         if (geom instanceof Polygon) {
           const {area, unit} = formatArea(geom);

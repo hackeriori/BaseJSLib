@@ -42,8 +42,8 @@ export default class App extends Vue {
             fill: {color: 'rgba(255,255,255,0.01)'},
             radius: 5,
           },
-          text:{
-            text:'你好'
+          text: {
+            text: '你好'
           }
         }]);
         feature.setHighLightStyle([{
@@ -55,8 +55,8 @@ export default class App extends Vue {
             fill: {color: 'rgba(255,255,255,0.01)'},
             radius: 5
           },
-          text:{
-            text:'你好'
+          text: {
+            text: '你好'
           }
         }]);
       }
@@ -79,7 +79,7 @@ export default class App extends Vue {
             coordinates: [[11849481.470703507, 3429761.3150701774], [11850011.752587235, 3429758.9264130434]]
           },
           properties: {id: 'test2', name: 'test2', clickable: true}
-        });
+        })!.getTrackPlayAnimationObj('http://www.baidu.com/favicon.ico',3000,false).then(x => window.pel = x);
       const dom = document.createElement('div');
       dom.style.height = '32px';
       dom.style.width = '32px';
@@ -99,11 +99,10 @@ export default class App extends Vue {
         pel.on('rightClick', () => {
           console.log('我被右键点了');
         });
-        window.pel = pel;
       }
     }
     mapHelper.interaction.customEvents.start(x => console.log(x));
-    mapHelper.interaction.rotateAndZoom.start(['rotate'] , x => console.log(x.id));
+    // mapHelper.interaction.rotateAndZoom.start(['rotate'] , x => console.log(x.id));
     // mapHelper.interaction.move.start();
     // mapHelper.interaction.modify.start();
     window.mapHelper = mapHelper;

@@ -48,7 +48,7 @@ export default class ViewHelper extends MapFrame {
    * 截取当前屏幕
    */
   screenShot() {
-    let canvas = this.map.getTargetElement().querySelector<HTMLCanvasElement>('.ol-layer canvas');
+    const canvas = this.map.getTargetElement().querySelector<HTMLCanvasElement>('.ol-layer canvas');
     if (canvas) {
       let url;
       try {

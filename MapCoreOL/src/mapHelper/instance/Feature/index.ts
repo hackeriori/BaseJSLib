@@ -13,7 +13,7 @@ import {FitOptions} from "ol/View";
 import {Geometry, SimpleGeometry} from "ol/geom";
 import LayerInstance from "../Layer";
 import TopologyMixin from "./TopologyMixin";
-import AnimationMixin from './AnimationMixin';
+import AnimationMixin from './animationsMixin';
 
 class FeatureInstance extends BaseFeature {
   //ol原生源

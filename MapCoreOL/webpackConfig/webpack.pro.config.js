@@ -1,5 +1,5 @@
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
 const {resolve} = require('path')
 
@@ -44,8 +44,8 @@ module.exports = {
       //编译css到js,再通过style-loader添加到html的style标签中
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, 'css-loader']
-        // use: ['style-loader', 'css-loader']
+        // use: [MiniCssExtractPlugin.loader, 'css-loader']
+        use: ['style-loader', 'css-loader']
       },
     ]
   },
@@ -53,9 +53,9 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['outLib', 'mapCoreOL.js.LICENSE.txt']
     }),
-    new MiniCssExtractPlugin({
-      filename: 'mapCoreOL.css'
-    }),
+    // new MiniCssExtractPlugin({
+    //   filename: 'mapCoreOL.css'
+    // }),
     new OptimizeCssAssetsWebpackPlugin()
   ],
   mode: "production",
