@@ -3,6 +3,7 @@ import LineFlowAnimation from "./lineFlow";
 import FlashAnimation from "./flash";
 import {unByKey} from "ol/Observable";
 import TrackPlayAnimation from "./trackPlay";
+import GifPlayAnimation from "./gifPlay";
 
 abstract class AnimationsMixin {
   /**
@@ -27,9 +28,9 @@ abstract class AnimationsMixin {
   }
 }
 
-interface AnimationsMixin extends LineFlowAnimation, FlashAnimation, TrackPlayAnimation {
+interface AnimationsMixin extends LineFlowAnimation, FlashAnimation, TrackPlayAnimation, GifPlayAnimation {
 }
 
-applyMixins(AnimationsMixin, [LineFlowAnimation, FlashAnimation, TrackPlayAnimation]);
+applyMixins(AnimationsMixin, [LineFlowAnimation, FlashAnimation, TrackPlayAnimation, GifPlayAnimation]);
 
 export default AnimationsMixin

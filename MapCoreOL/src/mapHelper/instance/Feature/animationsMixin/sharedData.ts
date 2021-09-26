@@ -5,9 +5,11 @@ import Feature from "ol/Feature";
 import {Geometry} from "ol/geom";
 import {EventsKey} from "ol/events";
 import {getHideButClickableStyle} from "../command";
+import MapHelper from "../../../index";
 
-export default abstract class AnimationsSharedData{
+export default abstract class AnimationsSharedData {
   map!: Map;
+  mapHelper!: MapHelper
   //图层实例
   readonly layerInstance!: LayerInstance;
   //样式缓存（用于隐藏时缓存样式）
@@ -28,7 +30,7 @@ export default abstract class AnimationsSharedData{
   hide!: () => void;
   show!: () => void;
 
-  protected canPlayNow(){
+  protected canPlayNow() {
     //正在播放动画，退出
     if (this.isPlayAnimation)
       return false;
@@ -40,7 +42,7 @@ export default abstract class AnimationsSharedData{
    * 准备动画状态
    * @protected
    */
-  protected setState(){
+  protected setState() {
     this.isPlayAnimation = true;
     this.playStyleLike = this.nativeFeature.getStyle();
     this.nativeFeature.setStyle(getHideButClickableStyle(this.normalStyle));

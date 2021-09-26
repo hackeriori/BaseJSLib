@@ -20,7 +20,7 @@ export interface ClusterStyles {
 export interface ViewerInfo {
   center: Coordinate;
   zoom: number;
-  resolution: number;
+  resolution?: number;
 }
 
 export interface ClusterStyle extends StyleType {
