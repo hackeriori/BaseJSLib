@@ -1,5 +1,5 @@
 import FeatureInstance from "../Feature";
-import FeaturePropType, {FeatureGeoType, FeaturePropCreateType, PelOptionsType} from "../Feature/types";
+import {FeatureGeoType, FeaturePropCreateType, PelOptionsType} from "../Feature/types";
 import SourceMixin from "./SourceMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
 import {MapFrame} from "../../MapFrame";

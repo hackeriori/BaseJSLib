@@ -1,10 +1,12 @@
-import {GeoJSONFeature} from "ol/format/GeoJSON";
 import {Options as OverlayOptions} from 'ol/Overlay';
 import {Options as FillOptions} from "ol/style/Fill";
 import {Options as StrokeOptions} from "ol/style/Stroke";
 import {Options as IconOptions} from "ol/style/Icon";
+import {Feature,  Geometry} from "geojson";
 
 export interface FeaturePropCreateType {
+  [name: string]: any;
+
   id: string;
   name: string;
   clickable: boolean;
@@ -14,7 +16,7 @@ export default interface FeaturePropType extends FeaturePropCreateType {
   layerID: string;
 }
 
-export interface FeatureGeoType extends GeoJSONFeature {
+export interface FeatureGeoType<G extends Geometry | null = Geometry, P = FeaturePropCreateType> extends Feature<G, P> {
   id: string;
 }
 

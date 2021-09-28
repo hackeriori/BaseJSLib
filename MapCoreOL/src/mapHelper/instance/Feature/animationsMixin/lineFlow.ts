@@ -16,8 +16,9 @@ abstract class LineFlowAnimation {
    * @param baseColor 线颜色,默认红色
    * @param width 线宽度,默认5
    * @param dashColor 断点颜色,默认黄色
+   * @param lineDash 虚线样式
    */
-  playLineFlowAnimation(durationTime = 1000, baseColor = 'red', width = 5, dashColor = 'yellow') {
+  playLineFlowAnimation(durationTime = 1000, baseColor = 'red', width = 5, dashColor = 'yellow',lineDash = [20, 60]) {
     if(!this.canPlayNow())
       return;
     const geometry = this.nativeFeature.getGeometry()!;
@@ -41,8 +42,7 @@ abstract class LineFlowAnimation {
       stroke: new Stroke({
         color: dashColor,
         width: width,
-        lineDash: [20, 60],
-        lineDashOffset: 0,
+        lineDash: lineDash,
       })
     });
 
