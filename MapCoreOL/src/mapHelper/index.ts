@@ -11,8 +11,6 @@ import ViewHelper from "./helper/ViewHelper";
 import StyleHelper from "./helper/StyleHelper";
 import {zoomLevelChanged} from "./global";
 
-import '../index.css';
-
 export default class MapHelper extends MapFrame {
   layer: LayerHelper
   interaction: InteractionHelper
