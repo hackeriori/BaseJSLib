@@ -59,8 +59,6 @@ export default class App extends Vue {
             text: '你好'
           }
         }]);
-        feature.playGif('https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20200207%2F2ff112e7e45144c0a64f48241ebcf7d7.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1635237380&t=46db1356aa4f150da870a5c2449a57a5');
-        window.pel = feature;
       }
       layer.createFeature(
         {
@@ -78,10 +76,10 @@ export default class App extends Vue {
           id: 'test2',
           geometry: {
             type: 'LineString',
-            coordinates: [[11849481.470703507, 3429761.3150701774], [11850011.752587235, 3429758.9264130434]]
+            coordinates: [[11849481.470703507, 3429761.3150701774], [11850011.752587235, 3429758.9264130434],[11850188.513215143, 3430174.552754344]]
           },
           properties: {id: 'test2', name: 'test2', clickable: true}
-        });
+        })!.getTrackPlayAnimationObj('./images/car.png',undefined,undefined,undefined,undefined,undefined,90).then(x=>x?.play());
       const dom = document.createElement('div');
       dom.style.height = '32px';
       dom.style.width = '32px';
@@ -103,15 +101,13 @@ export default class App extends Vue {
         });
       }
     }
-    mapHelper.interaction.customEvents.start(x => {// console.log(x)
-        console.log(mapHelper.projection.transCoordinate(x, 'EPSG:3857'));
-        mapHelper.view.setViewerInfo({center: x, zoom: 14}, false);
-        console.log(mapHelper.view.getBBox('EPSG:4326'));
-      }
-    );
-    // mapHelper.interaction.rotateAndZoom.start(['rotate'] , x => console.log(x.id));
-    // mapHelper.interaction.move.start();
-    // mapHelper.interaction.modify.start();
+    // mapHelper.interaction.customEvents.start(x => {// console.log(x)
+    //     console.log(mapHelper.projection.transCoordinate(x, 'EPSG:3857'));
+    //     mapHelper.view.setViewerInfo({center: x, zoom: 14}, false);
+    //     console.log(mapHelper.view.getBBox('EPSG:4326'));
+    //   }
+    // );
+    mapHelper.interaction.customEvents.start(x=>console.log(x));
     window.mapHelper = mapHelper;
   }
 }

@@ -17,6 +17,7 @@ import {LineString as GeoLineString} from 'geojson'
 import geoJson from "../../../global";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
+import {Coordinate} from "ol/coordinate";
 
 abstract class TrackPlayAnimation {
   /**
@@ -27,8 +28,9 @@ abstract class TrackPlayAnimation {
    * @param color 轨迹颜色
    * @param width 轨迹宽度
    * @param label 精灵标签
+   * @param degree 精灵与X轴的夹角（角度）
    */
-  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string) {
+  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number) {
     if (!this.canPlayNow())
       return;
     const geometry = this.nativeFeature.getGeometry()!;
@@ -43,7 +45,7 @@ abstract class TrackPlayAnimation {
       return
     }
     this.setState();
-    return new TrackPlay(this as any, image, time, showLine, color, width, label);
+    return new TrackPlay(this as any, image, time, showLine, color, width, label, degree);
   }
 }
 
@@ -57,14 +59,21 @@ class TrackPlay {
   listenerKey?: EventsKey;
   length: number;
   line: GeoLineString;
+  radian?: number;
+  renderer?: (pointStyle: Style, styleOver: Style, point: Coordinate) => void
 
-  constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, private time: number, private showLine: boolean, color: string, width: number, label?: string) {
+  constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, private time: number,
+              private showLine: boolean, color: string, width: number, label?: string, degree?: number) {
     //设置精灵
     this.styleBase = featureInstance.nativeFeature.getStyle() as Style;
     const geometry = featureInstance.nativeFeature.getGeometry()! as LineString;
     this.line = geoJson.writeFeatureObject(this.featureInstance.nativeFeature, {
       featureProjection: 'EPSG:3857'
     }).geometry as GeoLineString;
+
+    if (degree != undefined) {
+      this.radian = degree * Math.PI / 180;
+    }
 
     this.length = geometry.getLength();
     this.styleOver = new Style({
@@ -138,6 +147,15 @@ class TrackPlay {
           if (this.showLine) {
             vectorContext.setStyle(this.lineStyle);
             vectorContext.drawGeometry(new LineString(newLine.geometry.coordinates));
+          }
+          if (this.radian != undefined) {
+            const pointBefore = newLine.geometry.coordinates[newLine.geometry.coordinates.length - 2];
+            const rotation = this.radian - Math.atan2(lastPoint[1] - pointBefore[1], lastPoint[0] - pointBefore[0]);
+            this.pointStyle.getImage().setRotation(rotation);
+            this.styleOver.getImage().setRotation(rotation);
+          }
+          if (this.renderer) {
+            this.renderer(this.pointStyle, this.styleOver, lastPoint);
           }
           vectorContext.setStyle(this.pointStyle);
           vectorContext.drawGeometry(new Point(lastPoint));
