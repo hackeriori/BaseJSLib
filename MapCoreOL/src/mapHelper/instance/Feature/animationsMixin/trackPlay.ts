@@ -167,7 +167,7 @@ class TrackPlay {
     this.featureInstance.map.render();
     return new Promise(resolve => {
       sfn = resolve;
-    })
+    });
   }
 
   private stop() {
