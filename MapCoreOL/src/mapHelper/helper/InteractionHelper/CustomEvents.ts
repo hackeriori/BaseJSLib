@@ -54,7 +54,10 @@ export default class CustomEvents extends MapFrame {
         if (firstFeature.get('clickable')) {
           evt.preventDefault();
           const event = new BaseEvent('rightClick');
-          event.target = this.map.getCoordinateFromPixel(pixel);
+          event.target = {
+            coordinate: this.map.getCoordinateFromPixel(pixel),
+            pixel: [evt.clientX, evt.clientY]
+          };
           if (!this.mapHelper.interaction.interactionType)
             firstFeature.dispatchEvent(event);
           return;
