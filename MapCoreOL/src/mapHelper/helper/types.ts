@@ -27,7 +27,7 @@ export interface ClusterStyle extends StyleType {
   //是否自动增长
   autoIncrease: true,
   //自动增长的契机
-  increaseNumber: 10,
+  increaseNumber: number,
   //增长值
-  increaseBy: 1
+  increaseBy: number
 }
