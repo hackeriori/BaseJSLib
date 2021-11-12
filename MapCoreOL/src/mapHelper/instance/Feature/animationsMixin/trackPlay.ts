@@ -56,11 +56,12 @@ class TrackPlay {
   pointStyle: Style;
   isPaused = true;
   elapsedTime = 0;
+  nowTime = 0;
   listenerKey?: EventsKey;
   length: number;
   line: GeoLineString;
   radian?: number;
-  renderer?: (pointStyle: Style, styleOver: Style, point: Coordinate) => void
+  renderer?: (pointStyle: Style, styleOver: Style, point: Coordinate) => void;
 
   constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, private time: number,
               private showLine: boolean, color: string, width: number, label?: string, degree?: number) {
@@ -130,8 +131,10 @@ class TrackPlay {
       let elapsed = frameState.time - startTime + this.elapsedTime;
       if (elapsed > this.time || this.isPaused) {
         if (this.isPaused) {
+          this.nowTime = elapsed;
           this.goto(elapsed);
         } else {
+          this.nowTime = this.time;
           this.gotoEnd();
           sfn();
         }
@@ -139,6 +142,7 @@ class TrackPlay {
         return;
       }
       if (elapsed > 0) {
+        this.nowTime = elapsed;
         const nowLength = this.length * (elapsed / this.time);
         const newLine = lineSliceAlong(this.line, 0, nowLength, {units: 'meters'});
         if (newLine.geometry) {
