@@ -49,7 +49,7 @@ abstract class TrackPlayAnimation {
   }
 }
 
-class TrackPlay {
+export class TrackPlay {
   styleBase: Style;
   styleOver: Style;
   lineStyle: Style;
@@ -62,8 +62,11 @@ class TrackPlay {
   line: GeoLineString;
   radian?: number;
   renderer?: (pointStyle: Style, styleOver: Style, point: Coordinate) => void;
+  ratio = 1;
+  ratioTime = 0;
+  state: 'play' | 'pause' | 'stop' = "stop";
 
-  constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, private time: number,
+  constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, public time: number,
               private showLine: boolean, color: string, width: number, label?: string, degree?: number) {
     //设置精灵
     this.styleBase = featureInstance.nativeFeature.getStyle() as Style;
@@ -75,8 +78,7 @@ class TrackPlay {
     if (degree != undefined) {
       this.radian = degree * Math.PI / 180;
     }
-
-    this.length = geometry.getLength();
+    this.length = featureInstance.calcLength()!;
     this.styleOver = new Style({
       geometry: new Point(geometry.getCoordinates()[0]),
       image: new Icon({
@@ -121,6 +123,9 @@ class TrackPlay {
   }
 
   async play() {
+    if (this.state === 'play')
+      return;
+    this.state = 'play';
     let sfn: any
     this.featureInstance.nativeFeature.setStyle(this.styleBase);
     this.isPaused = false;
@@ -128,7 +133,7 @@ class TrackPlay {
     const animate = (event: RenderEvent) => {
       const vectorContext = getVectorContext(event);
       const frameState = event.frameState!;
-      let elapsed = frameState.time - startTime + this.elapsedTime;
+      let elapsed = frameState.time - startTime + this.elapsedTime - this.ratioTime;
       if (elapsed > this.time || this.isPaused) {
         if (this.isPaused) {
           this.nowTime = elapsed;
@@ -174,6 +179,19 @@ class TrackPlay {
     });
   }
 
+  setRatio(ratio: number) {
+    const currentRatio = ratio / this.ratio;
+    if (currentRatio !== 1) {
+      let ratioTime = this.nowTime >= this.time ? 0 : this.nowTime / currentRatio;
+      if (currentRatio < 1)
+        ratioTime = -ratioTime;
+      this.ratioTime += ratioTime;
+      this.time = this.time / currentRatio;
+      this.nowTime = this.ratioTime;
+      this.ratio = ratio;
+    }
+  }
+
   private stop() {
     if (this.listenerKey)
       unByKey(this.listenerKey);
@@ -196,9 +214,14 @@ class TrackPlay {
       return;
     }
     this.stop();
+    this.ratioTime = 0;
     this.elapsedTime = time;
-    if (time === this.time)
+    if (time === this.time) {
+      this.state = 'stop';
       this.elapsedTime = 0;
+    } else {
+      this.state = 'pause';
+    }
     if (time > 0) {
       const nowLength = this.length * (time / this.time);
       const newLine = lineSliceAlong(this.line, 0, nowLength, {units: 'meters'});
