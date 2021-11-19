@@ -134,5 +134,12 @@ export default abstract class TopologyMixin {
   getBeContainFeatures() {
     return getInExtentFeatures(this as any).filter(x => this.isBeContain(x, false)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
   }
+
+  /**
+   * 获取与此元素相交的所有元素
+   */
+  getCrossFeatures() {
+    return getInExtentFeatures(this as any).filter(x => this.isCross(x, false)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
+  }
 }
 
