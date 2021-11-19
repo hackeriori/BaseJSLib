@@ -15,6 +15,7 @@ import VectorSource from "ol/source/Vector";
 import {StyleLike} from "ol/style/Style";
 import TopologyMixin from "./TopologyMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
+import BaseEvent from "ol/events/Event";
 
 class PelInstance extends BaseFeature {
   //原生对象
@@ -217,11 +218,20 @@ class PelInstance extends BaseFeature {
           return;
       }
       element.addEventListener(event, ev => {
-        if (type === 'singleClick' && (ev as PointerEvent).button !== 0)
+        const evt = ev as PointerEvent;
+        if (type === 'singleClick' && evt.button !== 0)
           return;
         if (this.mapHelper.interaction.interactionType)
           return;
-        callback({type: type});
+        const event = new BaseEvent(type);
+        if (type === 'rightClick') {
+          const pixel = [evt.clientX, evt.clientY];
+          event.target = {
+            coordinate: this.map.getCoordinateFromPixel(pixel),
+            pixel,
+          }
+        }
+        callback(event);
         ev.preventDefault();
         ev.stopPropagation();
         ev.returnValue = false;
