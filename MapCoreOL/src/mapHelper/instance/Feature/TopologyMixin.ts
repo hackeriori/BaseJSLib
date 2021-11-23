@@ -1,10 +1,11 @@
 import Feature from "ol/Feature";
 import {Geometry, LineString, MultiLineString, MultiPoint, Point, Polygon} from "ol/geom";
 import geoJson, {getBaseFeatureInstanceByFeature} from "../../global";
-import {booleanContains, booleanCrosses} from "@turf/turf";
+import {booleanContains, booleanCrosses, lineSlice, length} from "@turf/turf";
 import MapHelper from "../../index";
 import {getInExtentFeatures} from "./command";
 import BaseFeature from "./BaseFeature";
+import {Coordinate} from "ol/coordinate";
 
 /**
  * 判断featureIn是否被featureOut所包含
@@ -140,6 +141,27 @@ export default abstract class TopologyMixin {
    */
   getCrossFeatures() {
     return getInExtentFeatures(this as any).filter(x => this.isCross(x, false)).map(x => getBaseFeatureInstanceByFeature(x, this.mapHelper)).filter(x => x) as BaseFeature[];
+  }
+
+  /**
+   * 获取线附近的点元素在线上的距离信息
+   * @param point
+   */
+  getLinePositionInfo(point: Coordinate) {
+    const type = this.nativeFeature.getGeometry()!.getType();
+    if (type === 'LineString') {
+      const line = (this.nativeFeature.getGeometry() as LineString).clone();
+      line.transform('EPSG:3857', 'EPSG:4326');
+      const firstPoint = line.getFirstCoordinate();
+      const closestPoint = line.getClosestPoint(this.mapHelper.projection.transCoordinate(point, 'EPSG:3857'));
+      const subLine = lineSlice(firstPoint, closestPoint, {
+        type: 'LineString',
+        coordinates: line.getCoordinates()
+      });
+      return length(subLine, {units: 'meters'});
+    } else {
+      console.log('指定图形不是线元素')
+    }
   }
 }
 
