@@ -63,7 +63,7 @@ export default abstract class MeasureMixin {
     const geometry = this.nativeFeature.getGeometry();
     if (geometry) {
       if ((geometry as any).getCoordinates) {
-        let coordinates = (geometry as any).getCoordinates() as any;
+        let coordinates = (geometry as any).getCoordinates() as Coordinate | Coordinate[] | Coordinate[][] | undefined;
         if (outProjection && coordinates)
           coordinates = this.mapHelper.projection.transCoordinates(coordinates, undefined, outProjection);
         return coordinates;

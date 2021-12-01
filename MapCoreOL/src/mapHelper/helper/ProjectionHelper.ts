@@ -46,6 +46,7 @@ export default class ProjectionHelper extends MapFrame {
   transCoordinates(coordinates: Coordinate, inProjection?: string, outProjection?: string): Coordinate
   transCoordinates(coordinates: Coordinate[], inProjection?: string, outProjection?: string): Coordinate[]
   transCoordinates(coordinates: Coordinate[][], inProjection?: string, outProjection?: string): Coordinate[][]
+  transCoordinates(coordinates: Coordinate | Coordinate[] | Coordinate[][], inProjection?: string, outProjection?: string): Coordinate | Coordinate[] | Coordinate[][]
   /**
    * 转换坐标或坐标数组，如果两个都没有，将点从对立坐标转到当前坐标，如果输出没有，将坐标从输入转到当前坐标，如果输入没有，将坐标从当前坐标转到输出坐标
    * @param coordinates 点
