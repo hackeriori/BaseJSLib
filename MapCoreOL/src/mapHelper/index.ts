@@ -11,6 +11,9 @@ import ViewHelper from "./helper/ViewHelper";
 import StyleHelper from "./helper/StyleHelper";
 import {zoomLevelChanged} from "./global";
 import setVersion from "../version";
+import Zoom, {Options as ZoomOptions} from 'ol/control/Zoom'
+import ScaleLine, {Options as ScaleLineOptions} from 'ol/control/ScaleLine';
+import MousePosition, {Options as MousePositionOptions} from 'ol/control/MousePosition';
 
 setVersion();
 
@@ -25,9 +28,10 @@ export default class MapHelper extends MapFrame {
   //Y偏移量缓存
   private offsetY?: number;
 
-  constructor(options: MapOptions, addDefaultLayer: boolean) {
+  constructor(options: MapOptions, addDefaultLayer = true) {
     let preOptions = getMapPreOptions();
     preOptions = {...preOptions, ...options};
+
     const map = new Map(preOptions);
     super(map);
     this.layer = new LayerHelper(map, this);
@@ -69,5 +73,34 @@ export default class MapHelper extends MapFrame {
       const coordinate = this.map.getCoordinateFromPixel(pixel);
       mapDropCallBack(coordinate, ev.dataTransfer);
     }
+  }
+
+  static getZoomControl(options?: ZoomOptions) {
+    let preOptions: ZoomOptions = {
+      zoomInTipLabel: '放大',
+      zoomOutTipLabel: '缩小',
+    };
+    preOptions = {...preOptions, ...options};
+    return new Zoom(preOptions);
+  }
+
+  static getScaleLineControl(options?: ScaleLineOptions) {
+    return new ScaleLine(options);
+  }
+
+  static getMousePositionControl(options?: MousePositionOptions) {
+    let fixedNumber = 2;
+    if (options && options.projection === 'EPSG:4326')
+      fixedNumber = 6;
+    let preOptions: MousePositionOptions = {
+      coordinateFormat(x) {
+        if (x)
+          return `${x[0].toFixed(fixedNumber)},${x[1].toFixed(fixedNumber)}`
+        else
+          return '';
+      }
+    }
+    preOptions = {...preOptions,...options};
+    return new MousePosition(preOptions)
   }
 }
