@@ -1,4 +1,4 @@
-import Draw, {Options as DrawOptions} from "ol/interaction/Draw";
+import Draw, {Options as DrawOptions, createBox} from "ol/interaction/Draw";
 import {OneFeatureCallBack} from "./types";
 import Snap from "ol/interaction/Snap";
 import Map from 'ol/Map';
@@ -25,10 +25,20 @@ export default class DrawFeatureMixin {
    */
   startDraw(geometryType: any, callBack: OneFeatureCallBack, drawOptions?: DrawOptions) {
     this.mapHelper.interaction.stopAll();
+    let type = geometryType;
+    //矩形
+    let geometryFunction: any = undefined;
+    if (geometryType === 'Box') {
+      type = 'Circle'
+      geometryFunction = createBox();
+    }
     let options: DrawOptions = {
-      type: geometryType,
+      type,
     };
     options = {...options, ...drawOptions};
+    if (geometryFunction) {
+      options.geometryFunction = geometryFunction;
+    }
     options.source = this.getVectorSource();
     this.nativeDraw = new Draw(options);
     this.nativeDraw.on('drawend', evt => {
