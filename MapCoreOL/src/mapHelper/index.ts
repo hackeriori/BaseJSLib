@@ -14,6 +14,7 @@ import setVersion from "../version";
 import Zoom, {Options as ZoomOptions} from 'ol/control/Zoom'
 import ScaleLine, {Options as ScaleLineOptions} from 'ol/control/ScaleLine';
 import MousePosition, {Options as MousePositionOptions} from 'ol/control/MousePosition';
+import OverviewMap, {Options as OverviewOptions} from "ol/control/OverviewMap";
 
 setVersion();
 
@@ -100,7 +101,11 @@ export default class MapHelper extends MapFrame {
           return '';
       }
     }
-    preOptions = {...preOptions,...options};
+    preOptions = {...preOptions, ...options};
     return new MousePosition(preOptions)
+  }
+
+  static getOverviewMapControl(options?: OverviewOptions) {
+    return new OverviewMap(options);
   }
 }
