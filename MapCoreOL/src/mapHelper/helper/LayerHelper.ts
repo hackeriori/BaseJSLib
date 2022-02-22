@@ -22,7 +22,7 @@ import CircleStyle from "ol/style/Circle";
 import {Tile, Vector} from "ol/source";
 import {Geometry} from "ol/geom";
 import {Options as ImageOptions} from "ol/layer/BaseImage";
-import ImageSource, {Options as ImageSourceOptions} from "ol/source/Image";
+import ImageSource, {Options as ImageSourceOptions} from "ol/source/ImageStatic";
 
 export default class LayerHelper extends MapFrame {
   readonly layerList: { [key: string]: LayerInstance } = {};

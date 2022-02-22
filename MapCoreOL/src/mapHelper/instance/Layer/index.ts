@@ -5,7 +5,7 @@ import {Options as ImageOptions} from 'ol/layer/BaseImage';
 import TileSource from "ol/source/Tile";
 import TileLayer from "ol/layer/Tile";
 import ImageLayer from "ol/layer/Image";
-import ImageSource from "ol/source/Image";
+import ImageSource from "ol/source/ImageStatic";
 import VectorLayer from "ol/layer/Vector";
 import {MapFrame} from "../../MapFrame";
 import Map from 'ol/Map';
