@@ -1,8 +1,11 @@
 import BaseLayer from "ol/layer/Base";
 import {Options as TileOptions} from 'ol/layer/BaseTile';
 import {Options as VectorOptions} from 'ol/layer/BaseVector';
+import {Options as ImageOptions} from 'ol/layer/BaseImage';
 import TileSource from "ol/source/Tile";
 import TileLayer from "ol/layer/Tile";
+import ImageLayer from "ol/layer/Image";
+import ImageSource from "ol/source/Image";
 import VectorLayer from "ol/layer/Vector";
 import {MapFrame} from "../../MapFrame";
 import Map from 'ol/Map';
@@ -20,7 +23,7 @@ class LayerInstance extends MapFrame {
   //ol原生图层
   readonly nativeLayer: BaseLayer;
   //图层类型
-  readonly mapType: 'tile' | 'vector';
+  readonly mapType: 'tile' | 'vector' | 'image';
   //图层ID
   readonly id: string;
   //图层列表
@@ -35,13 +38,18 @@ class LayerInstance extends MapFrame {
   zoomVisibly: boolean;
 
   //图层的可见性可以设置在options里面
-  constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions<Tile> | VectorOptions<Vector<Geometry>>, layerList: { [key: string]: LayerInstance }) {
+  constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions<Tile> |
+                VectorOptions<Vector<Geometry>> | ImageOptions<ImageSource>
+    , layerList: { [key: string]: LayerInstance }) {
     super(map, mapHelper);
     this.id = id;
     this.layerList = layerList;
     if (options.source instanceof TileSource) {
       this.mapType = "tile";
       this.nativeLayer = new TileLayer(options as TileOptions<Tile>);
+    } else if (options.source instanceof ImageSource) {
+      this.mapType = 'image';
+      this.nativeLayer = new ImageLayer(options as ImageOptions<ImageSource>)
     } else {
       this.mapType = "vector";
       this.nativeLayer = new VectorLayer(options as VectorOptions<Vector<Geometry>>);

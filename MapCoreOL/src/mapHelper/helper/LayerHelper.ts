@@ -21,6 +21,8 @@ import PelInstance from '../instance/Feature/Pel';
 import CircleStyle from "ol/style/Circle";
 import {Tile, Vector} from "ol/source";
 import {Geometry} from "ol/geom";
+import {Options as ImageOptions} from "ol/layer/BaseImage";
+import ImageSource, {Options as ImageSourceOptions} from "ol/source/Image";
 
 export default class LayerHelper extends MapFrame {
   readonly layerList: { [key: string]: LayerInstance } = {};
@@ -34,7 +36,7 @@ export default class LayerHelper extends MapFrame {
    * @param id 图层ID
    * @param options 图层选项
    */
-  createLayer(id: string, options: TileOptions<Tile> | VectorOptions<Vector<Geometry>>) {
+  createLayer(id: string, options: TileOptions<Tile> | VectorOptions<Vector<Geometry>> | ImageOptions<ImageSource>) {
     if (this.layerList[id])
       console.log(`图层id[${id}]重复，重复的图层未添加到地图上`);
     else {
@@ -62,7 +64,7 @@ export default class LayerHelper extends MapFrame {
     if ('source' in options) {
       const cluster = new Cluster(options);
       cluster.on('addfeature', evt => {
-        const feature = evt.feature! ;
+        const feature = evt.feature!;
         const features = feature.get('features') as Feature<Geometry>[];
         const featureInstances = features.map(x => getFeatureInstanceByFeature(x, this.mapHelper))
           .filter(x => x) as FeatureInstance[];
@@ -153,6 +155,14 @@ export default class LayerHelper extends MapFrame {
    */
   createTileSource(options: XYZSourceOptions) {
     return new XYZ(options);
+  }
+
+  /**
+   * 创建图片源
+   * @param options 图片源选项
+   */
+  createImageSource(options: ImageSourceOptions) {
+    return new ImageSource(options);
   }
 
   /**
