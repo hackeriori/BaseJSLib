@@ -50,7 +50,7 @@ class FeatureInstance extends BaseFeature {
       //如果是多边形，需要闭合
       for (let i = 0; i < geoJSONFeature.geometry.coordinates.length; i++) {
         const ring = geoJSONFeature.geometry.coordinates[i];
-        if (ring[0].toString() !== ring[ring.length - 1].toString())
+        if (ring.length > 0 && ring[0].toString() !== ring[ring.length - 1].toString())
           ring.push([ring[0][0], ring[0][1]]);
       }
     }
