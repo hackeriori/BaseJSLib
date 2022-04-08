@@ -47,7 +47,7 @@ export default class CustomEvents extends MapFrame {
       }
     }) as EventsKey;
     this.obRightClick = evt => {
-      const pixel = [evt.clientX, evt.clientY];
+      const pixel = [evt.offsetX, evt.offsetY];
       const features = this.map.getFeaturesAtPixel(pixel);
       if (features.length > 0) {
         const firstFeature = features[0] as Feature<Geometry>;
