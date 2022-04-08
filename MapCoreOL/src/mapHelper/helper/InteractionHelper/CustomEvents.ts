@@ -167,7 +167,7 @@ export default class CustomEvents extends MapFrame {
       }
     } else {
       const featureInstance = getFeatureInstanceByFeature(feature, this.mapHelper);
-      if (featureInstance && !featureInstance.getPlayState()) {
+      if (featureInstance && !featureInstance.getPlayState() && !featureInstance.styleLike) {
         if (normalStyle)
           featureInstance.setNormalStyle();
         else

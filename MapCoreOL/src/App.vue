@@ -35,7 +35,7 @@ export default class App extends Vue {
         });
         feature.setNormalStyle([{
           image: {
-            src:'./images/car.png'
+            src: './images/car.png'
           },
           text: {
             text: '你好'
@@ -43,10 +43,11 @@ export default class App extends Vue {
         }]);
         feature.setHighLightStyle([{
           image: {
-            src:'./images/car.png'
+            src: './images/car.png'
           },
           text: {
-            text: '你好'
+            text: '你好',
+            offsetY: -20
           }
         }]);
       }
@@ -66,10 +67,10 @@ export default class App extends Vue {
           id: 'test2',
           geometry: {
             type: 'LineString',
-            coordinates: [[11849481.470703507, 3429761.3150701774], [11850011.752587235, 3429758.9264130434],[11850188.513215143, 3430174.552754344]]
+            coordinates: [[11849481.470703507, 3429761.3150701774], [11850011.752587235, 3429758.9264130434], [11850188.513215143, 3430174.552754344]]
           },
           properties: {id: 'test2', name: 'test2', clickable: true}
-        })!.getTrackPlayAnimationObj('./images/car.png',undefined,undefined,undefined,undefined,undefined,0).then(x=>x?.play());
+        })!.getTrackPlayAnimationObj('./images/car.png', undefined, undefined, undefined, undefined, undefined, 0).then(x => x?.play());
       const dom = document.createElement('div');
       dom.style.height = '32px';
       dom.style.width = '32px';
@@ -97,7 +98,7 @@ export default class App extends Vue {
     //     console.log(mapHelper.view.getBBox('EPSG:4326'));
     //   }
     // );
-    mapHelper.interaction.customEvents.start(x=>console.log(x));
+    mapHelper.interaction.customEvents.start(x => console.log(x));
     window.mapHelper = mapHelper;
   }
 }

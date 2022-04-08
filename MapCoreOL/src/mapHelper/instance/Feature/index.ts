@@ -25,7 +25,7 @@ class FeatureInstance extends BaseFeature {
   //图层实例
   readonly layerInstance: LayerInstance;
   //样式缓存（用于隐藏时缓存样式）
-  protected styleLike?: StyleLike = undefined;
+  public styleLike?: StyleLike = undefined;
   //普通样式
   normalStyle?: StyleLike = undefined;
   //高亮样式
