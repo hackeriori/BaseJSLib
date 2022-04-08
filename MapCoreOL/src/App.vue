@@ -35,12 +35,7 @@ export default class App extends Vue {
         });
         feature.setNormalStyle([{
           image: {
-            stroke: {
-              color: 'red',
-              width: 1,
-            },
-            fill: {color: 'rgba(255,255,255,0.01)'},
-            radius: 5,
+            src:'./images/car.png'
           },
           text: {
             text: '你好'
@@ -48,12 +43,7 @@ export default class App extends Vue {
         }]);
         feature.setHighLightStyle([{
           image: {
-            stroke: {
-              color: 'yellow',
-              width: 2,
-            },
-            fill: {color: 'rgba(255,255,255,0.01)'},
-            radius: 5
+            src:'./images/car.png'
           },
           text: {
             text: '你好'
@@ -79,7 +69,7 @@ export default class App extends Vue {
             coordinates: [[11849481.470703507, 3429761.3150701774], [11850011.752587235, 3429758.9264130434],[11850188.513215143, 3430174.552754344]]
           },
           properties: {id: 'test2', name: 'test2', clickable: true}
-        })!.getTrackPlayAnimationObj('./images/car.png',undefined,undefined,undefined,undefined,undefined,90).then(x=>x?.play());
+        })!.getTrackPlayAnimationObj('./images/car.png',undefined,undefined,undefined,undefined,undefined,0).then(x=>x?.play());
       const dom = document.createElement('div');
       dom.style.height = '32px';
       dom.style.width = '32px';
@@ -88,7 +78,7 @@ export default class App extends Vue {
         id: 'testPel',
         options: {
           element: dom,
-          position: [11849211.99781884, 3430166.63782584],
+          position: [11849311.99781884, 3430166.63782584],
           stopEvent: false
         }
       });
