@@ -154,6 +154,9 @@ export default class LayerHelper extends MapFrame {
    * @param options 数据源选项
    */
   createTileSource(options: XYZSourceOptions) {
+    if (!options.crossOrigin) {
+      options.crossOrigin = 'anonymous';
+    }
     return new XYZ(options);
   }
 
@@ -162,6 +165,9 @@ export default class LayerHelper extends MapFrame {
    * @param options 图片源选项
    */
   createImageSource(options: ImageSourceOptions) {
+    if (!options.crossOrigin) {
+      options.crossOrigin = 'anonymous';
+    }
     return new ImageSource(options);
   }
 
