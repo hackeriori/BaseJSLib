@@ -92,14 +92,7 @@ export default class App extends Vue {
         });
       }
     }
-    // mapHelper.interaction.customEvents.start(x => {// console.log(x)
-    //     console.log(mapHelper.projection.transCoordinate(x, 'EPSG:3857'));
-    //     mapHelper.view.setViewerInfo({center: x, zoom: 14}, false);
-    //     console.log(mapHelper.view.getBBox('EPSG:4326'));
-    //   }
-    // );
     mapHelper.interaction.customEvents.start(x => console.log(x));
-    window.mapHelper = mapHelper;
   }
 }
 </script>

@@ -3,3 +3,5 @@ interface Window {
     [key: string]: string,
   }
 }
+
+declare const ResizeObserver:any

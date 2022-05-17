@@ -55,6 +55,13 @@ export default class MapHelper extends MapFrame {
     map.getView().on('change:resolution', () => {
       zoomLevelChanged(this);
     });
+    //注册容器大小改变事件
+    const resizeObserver = new ResizeObserver((entries: any) => {
+      for (let entry of entries) {
+        map.updateSize();
+      }
+    });
+    resizeObserver.observe(map.getTargetElement());
     this.mapHelper = this;
   }
 
