@@ -23,7 +23,8 @@ abstract class LineFlowAnimation {
       return;
     const geometry = this.nativeFeature.getGeometry()!;
     //不是线，退出
-    if (geometry.getType() !== 'LineString') {
+    const geometryType = geometry.getType();
+    if (geometryType !== 'LineString' && geometryType !== 'MultiLineString') {
       console.log('播放线流动动画的元素不是线类型');
       return;
     }
