@@ -9,7 +9,7 @@ import InteractionHelper from "./helper/InteractionHelper";
 import ProjectionHelper from "./helper/ProjectionHelper";
 import ViewHelper from "./helper/ViewHelper";
 import StyleHelper from "./helper/StyleHelper";
-import {zoomLevelChanged} from "./global";
+import {debounce, zoomLevelChanged} from "./global";
 import setVersion from "../version";
 import Zoom, {Options as ZoomOptions} from 'ol/control/Zoom'
 import ScaleLine, {Options as ScaleLineOptions} from 'ol/control/ScaleLine';
@@ -36,6 +36,7 @@ export default class MapHelper extends MapFrame {
 
     const map = new Map(preOptions);
     super(map);
+    this.mapHelper = this;
     this.layer = new LayerHelper(map, this);
     this.interaction = new InteractionHelper(map, this);
     this.projection = new ProjectionHelper(map, this);
@@ -52,17 +53,12 @@ export default class MapHelper extends MapFrame {
       })
     }
     //注册缩放事件，控制图元显隐
-    map.getView().on('change:resolution', () => {
-      zoomLevelChanged(this);
-    });
+    this.view.on('zoomLevelChanged', () => zoomLevelChanged(this));
     //注册容器大小改变事件
-    const resizeObserver = new ResizeObserver((entries: any) => {
-      for (let entry of entries) {
-        map.updateSize();
-      }
-    });
+    const resizeObserver = new ResizeObserver(debounce(() => {
+      map.updateSize();
+    }, 50));
     resizeObserver.observe(map.getTargetElement());
-    this.mapHelper = this;
   }
 
   /**

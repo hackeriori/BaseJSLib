@@ -102,3 +102,47 @@ export function zoomLevelChanged(mapHelper: MapHelper) {
     }
   }
 }
+
+interface DebounceReturnFunType<T extends (...args: any) => any> {
+  (...arg: Parameters<T>): void,
+
+  // 取消执行
+  cancel(): void
+}
+
+/**
+ * 防抖，目标函数在防抖时间内不会执行，每次执行防抖方法都会造成防抖时间延长，超过防抖时间才会执行
+ * @param fn 目标函数
+ * @param delay 防抖时间
+ * @param immediate 是否立即执行
+ * @param resultCallback 用于获取目标函数执行结果的回调方法
+ */
+export function debounce<T extends (...args: any) => any>(fn: T, delay: number, immediate = false, resultCallback?: (result: ReturnType<T>) => void) {
+  let timer: NodeJS.Timeout | null = null
+  //是否已执行
+  let isInvoke = false
+
+  const _debounce: DebounceReturnFunType<T> = function (this: any, ...args) {
+    if (timer)
+      clearTimeout(timer)
+    if (immediate && !isInvoke) {
+      const result = fn.apply(this, args)
+      if (resultCallback)
+        resultCallback(result)
+      isInvoke = true
+    }
+    timer = setTimeout(() => {
+      const result = fn.apply(this, args)
+      if (resultCallback)
+        resultCallback(result)
+      timer = null
+    }, delay)
+  }
+
+  _debounce.cancel = function () {
+    if (timer) clearTimeout(timer)
+    timer = null
+  }
+
+  return _debounce
+}
