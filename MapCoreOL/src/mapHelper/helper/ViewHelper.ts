@@ -2,15 +2,15 @@ import {MapFrame} from "../MapFrame";
 import Map from "ol/Map";
 import MapHelper from "../index";
 import {ViewerInfo} from "./types";
-import {debounce, zoomLevelChanged} from "../global";
+import {debounce} from "../global";
 
 export default class ViewHelper extends MapFrame {
   private events: Function[] = [];
 
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
-    map.getView().on('change:resolution', debounce(() => {
-      this.events.forEach(x => x());
+    map.getView().on('change:resolution', debounce((...args) => {
+      this.events.forEach(x => x(...args));
     }, 50));
   }
 

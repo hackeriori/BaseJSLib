@@ -4,13 +4,13 @@
  * @param crossOrigin 设置图片跨域，常用于canvas导出（需远程服务器支持）
  */
 export default async function loadImg(src: string, crossOrigin = true): Promise<HTMLImageElement | undefined> {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
+  return new Promise<HTMLImageElement | undefined>((resolve, reject) => {
     const img = new Image();
     img.addEventListener('load', () => {
       resolve(img)
     });
     img.addEventListener('error', () => {
-      resolve();
+      resolve(undefined);
     });
     if (crossOrigin)
       img.crossOrigin = 'Anonymous';

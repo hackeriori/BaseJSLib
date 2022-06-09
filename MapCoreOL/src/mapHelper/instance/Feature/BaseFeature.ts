@@ -58,7 +58,7 @@ abstract class BaseFeature extends MapFrame {
   /**
    * 闪烁动画
    */
-  abstract async flash(options?: Partial<FlashPointParamsType>): Promise<void>
+  abstract flash(options?: Partial<FlashPointParamsType>): Promise<void>
 }
 
 interface BaseFeature extends TopologyMixin {
