@@ -35,7 +35,7 @@ export default abstract class AnimationsSharedData {
     if (this.isPlayAnimation)
       return false;
     //元素不可见，退出
-    return !(this.styleLike || !this.layerInstance.visibly);
+    return !this.styleLike;
   }
 
   /**
