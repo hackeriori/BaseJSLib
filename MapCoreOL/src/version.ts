@@ -1,5 +1,5 @@
 export default function setVersion() {
-  if (!window.top.versionInfo)
-    window.top.versionInfo = {};
-  window.top.versionInfo[process.env.projName!] = process.env.version!;
+  if (!window.versionInfo)
+    window.versionInfo = {};
+  window.versionInfo[process.env.projName!] = process.env.version!;
 }
