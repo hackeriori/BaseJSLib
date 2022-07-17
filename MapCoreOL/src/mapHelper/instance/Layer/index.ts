@@ -16,14 +16,14 @@ import PelInstance from "../Feature/Pel";
 import MapHelper from "../../index";
 import {zoomLevelChanged} from "../../global";
 import DrawFeatureMixin from "./DrawFeatureMixin";
-import {Tile, Vector} from "ol/source";
+import {Tile, Vector, WMTS} from "ol/source";
 import {Geometry} from "ol/geom";
 
 class LayerInstance extends MapFrame {
   //ol原生图层
   readonly nativeLayer: BaseLayer;
   //图层类型
-  readonly mapType: 'tile' | 'vector' | 'image';
+  readonly mapType: 'tile' | 'vector' | 'image' | 'wmts';
   //图层ID
   readonly id: string;
   //图层列表
@@ -38,15 +38,20 @@ class LayerInstance extends MapFrame {
   zoomVisibly: boolean;
 
   //图层的可见性可以设置在options里面
-  constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions<Tile> |
+  constructor(map: Map, mapHelper: MapHelper, id: string, options: TileOptions<Tile | WMTS> |
                 VectorOptions<Vector<Geometry>> | ImageOptions<ImageSource>
     , layerList: { [key: string]: LayerInstance }) {
     super(map, mapHelper);
     this.id = id;
     this.layerList = layerList;
     if (options.source instanceof TileSource) {
-      this.mapType = "tile";
-      this.nativeLayer = new TileLayer(options as TileOptions<Tile>);
+      if (options.source instanceof WMTS) {
+        this.mapType = 'wmts';
+        this.nativeLayer = new TileLayer(options as TileOptions<WMTS>)
+      } else {
+        this.mapType = "tile";
+        this.nativeLayer = new TileLayer(options as TileOptions<Tile>);
+      }
     } else if (options.source instanceof ImageSource) {
       this.mapType = 'image';
       this.nativeLayer = new ImageLayer(options as ImageOptions<ImageSource>)

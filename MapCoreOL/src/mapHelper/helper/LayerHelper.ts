@@ -6,6 +6,8 @@ import {Options as VectorOptions} from "ol/layer/BaseVector";
 import VectorSource, {Options as VectorSourceOptions} from "ol/source/Vector";
 import Cluster, {Options as ClusterSourceOptions} from "ol/source/Cluster";
 import XYZ, {Options as XYZSourceOptions} from "ol/source/XYZ";
+import {Options as WMTSOptions} from 'ol/source/WMTS';
+import WMTSGrid from 'ol/tilegrid/WMTS';
 import MapHelper from "../index";
 import Feature from "ol/Feature";
 import BaseEvent from "ol/events/Event";
@@ -19,10 +21,12 @@ import {ClusterEventType, ClusterStyle, ClusterStyles} from "./types";
 import FeatureInstance from "../instance/Feature";
 import PelInstance from '../instance/Feature/Pel';
 import CircleStyle from "ol/style/Circle";
-import {Tile, Vector} from "ol/source";
+import {Tile, Vector, WMTS} from "ol/source";
 import {Geometry} from "ol/geom";
 import {Options as ImageOptions} from "ol/layer/BaseImage";
 import ImageSource, {Options as ImageSourceOptions} from "ol/source/ImageStatic";
+import {get as getProjection} from "ol/proj";
+import {getTopLeft, getWidth} from "ol/extent";
 
 export default class LayerHelper extends MapFrame {
   readonly layerList: { [key: string]: LayerInstance } = {};
@@ -36,7 +40,7 @@ export default class LayerHelper extends MapFrame {
    * @param id 图层ID
    * @param options 图层选项
    */
-  createLayer(id: string, options: TileOptions<Tile> | VectorOptions<Vector<Geometry>> | ImageOptions<ImageSource>) {
+  createLayer(id: string, options: TileOptions<Tile | WMTS> | VectorOptions<Vector<Geometry>> | ImageOptions<ImageSource>) {
     if (this.layerList[id])
       console.log(`图层id[${id}]重复，重复的图层未添加到地图上`);
     else {
@@ -169,6 +173,39 @@ export default class LayerHelper extends MapFrame {
       options.crossOrigin = 'anonymous';
     }
     return new ImageSource(options);
+  }
+
+  /**
+   * 创建WMTS源
+   * @param options WMTS选项(tileGrid除外)
+   */
+  createWMTSSource(options: PartialByKeys<WMTSOptions, 'tileGrid' | 'matrixSet'>) {
+    if (!options.crossOrigin) {
+      options.crossOrigin = 'anonymous';
+    }
+    if (!options.tileGrid) {
+      //默认使用3857的网格
+      const projection = getProjection('EPSG:3857')!;
+      const projectionExtent = projection.getExtent();
+      const size = getWidth(projectionExtent) / 256;
+      const maxZoom = 21;
+      const resolutions = new Array(maxZoom);
+      const matrixIds = new Array(maxZoom);
+      for (let z = 0; z < maxZoom; ++z) {
+        resolutions[z] = size / Math.pow(2, z);
+        matrixIds[z] = z;
+      }
+      options.tileGrid = new WMTSGrid({
+        origin: getTopLeft(projectionExtent),
+        resolutions: resolutions,
+        matrixIds: matrixIds,
+      })
+    }
+    if (options.wrapX === undefined || options.wrapX === null)
+      options.wrapX = true;
+    if (!options.matrixSet)
+      options.matrixSet = 'GoogleMapsCompatible';
+    return new WMTS(options as WMTSOptions);
   }
 
   /**
