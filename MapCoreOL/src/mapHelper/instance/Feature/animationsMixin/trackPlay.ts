@@ -106,7 +106,9 @@ export class TrackPlay {
     this.pointStyle = new Style({
       image: new Icon({
         img: image,
-        imgSize: [image.width, image.height]
+        imgSize: [image.width, image.height],
+        scale: devicePixelRatio,
+        anchor: [1 - 0.5 * devicePixelRatio, 1 - 0.5 * devicePixelRatio]
       }),
       text: label ? new Text({
         text: label,
