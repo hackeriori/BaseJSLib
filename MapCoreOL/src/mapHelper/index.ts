@@ -55,10 +55,12 @@ export default class MapHelper extends MapFrame {
     //注册缩放事件，控制图元显隐
     this.view.on('zoomLevelChanged', () => zoomLevelChanged(this));
     //注册容器大小改变事件
-    const resizeObserver = new ResizeObserver(debounce(() => {
-      map.updateSize();
-    }, 50));
-    resizeObserver.observe(map.getTargetElement());
+    if ((window as any).ResizeObserver) {
+      const resizeObserver = new ResizeObserver(debounce(() => {
+        map.updateSize();
+      }, 50));
+      resizeObserver.observe(map.getTargetElement());
+    }
   }
 
   /**
