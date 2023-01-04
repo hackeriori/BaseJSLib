@@ -19,7 +19,7 @@ import BaseEvent from "ol/events/Event";
 
 class PelInstance extends BaseFeature {
   //原生对象
-  readonly nativeOverlay: Overlay;
+  nativeOverlay: Overlay;
   //ol原生元素对象，此对象设置为始终不可见
   readonly nativeFeature: Feature<Geometry>;
   //元素ID
@@ -125,6 +125,8 @@ class PelInstance extends BaseFeature {
   destroy(): void {
     if (this.layerInstance.pelList[this.id]) {
       this.map.removeOverlay(this.nativeOverlay);
+      this.nativeOverlay.dispose();
+      this.nativeOverlay = undefined as any;
       this.nativeSource.removeFeature(this.nativeFeature);
       delete this.layerInstance.pelList[this.id];
     } else
