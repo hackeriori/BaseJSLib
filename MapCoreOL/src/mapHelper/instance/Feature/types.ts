@@ -29,7 +29,7 @@ export interface StyleType {
   fill?: FillOptions;
   stroke?: StrokeOptions;
   text?: StyleText;
-  image?: StyleCircle | IconOptions;
+  image?: StyleCircle | IconOptions | StyleRegularShape;
   zIndex?: number;
 }
 
@@ -58,6 +58,20 @@ export interface StyleCircle {
   radius: number;
   stroke?: StrokeOptions;
   displacement?: number[];
+}
+
+export interface StyleRegularShape{
+  fill?: FillOptions;
+  points: number;
+  radius?: number;
+  radius1?: number;
+  radius2?: number;
+  angle?: number;
+  displacement?: number[];
+  stroke?: StrokeOptions;
+  rotation?: number;
+  rotateWithView?: boolean;
+  scale?: number;
 }
 
 export interface FlashPointParamsType {

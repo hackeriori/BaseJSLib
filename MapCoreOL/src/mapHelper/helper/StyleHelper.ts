@@ -1,5 +1,5 @@
 import {MapFrame} from "../MapFrame";
-import {StyleCircle, StyleText, StyleType} from "../instance/Feature/types";
+import {StyleCircle, StyleRegularShape, StyleText, StyleType} from "../instance/Feature/types";
 import Fill, {Options as FillOptions} from "ol/style/Fill";
 import Stroke, {Options as StrokeOptions} from "ol/style/Stroke";
 import Text, {Options as TextOptions} from "ol/style/Text";
@@ -11,8 +11,9 @@ import Map from "ol/Map";
 import MapHelper from "../index";
 import loadImg from '../../../../Utils/loadImg';
 import resizeImg from '../../../../Utils/resizeImg';
+import RegularShape from "ol/style/RegularShape";
 
-export default class StyleHelper extends MapFrame{
+export default class StyleHelper extends MapFrame {
   readonly loadImg = loadImg;
   readonly resizeImg = resizeImg;
 
@@ -99,15 +100,27 @@ export default class StyleHelper extends MapFrame{
    * @param image
    */
   private createImageStyle(image: IconOptions): ImageStyle
-  private createImageStyle(image: StyleCircle | IconOptions) {
-    if (image.hasOwnProperty('radius')) {
-      const circle = image as StyleCircle
+  /**
+   * 创建形状样式
+   * @param image
+   */
+  private createImageStyle(image: StyleRegularShape): ImageStyle
+  private createImageStyle(image: StyleCircle | IconOptions | StyleRegularShape) {
+    if (image.hasOwnProperty('radius') && !image.hasOwnProperty('point')) {
+      const circle = image as StyleCircle;
       return new CircleStyle({
         fill: circle.fill ? this.createFillStyle(circle.fill) : undefined,
         radius: circle.radius,
         stroke: circle.stroke ? this.createStrokeStyle(circle.stroke) : undefined,
         displacement: circle.displacement,
       });
+    } else if (image.hasOwnProperty('point')) {
+      const circle = image as StyleRegularShape;
+      return new RegularShape({
+        ...circle,
+        fill: circle.fill ? this.createFillStyle(circle.fill) : undefined,
+        stroke: circle.stroke ? this.createStrokeStyle(circle.stroke) : undefined,
+      })
     } else
       return new Icon(image);
   }
