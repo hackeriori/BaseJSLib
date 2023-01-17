@@ -106,7 +106,7 @@ export default class StyleHelper extends MapFrame {
    */
   private createImageStyle(image: StyleRegularShape): ImageStyle
   private createImageStyle(image: StyleCircle | IconOptions | StyleRegularShape) {
-    if (image.hasOwnProperty('radius') && !image.hasOwnProperty('point')) {
+    if (image.hasOwnProperty('radius') && !image.hasOwnProperty('points')) {
       const circle = image as StyleCircle;
       return new CircleStyle({
         fill: circle.fill ? this.createFillStyle(circle.fill) : undefined,
@@ -114,7 +114,7 @@ export default class StyleHelper extends MapFrame {
         stroke: circle.stroke ? this.createStrokeStyle(circle.stroke) : undefined,
         displacement: circle.displacement,
       });
-    } else if (image.hasOwnProperty('point')) {
+    } else if (image.hasOwnProperty('points')) {
       const circle = image as StyleRegularShape;
       return new RegularShape({
         ...circle,
