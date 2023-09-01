@@ -1,11 +1,24 @@
 import Feature from "ol/Feature";
 import {Geometry, LineString, MultiLineString, MultiPoint, Point, Polygon} from "ol/geom";
 import geoJson, {getBaseFeatureInstanceByFeature} from "../../global";
-import {booleanContains, booleanCrosses, lineSlice, length} from "@turf/turf";
+import {
+  booleanContains,
+  booleanCrosses,
+  lineSlice,
+  length,
+  lineOffset,
+  lineString,
+  midpoint,
+  bezierSpline
+} from "@turf/turf";
 import MapHelper from "../../index";
 import {getInExtentFeatures} from "./command";
 import BaseFeature from "./BaseFeature";
 import {Coordinate} from "ol/coordinate";
+import {GeoJsonProperties} from "geojson";
+
+const message = '指定图形不是面类型';
+const lineMessage = '指定图形不是线元素';
 
 /**
  * 判断featureIn是否被featureOut所包含
@@ -56,8 +69,6 @@ function isCrossAB(featureOut: Feature<Geometry>, featureIn: Feature<Geometry>) 
     return false
   }
 }
-
-const message = '指定图形不是面类型，无法计算';
 
 export default abstract class TopologyMixin {
   //ol原生元素对象
@@ -160,7 +171,42 @@ export default abstract class TopologyMixin {
       });
       return length(subLine, {units: 'meters'});
     } else {
-      console.log('指定图形不是线元素')
+      console.log(lineMessage)
+    }
+  }
+
+  /**
+   * 计算航线
+   * @param replace 是否将计算出的航线替换掉自身
+   * @param radian 航线弧度，默认为长度的10%
+   */
+  getAirLine(replace = true, radian = 0.1) {
+    const geometry = this.nativeFeature.getGeometry() as LineString
+    const type = geometry.getType();
+    if (type === 'LineString') {
+      if (geometry.getCoordinates().length > 2) {
+        console.log('计算航线仅需两个点的线段');
+        return
+      }
+      const lineNative = geometry.clone();
+      lineNative.transform('EPSG:3857', 'EPSG:4326');
+      const line = lineString(lineNative.getCoordinates());
+      //获取线段长度
+      const lineLength = length(line, {units: "meters"});
+      const offsetLine = lineOffset(line, lineLength * radian, {units: "meters"});
+      //获取偏移后线段的中点
+      const midPoint = midpoint(offsetLine.geometry.coordinates[0], offsetLine.geometry.coordinates[1]);
+      //计算由原线段和中点构成的贝塞尔曲线
+      const bezierLine = bezierSpline(
+        lineString([line.geometry.coordinates[0], midPoint.geometry.coordinates, line.geometry.coordinates[1]])
+      );
+      if (replace) {
+        geometry.setCoordinates(bezierLine.geometry.coordinates);
+        geometry.transform('EPSG:4326', 'EPSG:3857');
+      }
+      return bezierLine.geometry.coordinates.map(x => x);
+    } else {
+      console.log(lineMessage);
     }
   }
 }
