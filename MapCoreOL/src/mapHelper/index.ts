@@ -1,4 +1,4 @@
-import Map from 'ol/Map'
+import OlMap from 'ol/Map'
 import {MapFrame} from "./MapFrame";
 import {MapOptions} from 'ol/PluggableMap'
 import getMapPreOptions from "./mapPreOptions";
@@ -16,6 +16,7 @@ import ScaleLine, {Options as ScaleLineOptions} from 'ol/control/ScaleLine';
 import MousePosition, {Options as MousePositionOptions} from 'ol/control/MousePosition';
 import OverviewMap, {Options as OverviewOptions} from "ol/control/OverviewMap";
 import ZoomSlider, {Options as ZoomSliderOptions} from "ol/control/ZoomSlider";
+import type PelInstance from "./instance/Feature/Pel";
 
 setVersion();
 
@@ -29,12 +30,14 @@ export default class MapHelper extends MapFrame {
   private offsetX?: number;
   //Y偏移量缓存
   private offsetY?: number;
+  //随图层缩放的元素
+  zoomFeatures: Map<string, PelInstance>;
 
   constructor(options: MapOptions, addDefaultLayer = true) {
     let preOptions = getMapPreOptions();
     preOptions = {...preOptions, ...options};
 
-    const map = new Map(preOptions);
+    const map = new OlMap(preOptions);
     super(map);
     this.mapHelper = this;
     this.layer = new LayerHelper(map, this);
@@ -42,6 +45,7 @@ export default class MapHelper extends MapFrame {
     this.projection = new ProjectionHelper(map, this);
     this.style = new StyleHelper(map, this);
     this.view = new ViewHelper(map, this);
+    this.zoomFeatures = new Map();
     //添加默认图层
     if (addDefaultLayer) {
       this.layer.createLayer('gdStreet', {
@@ -52,8 +56,15 @@ export default class MapHelper extends MapFrame {
         })
       })
     }
-    //注册缩放事件，控制图元显隐
-    this.view.on('zoomLevelChanged', () => zoomLevelChanged(this));
+    //注册缩放事件，
+    this.view.on('zoomLevelChanged', () => {
+      //控制图元显隐
+      zoomLevelChanged(this);
+      const zoom = this.map.getView().getZoom()!;
+      this.zoomFeatures.forEach(x => {
+        x.zoomLevelChanged(zoom);
+      })
+    });
     //注册容器大小改变事件
     if ((window as any).ResizeObserver) {
       const resizeObserver = new ResizeObserver(debounce(() => {

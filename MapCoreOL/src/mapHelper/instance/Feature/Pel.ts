@@ -36,6 +36,12 @@ class PelInstance extends BaseFeature {
   readonly nativeSource: VectorSource<Geometry>;
   //样式缓存（用于隐藏时缓存样式）
   protected styleLike?: StyleLike = undefined;
+  //随图层按比例缩放的最小图层
+  private minZoom = 1;
+  //随图层按比例缩放的最大图层
+  private maxZoom = 18;
+  //随图层按比例缩放的最小比例（最大为1）
+  private minScale = 0.1;
 
   constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerInstance: LayerInstance, source: VectorSource<Geometry>) {
     super(map, mapHelper);
@@ -124,6 +130,7 @@ class PelInstance extends BaseFeature {
    */
   destroy(): void {
     if (this.layerInstance.pelList[this.id]) {
+      this.mapHelper.zoomFeatures.delete(this.id);
       this.map.removeOverlay(this.nativeOverlay);
       this.nativeOverlay.dispose();
       this.nativeOverlay = undefined as any;
@@ -299,6 +306,39 @@ class PelInstance extends BaseFeature {
    */
   getBBox() {
     return this.nativeFeature.getGeometry()!.getExtent();
+  }
+
+  /**
+   * 设置按图层缩放层级放大缩小的图标，
+   * @param max 最大层级，在最大层级时，缩放比例为1
+   * @param min 最小层级，在最小层级时，缩放比例为minScale
+   * @param minScale 最小缩放比例，默认0.1
+   */
+  setZoomLevelScale(max: number, min: number, minScale = 0.1) {
+    this.maxZoom = max;
+    this.minZoom = min;
+    this.minScale = minScale;
+    this.zoomLevelChanged(this.map.getView()!.getZoom()!)
+    this.mapHelper.zoomFeatures.set(this.id, this);
+  }
+
+  /**
+   * 图层改变时的回调
+   * @param zoom 缩放层级
+   */
+  zoomLevelChanged(zoom: number) {
+    let scale: number
+    if (zoom >= this.maxZoom) {
+      scale = 1;
+    } else if (zoom <= this.minZoom) {
+      scale = this.minScale;
+    } else {
+      const zoomPercent = (zoom - this.minZoom) / (this.maxZoom - this.minZoom);
+      scale = this.minScale + zoomPercent * (1 - this.minScale);
+    }
+    //这里试过使用图元的外包盒（即parent），是不行的，因为外包盒被ol实时改变，这里改变一次会被ol覆盖
+    const target = this.nativeOverlay.getElement()!;
+    target.style.transform = 'scale(' + scale + ')'
   }
 }
 
