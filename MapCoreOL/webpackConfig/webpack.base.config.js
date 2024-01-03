@@ -30,7 +30,7 @@ module.exports = {
   plugins: [
     new VueLoaderPlugin(),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      // 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.version': JSON.stringify(version),
       'process.env.projName': JSON.stringify(projName),
     })

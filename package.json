@@ -4,9 +4,9 @@
   "description": "基础组件",
   "main": "index.js",
   "scripts": {
-    "serve": "webpack-dev-server --model=development --config ./MapCoreOL/webpack.config.js",
-    "build": "webpack --model=production --config ./MapCoreOL/webpack.config.js",
-    "buildLite": "webpack --model=production  --isLite --config ./MapCoreOL/webpack.config.js"
+    "serve": "webpack-dev-server --mode=development --config ./MapCoreOL/webpack.config.js",
+    "build": "webpack --mode=production --config ./MapCoreOL/webpack.config.js",
+    "buildLite": "webpack --mode=production  --isLite --config ./MapCoreOL/webpack.config.js"
   },
   "author": "",
   "license": "ISC",

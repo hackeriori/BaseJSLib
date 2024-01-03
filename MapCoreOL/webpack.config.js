@@ -5,10 +5,10 @@ const proConfig = require('./webpackConfig/webpack.pro.config');
 const proLiteConfig = require('./webpackConfig/webpack.pro.lite.config');
 
 module.exports = (env, argv) => {
-  process.env.NODE_ENV = argv.model;
+  // process.env.NODE_ENV = argv.model;
   const configs = [];
   configs.push(baseConfig)
-  if (argv.model === 'development')
+  if (argv.mode === 'development')
     configs.push(devConfig);
   else {
     configs.push(proConfig);
