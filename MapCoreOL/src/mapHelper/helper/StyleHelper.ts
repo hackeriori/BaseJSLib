@@ -44,6 +44,7 @@ export default class StyleHelper extends MapFrame {
       text: text,
       image: image,
       zIndex: style.zIndex,
+      renderer: style.renderer
     });
   }
 

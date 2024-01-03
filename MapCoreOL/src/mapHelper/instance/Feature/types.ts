@@ -2,7 +2,8 @@ import {Options as OverlayOptions} from 'ol/Overlay';
 import {Options as FillOptions} from "ol/style/Fill";
 import {Options as StrokeOptions} from "ol/style/Stroke";
 import {Options as IconOptions} from "ol/style/Icon";
-import {Feature,  Geometry} from "geojson";
+import {Feature, Geometry} from "geojson";
+import {RenderFunction} from "ol/style/Style";
 
 export interface FeaturePropCreateType {
   [name: string]: any;
@@ -31,6 +32,7 @@ export interface StyleType {
   text?: StyleText;
   image?: StyleCircle | IconOptions | StyleRegularShape;
   zIndex?: number;
+  renderer?: RenderFunction
 }
 
 export interface StyleText {
@@ -60,7 +62,7 @@ export interface StyleCircle {
   displacement?: number[];
 }
 
-export interface StyleRegularShape{
+export interface StyleRegularShape {
   fill?: FillOptions;
   points: number;
   radius?: number;
