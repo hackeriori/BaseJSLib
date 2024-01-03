@@ -1,5 +1,5 @@
 import {StyleType} from "./types";
-import Style, {StyleLike} from "ol/style/Style";
+import Style, {StyleFunction, StyleLike} from "ol/style/Style";
 import Feature from "ol/Feature";
 import MapHelper from "../../index";
 import {Geometry} from "ol/geom";
@@ -18,13 +18,16 @@ export default abstract class StyleMixin {
    * @param styles 样式数组
    * @param useIt 是否立即使用在元素上
    */
-  setNormalStyle(styles?: StyleType[], useIt = true) {
+  setNormalStyle(styles?: StyleType[] | StyleFunction, useIt = true) {
     if (styles) {
-      const createdStyles: Style[] = [];
-      styles.forEach(x => createdStyles.push(this.mapHelper.style.createStyle(x)));
-      this.normalStyle = createdStyles;
+      if (Array.isArray(styles)) {
+        const createdStyles: Style[] = [];
+        styles.forEach(x => createdStyles.push(this.mapHelper.style.createStyle(x)));
+        this.normalStyle = createdStyles;
+      } else
+        this.normalStyle = styles;
       if (useIt)
-        this.nativeFeature.setStyle(createdStyles);
+        this.nativeFeature.setStyle(this.normalStyle);
     } else {
       if (this.normalStyle)
         this.nativeFeature.setStyle(this.normalStyle);
@@ -35,11 +38,14 @@ export default abstract class StyleMixin {
    * 设置高亮样式
    * @param styles 样式数组
    */
-  setHighLightStyle(styles?: StyleType[]) {
+  setHighLightStyle(styles?: StyleType[] | StyleFunction) {
     if (styles) {
-      const createdStyles: Style[] = [];
-      styles.forEach(x => createdStyles.push(this.mapHelper.style.createStyle(x)));
-      this.highLightStyle = createdStyles;
+      if (Array.isArray(styles)) {
+        const createdStyles: Style[] = [];
+        styles.forEach(x => createdStyles.push(this.mapHelper.style.createStyle(x)));
+        this.highLightStyle = createdStyles;
+      } else
+        this.highLightStyle = styles;
     } else {
       if (this.highLightStyle)
         this.nativeFeature.setStyle(this.highLightStyle);

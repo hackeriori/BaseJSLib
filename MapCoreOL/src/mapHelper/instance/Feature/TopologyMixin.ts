@@ -2,20 +2,19 @@ import Feature from "ol/Feature";
 import {Geometry, LineString, MultiLineString, MultiPoint, Point, Polygon} from "ol/geom";
 import geoJson, {getBaseFeatureInstanceByFeature} from "../../global";
 import {
+  bezierSpline,
   booleanContains,
   booleanCrosses,
-  lineSlice,
   length,
   lineOffset,
+  lineSlice,
   lineString,
-  midpoint,
-  bezierSpline
+  midpoint
 } from "@turf/turf";
 import MapHelper from "../../index";
 import {getInExtentFeatures} from "./command";
 import BaseFeature from "./BaseFeature";
 import {Coordinate} from "ol/coordinate";
-import {GeoJsonProperties} from "geojson";
 
 const message = '指定图形不是面类型';
 const lineMessage = '指定图形不是线元素';

@@ -23,7 +23,7 @@ class FeatureMixin {
    */
   createFeature(geoJSONFeature: FeatureGeoType) {
     if (this.featureList[geoJSONFeature.id]) {
-      // console.log(`元素id[${geoJSONFeature.id}]重复，重复的元素未添加到图层中`);
+      console.log(`元素id[${geoJSONFeature.id}]重复，重复的元素未添加到图层中`);
     }
     else {
       const source = this.getVectorSource();
