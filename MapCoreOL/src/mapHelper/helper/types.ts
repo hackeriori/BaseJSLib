@@ -25,9 +25,9 @@ export interface ViewerInfo {
 
 export interface ClusterStyle extends StyleType {
   //是否自动增长
-  autoIncrease: true,
+  autoIncrease?: boolean,
   //自动增长的契机
-  increaseNumber: number,
+  increaseNumber?: number,
   //增长值
-  increaseBy: number
+  increaseBy?: number
 }

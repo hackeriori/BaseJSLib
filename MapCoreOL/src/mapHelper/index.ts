@@ -16,7 +16,6 @@ import ScaleLine, {Options as ScaleLineOptions} from 'ol/control/ScaleLine';
 import MousePosition, {Options as MousePositionOptions} from 'ol/control/MousePosition';
 import OverviewMap, {Options as OverviewOptions} from "ol/control/OverviewMap";
 import ZoomSlider, {Options as ZoomSliderOptions} from "ol/control/ZoomSlider";
-import type PelInstance from "./instance/Feature/Pel";
 
 setVersion();
 
@@ -26,12 +25,12 @@ export default class MapHelper extends MapFrame {
   projection: ProjectionHelper
   style: StyleHelper
   view: ViewHelper
+  //随图层缩放的元素
+  zoomFeatures: Map<string, {zoomLevelChanged(zoom: number): void}>;
   //X偏移量缓存
   private offsetX?: number;
   //Y偏移量缓存
   private offsetY?: number;
-  //随图层缩放的元素
-  zoomFeatures: Map<string, PelInstance>;
 
   constructor(options: MapOptions, addDefaultLayer = true) {
     let preOptions = getMapPreOptions();
@@ -63,7 +62,7 @@ export default class MapHelper extends MapFrame {
       const zoom = this.map.getView().getZoom()!;
       this.zoomFeatures.forEach(x => {
         x.zoomLevelChanged(zoom);
-      })
+      });
     });
     //注册容器大小改变事件
     if ((window as any).ResizeObserver) {
@@ -74,29 +73,10 @@ export default class MapHelper extends MapFrame {
     }
   }
 
-  /**
-   * 将地图设置为可拖放
-   * @param mapDropCallBack 回调函数，返回坐标和DataTransfer
-   */
-  setDropAble(mapDropCallBack: MapDropCallBack) {
-    const el = this.map.getTargetElement();
-    el.ondragover = ev => ev.preventDefault();
-    el.ondrop = ev => {
-      ev.preventDefault();
-      if (this.offsetX === undefined)
-        this.offsetX = getOffsetX(el);
-      if (this.offsetY === undefined)
-        this.offsetY = getOffsetY(el);
-      const pixel = [ev.clientX - this.offsetX, ev.clientY - this.offsetY];
-      const coordinate = this.map.getCoordinateFromPixel(pixel);
-      mapDropCallBack(coordinate, ev.dataTransfer);
-    }
-  }
-
   static getZoomControl(options?: ZoomOptions) {
     let preOptions: ZoomOptions = {
       zoomInTipLabel: '放大',
-      zoomOutTipLabel: '缩小',
+      zoomOutTipLabel: '缩小'
     };
     preOptions = {...preOptions, ...options};
     return new Zoom(preOptions);
@@ -128,5 +108,24 @@ export default class MapHelper extends MapFrame {
 
   static getOverviewMapControl(options?: OverviewOptions) {
     return new OverviewMap(options);
+  }
+
+  /**
+   * 将地图设置为可拖放
+   * @param mapDropCallBack 回调函数，返回坐标和DataTransfer
+   */
+  setDropAble(mapDropCallBack: MapDropCallBack) {
+    const el = this.map.getTargetElement();
+    el.ondragover = ev => ev.preventDefault();
+    el.ondrop = ev => {
+      ev.preventDefault();
+      if (this.offsetX === undefined)
+        this.offsetX = getOffsetX(el);
+      if (this.offsetY === undefined)
+        this.offsetY = getOffsetY(el);
+      const pixel = [ev.clientX - this.offsetX, ev.clientY - this.offsetY];
+      const coordinate = this.map.getCoordinateFromPixel(pixel);
+      mapDropCallBack(coordinate, ev.dataTransfer);
+    }
   }
 }

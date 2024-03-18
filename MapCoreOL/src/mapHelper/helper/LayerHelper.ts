@@ -15,7 +15,9 @@ import {
   getDefaultHighLightClusterStyles,
   getDefaultNormalClusterStyles,
   getFeatureInstanceByFeature,
-  getPelInstanceByFeature
+  getPelInstanceByFeature,
+  getZoomScale,
+  type ZoomConfig
 } from "../global";
 import {ClusterEventType, ClusterStyle, ClusterStyles} from "./types";
 import FeatureInstance from "../instance/Feature";
@@ -29,7 +31,7 @@ import {get as getProjection} from "ol/proj";
 import {getTopLeft, getWidth} from "ol/extent";
 
 export default class LayerHelper extends MapFrame {
-  readonly layerList: { [key: string]: LayerInstance } = {};
+  readonly layerList: {[key: string]: LayerInstance} = {};
 
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
@@ -52,15 +54,16 @@ export default class LayerHelper extends MapFrame {
    * 创建数据源，如果时创建聚合源，可以指定styles参数
    * @param options 数据源选项
    * @param clusterStyles 聚合图元样式
+   * @param zoom 聚合缩放配置
    */
-  createVectorSource(options: VectorSourceOptions | ClusterSourceOptions, clusterStyles?: ClusterStyles) {
+  createVectorSource(options: VectorSourceOptions | ClusterSourceOptions, clusterStyles?: ClusterStyles, zoom?: ZoomConfig) {
     const dealStyle = (x: ClusterStyle, length: number) => {
       const style = this.mapHelper.style.createStyle(x);
       if (x.text)
         style.getText().setText(x.text.text?.replace('${num}', length.toString()));
       if (clusterStyles && x.autoIncrease && x.image && 'radius' in x.image) {
         const circle = style.getImage() as CircleStyle;
-        circle.setRadius(circle.getRadius() + Math.floor(length / x.increaseNumber) * x.increaseBy);
+        circle.setRadius(circle.getRadius() + Math.floor(length / x.increaseNumber!) * x.increaseBy!);
       }
       return style;
     }
@@ -95,6 +98,19 @@ export default class LayerHelper extends MapFrame {
             normalStyles = getDefaultNormalClusterStyles();
             highLightStyles = getDefaultHighLightClusterStyles();
           }
+          //#region 设置聚合缩放，由于这个回调是地图缩放后必定调用，所以就没必要放地图缩放回调里面去执行zoomLevelChanged了
+          if (zoom) {
+            const scale = getZoomScale(zoom, this.mapHelper.map.getView().getZoom()!);
+            normalStyles.forEach(x => {
+              x.image && 'src' in x.image && (x.image.scale = scale);
+              x.text && (x.text.scale = scale);
+            });
+            highLightStyles.forEach(x => {
+              x.image && 'src' in x.image && (x.image.scale = scale);
+              x.text && (x.text.scale = scale);
+            });
+          }
+          //#endregion
           const normalStyle = normalStyles.map(x => dealStyle(x, features.length));
           const highLightStyle = highLightStyles.map(x => dealStyle(x, features.length));
           feature.set('normalStyle', normalStyle);
@@ -198,7 +214,7 @@ export default class LayerHelper extends MapFrame {
       options.tileGrid = new WMTSGrid({
         origin: getTopLeft(projectionExtent),
         resolutions: resolutions,
-        matrixIds: matrixIds,
+        matrixIds: matrixIds
       })
     }
     if (options.wrapX === undefined || options.wrapX === null)

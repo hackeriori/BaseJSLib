@@ -16,6 +16,7 @@ import {StyleLike} from "ol/style/Style";
 import TopologyMixin from "./TopologyMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
 import BaseEvent from "ol/events/Event";
+import {getZoomScale} from '../../global';
 
 class PelInstance extends BaseFeature {
   //原生对象
@@ -26,22 +27,20 @@ class PelInstance extends BaseFeature {
   readonly id: string;
   //所属图层示例
   readonly layerInstance: LayerInstance;
-  //位置信息缓存
-  private position?: Coordinate = undefined;
-  //图元自身的显隐属性（在开关图层时决定图元是否显隐）
-  private visible = true;
-  //是否处于聚合状态
-  private _isCluster = false;
   //ol原生源
   readonly nativeSource: VectorSource<Geometry>;
   //样式缓存（用于隐藏时缓存样式）
   protected styleLike?: StyleLike = undefined;
+  //位置信息缓存
+  private position?: Coordinate = undefined;
+  //图元自身的显隐属性（在开关图层时决定图元是否显隐）
+  private visible = true;
   //随图层按比例缩放的最小图层
-  private minZoom = 1;
+  minZoom = 1;
   //随图层按比例缩放的最大图层
-  private maxZoom = 18;
+  maxZoom = 18;
   //随图层按比例缩放的最小比例（最大为1）
-  private minScale = 0.1;
+  minScale = 0.1;
 
   constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerInstance: LayerInstance, source: VectorSource<Geometry>) {
     super(map, mapHelper);
@@ -90,7 +89,7 @@ class PelInstance extends BaseFeature {
           const handler = (event: MouseEvent) => {
             const coordinate = this.mapHelper.map.getCoordinateFromPixel([
               event.clientX - featureOffsetX,
-              event.clientY - featureOffsetY,
+              event.clientY - featureOffsetY
             ]);
             this.setPosition(coordinate)
           };
@@ -107,6 +106,9 @@ class PelInstance extends BaseFeature {
       })
     }
   }
+
+  //是否处于聚合状态
+  private _isCluster = false;
 
   get isCluster() {
     return this._isCluster;
@@ -130,7 +132,7 @@ class PelInstance extends BaseFeature {
    */
   destroy(): void {
     if (this.layerInstance.pelList[this.id]) {
-      this.mapHelper.zoomFeatures.delete(this.id);
+      this.mapHelper.zoomFeatures.delete(this.layerInstance.id + this.id);
       this.map.removeOverlay(this.nativeOverlay);
       this.nativeOverlay.dispose();
       this.nativeOverlay = undefined as any;
@@ -190,12 +192,12 @@ class PelInstance extends BaseFeature {
     }
   }
 
-  on(type: "singleClick", callback: (evt: { type: string }) => void): void;
-  on(type: "doubleClick", callback: (evt: { type: string }) => void): void;
-  on(type: "rightClick", callback: (evt: { type: string }) => void): void;
-  on(type: "mouseEnter", callback: (evt: { type: string }) => void): void;
-  on(type: "mouseLeave", callback: (evt: { type: string }) => void): void;
-  on(type: string | string[], callback: (evt: { type: string }) => void): void {
+  on(type: "singleClick", callback: (evt: {type: string}) => void): void;
+  on(type: "doubleClick", callback: (evt: {type: string}) => void): void;
+  on(type: "rightClick", callback: (evt: {type: string}) => void): void;
+  on(type: "mouseEnter", callback: (evt: {type: string}) => void): void;
+  on(type: "mouseLeave", callback: (evt: {type: string}) => void): void;
+  on(type: string | string[], callback: (evt: {type: string}) => void): void {
     if (Array.isArray(type)) {
       for (let i = 0; i < type.length; i++) {
         this.on(type[i] as any, callback)
@@ -237,7 +239,7 @@ class PelInstance extends BaseFeature {
           const pixel = [evt.clientX, evt.clientY];
           event.target = {
             coordinate: this.map.getCoordinateFromPixel(pixel),
-            pixel,
+            pixel
           }
         }
         callback(event);
@@ -271,7 +273,7 @@ class PelInstance extends BaseFeature {
     const view = this.map.getView();
     let fitOptions: FitOptions = {
       duration: 300,
-      maxZoom: view.getZoom(),
+      maxZoom: view.getZoom()
     };
     if (options)
       fitOptions = {...fitOptions, ...options};
@@ -319,7 +321,7 @@ class PelInstance extends BaseFeature {
     this.minZoom = min;
     this.minScale = minScale;
     this.zoomLevelChanged(this.map.getView()!.getZoom()!)
-    this.mapHelper.zoomFeatures.set(this.id, this);
+    this.mapHelper.zoomFeatures.set(this.layerInstance.id + this.id, this);
   }
 
   /**
@@ -327,15 +329,7 @@ class PelInstance extends BaseFeature {
    * @param zoom 缩放层级
    */
   zoomLevelChanged(zoom: number) {
-    let scale: number
-    if (zoom >= this.maxZoom) {
-      scale = 1;
-    } else if (zoom <= this.minZoom) {
-      scale = this.minScale;
-    } else {
-      const zoomPercent = (zoom - this.minZoom) / (this.maxZoom - this.minZoom);
-      scale = this.minScale + zoomPercent * (1 - this.minScale);
-    }
+    const scale = getZoomScale(this, zoom);
     //这里试过使用图元的外包盒（即parent），是不行的，因为外包盒被ol实时改变，这里改变一次会被ol覆盖
     const target = this.nativeOverlay.getElement()!;
     target.style.transform = 'scale(' + scale + ')'

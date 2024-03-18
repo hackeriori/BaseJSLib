@@ -14,7 +14,7 @@ import lineSliceAlong from "@turf/line-slice-along";
 import {EventsKey} from "ol/events";
 import {unByKey} from "ol/Observable";
 import {LineString as GeoLineString} from 'geojson'
-import geoJson from "../../../global";
+import geoJson, {getZoomScale, type ZoomConfig} from "../../../global";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import {Coordinate} from "ol/coordinate";
@@ -29,8 +29,9 @@ abstract class TrackPlayAnimation {
    * @param width 轨迹宽度
    * @param label 精灵标签
    * @param degree 精灵与X轴的夹角（角度）
+   * @param zoom 缩放配置，不配置不会缩放
    */
-  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number) {
+  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number, zoom?: ZoomConfig) {
     if (!this.canPlayNow())
       return;
     const geometry = this.nativeFeature.getGeometry()!;
@@ -45,7 +46,10 @@ abstract class TrackPlayAnimation {
       return
     }
     this.setState();
-    return new TrackPlay(this as any, image, time, showLine, color, width, label, degree);
+    const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom);
+    if (zoom)
+      this.mapHelper.zoomFeatures.set(this.layerInstance.id + (this as any).id, trackObj);
+    return trackObj;
   }
 }
 
@@ -65,25 +69,28 @@ export class TrackPlay {
   ratio = 1;
   ratioTime = 0;
   state: 'play' | 'pause' | 'stop' = "stop";
+  zoom?: ZoomConfig
 
   constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, public time: number,
-              private showLine: boolean, color: string, width: number, label?: string, degree?: number) {
+              private showLine: boolean, color: string, width: number, label?: string, degree?: number, zoom?: ZoomConfig) {
     //设置精灵
     this.styleBase = featureInstance.nativeFeature.getStyle() as Style;
     const geometry = featureInstance.nativeFeature.getGeometry()! as LineString;
     this.line = geoJson.writeFeatureObject(this.featureInstance.nativeFeature, {
       featureProjection: 'EPSG:3857'
     }).geometry as GeoLineString;
-
+    this.zoom = zoom;
     if (degree != undefined) {
       this.radian = degree * Math.PI / 180;
     }
     this.length = featureInstance.calcLength()!;
+    const currentZoom = zoom ? getZoomScale(zoom, this.featureInstance.map.getView().getZoom()!) : undefined;
     this.styleOver = new Style({
       geometry: new Point(geometry.getCoordinates()[0]),
       image: new Icon({
         img: image,
-        imgSize: [image.width, image.height]
+        imgSize: [image.width, image.height],
+        scale: currentZoom
       }),
       text: label ? new Text({
         text: label,
@@ -93,7 +100,8 @@ export class TrackPlay {
         stroke: new Stroke({
           color: 'white',
           width: 2
-        })
+        }),
+        scale: currentZoom
       }) : undefined
     });
     this.lineStyle = new Style({
@@ -168,6 +176,15 @@ export class TrackPlay {
           if (this.renderer) {
             this.renderer(this.pointStyle, this.styleOver, lastPoint);
           }
+          //#region 获取当前缩放层级，并根据缩放层级调整图标及字体大小
+          if (this.zoom) {
+            const zoom = this.featureInstance.map.getView().getZoom()!;
+            this.pointStyle.getImage().setScale(getZoomScale(this.zoom, zoom));
+            this.pointStyle.getText()?.setScale(getZoomScale(this.zoom, zoom));
+            this.styleOver.getImage().setScale(getZoomScale(this.zoom, zoom));
+            this.styleOver.getText()?.setScale(getZoomScale(this.zoom, zoom));
+          }
+          //#endregion
           vectorContext.setStyle(this.pointStyle);
           vectorContext.drawGeometry(new Point(lastPoint));
         }
@@ -192,11 +209,6 @@ export class TrackPlay {
       this.nowTime = this.ratioTime;
       this.ratio = ratio;
     }
-  }
-
-  private stop() {
-    if (this.listenerKey)
-      unByKey(this.listenerKey);
   }
 
   gotoBegin() {
@@ -235,7 +247,7 @@ export class TrackPlay {
           this.lineStyle.setGeometry(new LineString(newLine.geometry.coordinates));
           this.featureInstance.nativeFeature.setStyle([this.lineStyle, this.styleOver]);
         } else
-          this.featureInstance.nativeFeature.setStyle(this.styleOver);
+          this.featureInstance.nativeFeature.setStyle([this.styleOver]);
       }
     } else {
       this.styleOver.setGeometry(new Point((this.featureInstance.nativeFeature.getGeometry() as LineString).getCoordinates()[0]));
@@ -250,6 +262,31 @@ export class TrackPlay {
   destroy() {
     this.stop();
     this.featureInstance.destroy();
+  }
+
+  /**
+   * 图层改变时的回调
+   * @param zoom 缩放层级
+   */
+  zoomLevelChanged(zoom: number) {
+    if (this.zoom) {
+      const scale = getZoomScale(this.zoom, zoom);
+      if (this.state !== 'play') {
+        const style = this.featureInstance.nativeFeature.getStyle();
+        if (Array.isArray(style)) {
+          style.forEach(x => {
+            x.getImage()?.setScale(scale);
+            x.getText()?.setScale(scale);
+          });
+          this.featureInstance.nativeFeature.setStyle(style);
+        }
+      }
+    }
+  }
+
+  private stop() {
+    if (this.listenerKey)
+      unByKey(this.listenerKey);
   }
 }
 

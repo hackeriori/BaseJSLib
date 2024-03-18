@@ -2,7 +2,6 @@ import GeoJSON from 'ol/format/GeoJSON'
 import Feature from "ol/Feature";
 import FeatureInstance from "./instance/Feature";
 import MapHelper from "./index";
-import {StyleType} from "./instance/Feature/types";
 import PelInstance from "./instance/Feature/Pel";
 import {ClusterStyle} from "./helper/types";
 import {Geometry} from "ol/geom";
@@ -48,7 +47,7 @@ export function getDefaultNormalClusterStyles() {
       fill: {
         color: '#3399CC'
       },
-      text: '${num}',
+      text: '${num}'
     },
     //是否自动增长
     autoIncrease: true,
@@ -74,7 +73,7 @@ export function getDefaultHighLightClusterStyles() {
       fill: {
         color: '#3399CC'
       },
-      text: '${num}',
+      text: '${num}'
     },
     //是否自动增长
     autoIncrease: true,
@@ -145,4 +144,31 @@ export function debounce<T extends (...args: any) => any>(fn: T, delay: number, 
   }
 
   return _debounce
+}
+
+export interface ZoomConfig {
+  // 最大缩放层级，达到或超过后缩放比例为1
+  maxZoom: number,
+  // 最小缩放层级，达到或小于后使用最小缩放比例minScale
+  minZoom: number,
+  // 最小缩放比例，大于0小于1
+  minScale: number
+}
+
+/**
+ * 根据配置（例如pel对象带的配置）和当前的缩放层级，计算出缩放大小
+ * @param config 带配置的对象
+ * @param zoom 当前的缩放层级
+ */
+export function getZoomScale(config: ZoomConfig, zoom: number) {
+  let scale: number
+  if (zoom >= config.maxZoom) {
+    scale = 1;
+  } else if (zoom <= config.minZoom) {
+    scale = config.minScale;
+  } else {
+    const zoomPercent = (zoom - config.minZoom) / (config.maxZoom - config.minZoom);
+    scale = config.minScale + zoomPercent * (1 - config.minScale);
+  }
+  return scale;
 }

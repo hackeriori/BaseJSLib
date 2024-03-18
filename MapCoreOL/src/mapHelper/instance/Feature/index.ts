@@ -1,6 +1,6 @@
 import Map from 'ol/Map';
 import Feature from "ol/Feature";
-import geoJson from "../../global";
+import geoJson, {getZoomScale} from "../../global";
 import VectorSource from "ol/source/Vector";
 import FeaturePropType, {FeatureGeoType} from "./types";
 import {StyleLike} from "ol/style/Style";
@@ -30,16 +30,22 @@ class FeatureInstance extends BaseFeature {
   normalStyle?: StyleLike = undefined;
   //高亮样式
   highLightStyle?: StyleLike = undefined;
+  //注册的事件
+  singleClickEvents: ((evt: {type: string}) => void)[] = [];
+  doubleClickEvents: ((evt: {type: string}) => void)[] = [];
+  rightClickEvents: ((evt: {type: string}) => void)[] = [];
+  mouseEnterEvents: ((evt: {type: string}) => void)[] = [];
+  mouseLeaveEvents: ((evt: {type: string}) => void)[] = [];
+  //随图层按比例缩放的最小图层
+  minZoom = 1;
+  //随图层按比例缩放的最大图层
+  maxZoom = 18;
+  //随图层按比例缩放的最小比例（最大为1）
+  minScale = 0.1;
   //是否正在播放动画
   protected isPlayAnimation = false;
   //元素动画是否可见
   protected animationVisible = true;
-  //注册的事件
-  singleClickEvents: ((evt: { type: string }) => void)[] = [];
-  doubleClickEvents: ((evt: { type: string }) => void)[] = [];
-  rightClickEvents: ((evt: { type: string }) => void)[] = [];
-  mouseEnterEvents: ((evt: { type: string }) => void)[] = [];
-  mouseLeaveEvents: ((evt: { type: string }) => void)[] = [];
 
   constructor(map: Map, mapHelper: MapHelper, geoJSONFeature: FeatureGeoType, layerInstance: LayerInstance, source: VectorSource<Geometry>) {
     super(map, mapHelper);
@@ -66,6 +72,7 @@ class FeatureInstance extends BaseFeature {
     if (this.layerInstance.featureList[this.id]) {
       this.stopAnimations();
       this.nativeSource.removeFeature(this.nativeFeature);
+      this.mapHelper.zoomFeatures.delete(this.layerInstance.id + this.id);
       delete this.layerInstance.featureList[this.id];
     } else
       console.log(`id为[${this.id}]的元素不存在，移除失败`);
@@ -109,12 +116,12 @@ class FeatureInstance extends BaseFeature {
     }
   }
 
-  on(type: 'singleClick', callback: (evt: { type: string }) => void): void
-  on(type: 'doubleClick', callback: (evt: { type: string }) => void): void
-  on(type: 'rightClick', callback: (evt: { type: string }) => void): void
-  on(type: 'mouseEnter', callback: (evt: { type: string }) => void): void
-  on(type: 'mouseLeave', callback: (evt: { type: string }) => void): void
-  on(type: string | string[], callback: (evt: { type: string }) => void): void {
+  on(type: 'singleClick', callback: (evt: {type: string}) => void): void
+  on(type: 'doubleClick', callback: (evt: {type: string}) => void): void
+  on(type: 'rightClick', callback: (evt: {type: string}) => void): void
+  on(type: 'mouseEnter', callback: (evt: {type: string}) => void): void
+  on(type: 'mouseLeave', callback: (evt: {type: string}) => void): void
+  on(type: string | string[], callback: (evt: {type: string}) => void): void {
     if (Array.isArray(type)) {
       type.forEach(x => {
         (this as any)[x + 'Events'].push(callback);
@@ -145,6 +152,50 @@ class FeatureInstance extends BaseFeature {
       if (options)
         fitOptions = {...fitOptions, ...options};
       view.fit(geometry as SimpleGeometry, fitOptions);
+    }
+  }
+
+  /**
+   * 设置按图层缩放层级放大缩小的图标，
+   * @param max 最大层级，在最大层级时，缩放比例为1
+   * @param min 最小层级，在最小层级时，缩放比例为minScale
+   * @param minScale 最小缩放比例，默认0.1
+   */
+  setZoomLevelScale(max: number, min: number, minScale = 0.1) {
+    this.maxZoom = max;
+    this.minZoom = min;
+    this.minScale = minScale;
+    this.zoomLevelChanged(this.map.getView()!.getZoom()!)
+    this.mapHelper.zoomFeatures.set(this.layerInstance.id + this.id, this);
+  }
+
+  /**
+   * 图层改变时的回调
+   * @param zoom 缩放层级
+   */
+  zoomLevelChanged(zoom: number) {
+    const scale = getZoomScale(this, zoom);
+    //这里试过使用图元的外包盒（即parent），是不行的，因为外包盒被ol实时改变，这里改变一次会被ol覆盖
+    if (Array.isArray(this.normalStyle)) {
+      this.normalStyle.forEach(x => {
+        x.getImage()?.setScale(scale);
+        x.getText()?.setScale(scale);
+      });
+
+    }
+    if (Array.isArray(this.highLightStyle)) {
+      this.highLightStyle.forEach(x => {
+        x.getImage()?.setScale(scale);
+        x.getText()?.setScale(scale);
+      });
+    }
+    const style = this.nativeFeature.getStyle();
+    if (Array.isArray(style)) {
+      style.forEach(x => {
+        x.getImage()?.setScale(scale);
+        x.getText()?.setScale(scale);
+      });
+      this.nativeFeature.setStyle(style);
     }
   }
 }
