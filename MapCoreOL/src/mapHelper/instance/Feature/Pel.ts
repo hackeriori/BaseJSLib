@@ -29,18 +29,18 @@ class PelInstance extends BaseFeature {
   readonly layerInstance: LayerInstance;
   //ol原生源
   readonly nativeSource: VectorSource<Geometry>;
-  //样式缓存（用于隐藏时缓存样式）
-  protected styleLike?: StyleLike = undefined;
-  //位置信息缓存
-  private position?: Coordinate = undefined;
-  //图元自身的显隐属性（在开关图层时决定图元是否显隐）
-  private visible = true;
   //随图层按比例缩放的最小图层
   minZoom = 1;
   //随图层按比例缩放的最大图层
   maxZoom = 18;
   //随图层按比例缩放的最小比例（最大为1）
   minScale = 0.1;
+  //样式缓存（用于隐藏时缓存样式）
+  protected styleLike?: StyleLike = undefined;
+  //位置信息缓存
+  private position?: Coordinate = undefined;
+  //图元自身的显隐属性（在开关图层时决定图元是否显隐）
+  private visible = true;
 
   constructor(map: Map, mapHelper: MapHelper, options: PelOptionsType, layerInstance: LayerInstance, source: VectorSource<Geometry>) {
     super(map, mapHelper);
@@ -320,6 +320,8 @@ class PelInstance extends BaseFeature {
     this.maxZoom = max;
     this.minZoom = min;
     this.minScale = minScale;
+    const [y, x] = this.nativeOverlay.getPositioning()!.split('-');
+    this.nativeOverlay.getElement()!.style.transformOrigin = `${x} ${y}`;
     this.zoomLevelChanged(this.map.getView()!.getZoom()!)
     this.mapHelper.zoomFeatures.set(this.layerInstance.id + this.id, this);
   }
