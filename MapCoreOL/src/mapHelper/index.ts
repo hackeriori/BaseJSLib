@@ -40,6 +40,7 @@ export default class MapHelper extends MapFrame {
     super(map);
     this.mapHelper = this;
     this.layer = new LayerHelper(map, this);
+    //考虑https://openlayers.org/en/latest/examples/earthquake-clusters.html的方式添加高亮交互
     this.interaction = new InteractionHelper(map, this);
     this.projection = new ProjectionHelper(map, this);
     this.style = new StyleHelper(map, this);
