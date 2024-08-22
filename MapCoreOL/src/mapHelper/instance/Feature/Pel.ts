@@ -16,7 +16,8 @@ import {StyleLike} from "ol/style/Style";
 import TopologyMixin from "./TopologyMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
 import BaseEvent from "ol/events/Event";
-import {getZoomScale} from '../../global';
+import geoJson, {getZoomScale} from '../../global';
+import {along, center, lineString} from '@turf/turf';
 
 class PelInstance extends BaseFeature {
   //原生对象
@@ -335,6 +336,20 @@ class PelInstance extends BaseFeature {
     //这里试过使用图元的外包盒（即parent），是不行的，因为外包盒被ol实时改变，这里改变一次会被ol覆盖
     const target = this.nativeOverlay.getElement()!;
     target.style.transform = 'scale(' + scale + ')'
+  }
+
+  /**
+   * 获取图形中心点
+   * @param outProjection
+   */
+  getCenter(outProjection?: string) {
+    const geometry = this.nativeFeature.getGeometry();
+    if (geometry) {
+      let coordinates = (geometry as any).getCoordinates();
+      if (outProjection && coordinates)
+        coordinates = this.mapHelper.projection.transCoordinates(coordinates, undefined, outProjection);
+      return coordinates;
+    }
   }
 }
 
