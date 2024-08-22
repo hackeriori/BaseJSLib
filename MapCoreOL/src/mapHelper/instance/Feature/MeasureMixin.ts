@@ -4,6 +4,8 @@ import Map from "ol/Map";
 import MapHelper from "../../index";
 import {Coordinate} from "ol/coordinate";
 import {Geometry} from "ol/geom";
+import {along, lineString, center} from "@turf/turf";
+import geoJson from '../../global';
 
 export default abstract class MeasureMixin {
   mapHelper!: MapHelper;
@@ -68,6 +70,33 @@ export default abstract class MeasureMixin {
           coordinates = this.mapHelper.projection.transCoordinates(coordinates, undefined, outProjection);
         return coordinates;
       }
+    }
+  }
+
+  /**
+   * 获取图形中心点
+   * @param outProjection
+   */
+  getCenter(outProjection?: string) {
+    const geometry = this.nativeFeature.getGeometry();
+    if (geometry) {
+      let coordinates: Coordinate;
+      const type = geometry.getType();
+      if (type === 'Point')
+        coordinates = (geometry as any).getCoordinates();
+      else if (type === 'LineString') {
+        const gisCoordinates: Coordinate[] = this.mapHelper.projection.transCoordinates((geometry as any).getCoordinates() as Coordinate[], undefined, 'EPSG:4326');
+        const centerPoint = along(lineString(gisCoordinates), (this.calcLength() as number) / 2, {units: 'meters'});
+        coordinates = this.mapHelper.projection.transCoordinate(centerPoint.geometry.coordinates, 'EPSG:4326');
+      } else {
+        const feature = geoJson.writeFeatureObject(this.nativeFeature);
+        (feature.geometry as any).coordinates = this.mapHelper.projection.transCoordinates((feature.geometry as any).coordinates, undefined, 'EPSG:4326');
+        const centerPoint = center(feature as any);
+        coordinates = this.mapHelper.projection.transCoordinate(centerPoint.geometry.coordinates, 'EPSG:4326');
+      }
+      if (outProjection && coordinates)
+        coordinates = this.mapHelper.projection.transCoordinates(coordinates, undefined, outProjection);
+      return coordinates;
     }
   }
 }
