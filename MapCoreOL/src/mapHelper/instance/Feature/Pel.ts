@@ -235,7 +235,7 @@ class PelInstance extends BaseFeature {
         if (this.mapHelper.interaction.interactionType)
           return;
         const event = new BaseEvent(type);
-        if (type === 'rightClick') {
+        if (type === 'rightClick' || type === 'singleClick') {
           const pixel = [evt.clientX, evt.clientY];
           event.target = {
             coordinate: this.map.getCoordinateFromPixel(pixel),

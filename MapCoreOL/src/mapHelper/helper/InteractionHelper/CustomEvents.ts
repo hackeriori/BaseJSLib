@@ -30,8 +30,15 @@ export default class CustomEvents extends MapFrame {
       const features = this.map.getFeaturesAtPixel(evt.pixel).filter(x => x.get('clickable'));
       if (features.length > 0) {
         const firstFeature = features[0] as Feature<Geometry>;
-        if (!this.mapHelper.interaction.interactionType)
-          firstFeature.dispatchEvent('singleClick');
+        if (!this.mapHelper.interaction.interactionType) {
+          const event = new BaseEvent('singleClick');
+          const pixel = [...(evt as any).On];
+          event.target = {
+            coordinate: this.map.getCoordinateFromPixel(pixel),
+            pixel
+          };
+          firstFeature.dispatchEvent(event);
+        }
         return;
       }
       if (callback) {
