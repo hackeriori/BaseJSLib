@@ -4,7 +4,7 @@ import Stroke from "ol/style/Stroke";
 import {Circle} from "ol/style";
 import RenderEvent from "ol/render/Event";
 import {getVectorContext} from "ol/render";
-import {Geometry, Point, Polygon} from "ol/geom";
+import {Geometry, Point} from "ol/geom";
 import Map from 'ol/Map';
 import {Coordinate} from "ol/coordinate";
 import {FlashPointParamsType} from "./types";
@@ -45,9 +45,9 @@ export async function flashPoint(layer: VectorLayer<VectorSource<Geometry>>, poi
       radius: 30,
       stroke: new Stroke({
         color: 'red',
-        width: 2,
-      }),
-    }),
+        width: 2
+      })
+    })
   });
   const start = new Date().getTime();
   const animate = (event: RenderEvent) => {
@@ -154,8 +154,8 @@ export async function flashGeom(layer: VectorLayer<VectorSource<Geometry>>, feat
   if (isPolygon)
     style = new Style({
       fill: new Fill({
-        color: 'red',
-      }),
+        color: 'red'
+      })
     });
   else {
     let width = 1;
@@ -170,8 +170,8 @@ export async function flashGeom(layer: VectorLayer<VectorSource<Geometry>>, feat
     style = new Style({
       stroke: new Stroke({
         color: 'red',
-        width: width,
-      }),
+        width: width
+      })
     });
   }
 

@@ -16,8 +16,7 @@ import {StyleLike} from "ol/style/Style";
 import TopologyMixin from "./TopologyMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
 import BaseEvent from "ol/events/Event";
-import geoJson, {getZoomScale} from '../../global';
-import {along, center, lineString} from '@turf/turf';
+import {getZoomScale} from '../../global';
 
 class PelInstance extends BaseFeature {
   //原生对象

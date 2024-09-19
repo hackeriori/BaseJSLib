@@ -92,3 +92,10 @@ export interface FlashPointParamsType {
 }
 
 export type InteractionType = 'move' | 'rotate' | 'zoom' | 'modify'
+
+export interface RotateParamsType {
+  // 旋转方向 0:顺时针，1:逆时针
+  rotate: 0 | 1,
+  // 动画频率，次/秒
+  frequency: number
+}

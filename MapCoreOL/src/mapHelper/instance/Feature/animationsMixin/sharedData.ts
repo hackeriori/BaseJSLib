@@ -26,6 +26,14 @@ export default abstract class AnimationsSharedData {
   protected playStyleLike?: StyleLike;
   //普通样式
   normalStyle?: StyleLike;
+  //高亮样式
+  highLightStyle?: StyleLike;
+  //旋转动画初始旋转量
+  rotateAngleNormal?: number;
+  //旋转动画初始旋转量
+  rotateAngleHighLight?: number;
+  //旋转动画key
+  rotateAnimationKey?: EventsKey;
 
   hide!: () => void;
   show!: () => void;
