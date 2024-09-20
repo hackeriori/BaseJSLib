@@ -9,15 +9,15 @@ import {Geometry} from 'ol/geom';
 import Icon from 'ol/style/Icon';
 
 abstract class ColorFlashAnimation {
-  colorFlash(options?: Partial<ColorFlashParamsType>) {
+  colorFlash(options?: any) {
     if (this.styleLike || !this.layerInstance.visibly)
       return;
     const preOptions: ColorFlashParamsType = {
       scale: false,
-      transColor: '#ff0000',
+      color: '#ff0000',
       frequency: 1
     };
-    const _options: ColorFlashParamsType = Object.assign(preOptions, options);
+    const _options: ColorFlashParamsType = Object.assign(preOptions, options, {color: options.jumpColor || options.transColor || preOptions.color});
     const duration = 1 / _options.frequency * 1000;
     const geometry = this.nativeFeature.getGeometry();
     if (!Array.isArray(this.normalStyle)) return;
@@ -59,7 +59,7 @@ abstract class ColorFlashAnimation {
           const context = canvas.getContext('2d');
           if (context) {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            context.shadowColor = _options.transColor;
+            context.shadowColor = _options.color;
             context.shadowBlur = (elapsed % duration) / duration * range + min;
             context.drawImage(this.colorImageNormal!.getImage(1) as HTMLImageElement, 0, 0);
             _options.scale && iconStyle.setScale((elapsed % duration) / duration * 0.34 + 0.66);

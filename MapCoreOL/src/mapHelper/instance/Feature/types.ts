@@ -104,7 +104,7 @@ export interface ColorFlashParamsType {
   // 是否闪烁
   scale: boolean,
   // 变化颜色
-  transColor: string,
+  color: string,
   // 动画频率，次/秒
-  frequency: number
+  frequency: number,
 }
