@@ -5,6 +5,7 @@ import {unByKey} from "ol/Observable";
 import TrackPlayAnimation from "./trackPlay";
 import GifPlayAnimation from "./gifPlay";
 import RotateAnimation from './rotate';
+import ColorFlashAnimation from './colorFlash';
 
 abstract class AnimationsMixin {
   /**
@@ -22,6 +23,13 @@ abstract class AnimationsMixin {
       if (Array.isArray(this.highLightStyle) && this.rotateAngleHighLight != null)
         this.highLightStyle[0].getImage()?.setRotation(this.rotateAngleHighLight)
     }
+    if (this.colorAnimationKey) {
+      unByKey(this.colorAnimationKey);
+      if (Array.isArray(this.normalStyle) && this.colorImageNormal != null)
+        this.normalStyle[0].setImage(this.colorImageNormal)
+      if (Array.isArray(this.highLightStyle) && this.colorImageHighLight != null)
+        this.highLightStyle[0].setImage(this.colorImageHighLight)
+    }
     if (this.playStyleLike !== undefined)
       this.nativeFeature.setStyle(this.playStyleLike);
     this.isPlayAnimation = false;
@@ -36,9 +44,9 @@ abstract class AnimationsMixin {
   }
 }
 
-interface AnimationsMixin extends LineFlowAnimation, FlashAnimation, TrackPlayAnimation, GifPlayAnimation, RotateAnimation {
+interface AnimationsMixin extends LineFlowAnimation, FlashAnimation, TrackPlayAnimation, GifPlayAnimation, RotateAnimation, ColorFlashAnimation {
 }
 
-applyMixins(AnimationsMixin, [LineFlowAnimation, FlashAnimation, TrackPlayAnimation, GifPlayAnimation, RotateAnimation]);
+applyMixins(AnimationsMixin, [LineFlowAnimation, FlashAnimation, TrackPlayAnimation, GifPlayAnimation, RotateAnimation, ColorFlashAnimation]);
 
 export default AnimationsMixin

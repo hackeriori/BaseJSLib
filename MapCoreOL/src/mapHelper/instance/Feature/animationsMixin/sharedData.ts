@@ -6,6 +6,7 @@ import {Geometry} from "ol/geom";
 import {EventsKey} from "ol/events";
 import {getHideButClickableStyle} from "../command";
 import MapHelper from "../../../index";
+import type Icon from 'ol/style/Icon';
 
 export default abstract class AnimationsSharedData {
   map!: Map;
@@ -34,6 +35,13 @@ export default abstract class AnimationsSharedData {
   rotateAngleHighLight?: number;
   //旋转动画key
   rotateAnimationKey?: EventsKey;
+  //染色动画初始图片
+  colorImageNormal?: Icon;
+  //染色动画初始图片
+  colorImageHighLight?: Icon;
+  //染色动画key
+  colorAnimationKey?: EventsKey;
+
 
   hide!: () => void;
   show!: () => void;
