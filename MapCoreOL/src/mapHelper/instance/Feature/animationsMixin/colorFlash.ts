@@ -17,7 +17,7 @@ abstract class ColorFlashAnimation {
       color: '#ff0000',
       frequency: 1
     };
-    const _options: ColorFlashParamsType = Object.assign(preOptions, options, {color: options.jumpColor || options.transColor || preOptions.color});
+    const _options: ColorFlashParamsType = Object.assign(preOptions, options);
     const duration = 1 / _options.frequency * 1000;
     const geometry = this.nativeFeature.getGeometry();
     if (!Array.isArray(this.normalStyle)) return;
