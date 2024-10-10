@@ -4,7 +4,6 @@ import MapHelper from "../../index";
 import {Translate} from "ol/interaction";
 import BaseFeature from "../../instance/Feature/BaseFeature";
 import {getFeatureInstanceByFeature} from "../../global";
-import Feature from "ol/Feature";
 import {Point} from "ol/geom";
 
 export default class Move extends MapFrame {

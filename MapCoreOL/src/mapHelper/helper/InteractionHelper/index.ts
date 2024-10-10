@@ -23,6 +23,7 @@ export default class InteractionHelper extends MapFrame {
   interactionType?: InteractionType;
   collection: Collection<Feature<Geometry>>;
   modify: ModifyAction;
+  disableInteractionLayers: string[] = [];
 
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
@@ -34,8 +35,15 @@ export default class InteractionHelper extends MapFrame {
     this.modify = new ModifyAction(map, this.mapHelper);
   }
 
+  addDisableInteractionLayer(layer: string) {
+    this.disableInteractionLayers.push(layer);
+  }
+
   addToCollection(feature: Feature<Geometry>) {
     if (this.interactionType) {
+      const layerID = feature.get('layerID');
+      if (this.disableInteractionLayers.includes(layerID))
+        return;
       if (this.interactionType === 'move') {
         //聚合元素不能移动
         if (feature.get('features') && feature.get('features').length > 1)
