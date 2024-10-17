@@ -32,6 +32,7 @@ export default class CustomEvents extends MapFrame {
         const firstFeature = features[0] as Feature<Geometry>;
         if (!this.mapHelper.interaction.interactionType) {
           const event = new BaseEvent('singleClick');
+          // 这里的坐标是基于canvas的偏移坐标，且已经经过缩放计算
           const pixel = [...(evt as any).On];
           event.target = {
             coordinate: this.map.getCoordinateFromPixel(pixel),
@@ -54,7 +55,8 @@ export default class CustomEvents extends MapFrame {
       }
     }) as EventsKey;
     this.obRightClick = evt => {
-      const pixel = [evt.clientX, evt.clientY];
+      // 这里如果使用clientX，那么canvas原点不在0，0时会拿不到元素，但是使用offsetX又会在缩放时拿不到正确的坐标，需要自己二次计算
+      const pixel = [Math.round(evt.offsetX / devicePixelRatio), Math.round(evt.offsetY / devicePixelRatio)];
       const features = this.map.getFeaturesAtPixel(pixel);
       if (features.length > 0) {
         const firstFeature = features[0] as Feature<Geometry>;

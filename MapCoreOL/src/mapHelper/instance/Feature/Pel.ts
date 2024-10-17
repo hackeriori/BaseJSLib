@@ -236,7 +236,10 @@ class PelInstance extends BaseFeature {
           return;
         const event = new BaseEvent(type);
         if (type === 'rightClick' || type === 'singleClick') {
-          const pixel = [evt.clientX, evt.clientY];
+          const rect = this.map.getTargetElement().getBoundingClientRect();
+          // evt是canvas元素内的一个dom节点，该节点到屏幕左边的距离需要减去canvas的偏移量才得到canvas的offsetX，这样拿到的点才是基于canvas的
+          // clientX不同于offsetX,clientX在屏幕缩放情况下是已经计算好了的，不需要二次计算。
+          const pixel = [evt.clientX - rect.x, evt.clientY - rect.y];
           event.target = {
             coordinate: this.map.getCoordinateFromPixel(pixel),
             pixel
