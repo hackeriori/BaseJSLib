@@ -18,6 +18,7 @@ import geoJson, {getZoomScale, type ZoomConfig} from "../../../global";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import {Coordinate} from "ol/coordinate";
+import CanvasImmediateRenderer from 'ol/render/canvas/Immediate';
 
 abstract class TrackPlayAnimation {
   /**
@@ -65,7 +66,7 @@ export class TrackPlay {
   length: number;
   line: GeoLineString;
   radian?: number;
-  renderer?: (pointStyle: Style, styleOver: Style, point: Coordinate) => void;
+  renderer?: (pointStyle: Style, styleOver: Style, point: Coordinate, vectorContext: CanvasImmediateRenderer) => void;
   ratio = 1;
   ratioTime = 0;
   state: 'play' | 'pause' | 'stop' = "stop";
@@ -174,7 +175,7 @@ export class TrackPlay {
             this.styleOver.getImage().setRotation(rotation);
           }
           if (this.renderer) {
-            this.renderer(this.pointStyle, this.styleOver, lastPoint);
+            this.renderer(this.pointStyle, this.styleOver, lastPoint, vectorContext);
           }
           //#region 获取当前缩放层级，并根据缩放层级调整图标及字体大小
           if (this.zoom) {
