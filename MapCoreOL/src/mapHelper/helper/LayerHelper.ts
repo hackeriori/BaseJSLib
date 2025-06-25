@@ -29,6 +29,7 @@ import {Options as ImageOptions} from "ol/layer/BaseImage";
 import ImageSource, {Options as ImageSourceOptions} from "ol/source/ImageStatic";
 import {get as getProjection} from "ol/proj";
 import {getTopLeft, getWidth} from "ol/extent";
+import type {Style} from 'ol/style';
 
 export default class LayerHelper extends MapFrame {
   readonly layerList: {[key: string]: LayerInstance} = {};
@@ -55,8 +56,9 @@ export default class LayerHelper extends MapFrame {
    * @param options 数据源选项
    * @param clusterStyles 聚合图元样式
    * @param zoom 聚合缩放配置
+   * @param dealEvent 聚合图元样式处理事件
    */
-  createVectorSource(options: VectorSourceOptions | ClusterSourceOptions, clusterStyles?: ClusterStyles, zoom?: ZoomConfig) {
+  createVectorSource(options: VectorSourceOptions | ClusterSourceOptions, clusterStyles?: ClusterStyles, zoom?: ZoomConfig, dealEvent?: (feature: Feature<Geometry>, features: Feature<Geometry>[], normalStyle: Style[], highLightStyle: Style[], isAdd: boolean) => void) {
     const dealStyle = (x: ClusterStyle, length: number) => {
       const style = this.mapHelper.style.createStyle(x);
       if (x.text)
@@ -113,6 +115,7 @@ export default class LayerHelper extends MapFrame {
           //#endregion
           const normalStyle = normalStyles.map(x => dealStyle(x, features.length));
           const highLightStyle = highLightStyles.map(x => dealStyle(x, features.length));
+          dealEvent?.(feature, features, normalStyle, highLightStyle, true);
           feature.set('normalStyle', normalStyle);
           feature.set('highLightStyle', highLightStyle);
           feature.setStyle(normalStyle);
@@ -163,6 +166,11 @@ export default class LayerHelper extends MapFrame {
             cluster.dispatchEvent(baseEvent);
           }
         });
+      })
+      cluster.on('removefeature', evt => {
+        const feature = evt.feature!;
+        const features = feature.get('features') as Feature<Geometry>[];
+        dealEvent?.(feature, features, [], [], false);
       })
       return cluster;
     } else

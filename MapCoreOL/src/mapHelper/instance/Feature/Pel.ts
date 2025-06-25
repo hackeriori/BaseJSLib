@@ -54,6 +54,7 @@ class PelInstance extends BaseFeature {
       clickable: false,
       layerID: this.layerInstance.id
     });
+    this.nativeFeature.setId(options.id);
     this.nativeFeature.setStyle(this.mapHelper.style.createStyle({
       image: {
         radius: 5,
