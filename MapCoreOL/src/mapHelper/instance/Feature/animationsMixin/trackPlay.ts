@@ -31,8 +31,9 @@ abstract class TrackPlayAnimation {
    * @param label 精灵标签
    * @param degree 精灵与X轴的夹角（角度）
    * @param zoom 缩放配置，不配置不会缩放
+   * @param textColor 标签颜色
    */
-  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number, zoom?: ZoomConfig) {
+  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number, zoom?: ZoomConfig, textColor?: string) {
     if (!this.canPlayNow())
       return;
     const geometry = this.nativeFeature.getGeometry()!;
@@ -47,7 +48,7 @@ abstract class TrackPlayAnimation {
       return
     }
     this.setState();
-    const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom);
+    const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom, textColor);
     if (zoom)
       this.mapHelper.zoomFeatures.set(this.layerInstance.id + (this as any).id, trackObj);
     return trackObj;
@@ -73,7 +74,8 @@ export class TrackPlay {
   zoom?: ZoomConfig
 
   constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, public time: number,
-              private showLine: boolean, color: string, width: number, label?: string, degree?: number, zoom?: ZoomConfig) {
+              private showLine: boolean, color: string, width: number, label?: string, degree?: number, zoom?: ZoomConfig
+    , textColor?: string) {
     //设置精灵
     this.styleBase = featureInstance.nativeFeature.getStyle() as Style;
     const geometry = featureInstance.nativeFeature.getGeometry()! as LineString;
@@ -97,7 +99,7 @@ export class TrackPlay {
         text: label,
         font: '14px sans-serif',
         offsetY: -image.height / 2 - 9,
-        fill: new Fill({color: 'black'}),
+        fill: new Fill({color: textColor || 'black'}),
         stroke: new Stroke({
           color: 'white',
           width: 2
