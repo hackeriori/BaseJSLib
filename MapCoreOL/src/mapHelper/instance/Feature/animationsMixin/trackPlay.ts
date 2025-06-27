@@ -32,8 +32,9 @@ abstract class TrackPlayAnimation {
    * @param degree 精灵与X轴的夹角（角度）
    * @param zoom 缩放配置，不配置不会缩放
    * @param textColor 标签颜色
+   * @param textStroke 标签描边色
    */
-  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number, zoom?: ZoomConfig, textColor?: string) {
+  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number, zoom?: ZoomConfig, textColor?: string, textStroke?: string) {
     if (!this.canPlayNow())
       return;
     const geometry = this.nativeFeature.getGeometry()!;
@@ -48,7 +49,7 @@ abstract class TrackPlayAnimation {
       return
     }
     this.setState();
-    const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom, textColor);
+    const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom, textColor, textStroke);
     if (zoom)
       this.mapHelper.zoomFeatures.set(this.layerInstance.id + (this as any).id, trackObj);
     return trackObj;
@@ -74,8 +75,8 @@ export class TrackPlay {
   zoom?: ZoomConfig
 
   constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, public time: number,
-              private showLine: boolean, color: string, width: number, label?: string, degree?: number, zoom?: ZoomConfig
-    , textColor?: string) {
+              private showLine: boolean, color: string, width: number, label?: string, degree?: number,
+              zoom?: ZoomConfig, textColor?: string, textStroke?: string) {
     //设置精灵
     this.styleBase = featureInstance.nativeFeature.getStyle() as Style;
     const geometry = featureInstance.nativeFeature.getGeometry()! as LineString;
@@ -101,7 +102,7 @@ export class TrackPlay {
         offsetY: -image.height / 2 - 9,
         fill: new Fill({color: textColor || 'black'}),
         stroke: new Stroke({
-          color: 'white',
+          color: textStroke || 'white',
           width: 2
         }),
         scale: currentZoom
