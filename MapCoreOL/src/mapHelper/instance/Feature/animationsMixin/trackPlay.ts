@@ -126,9 +126,9 @@ export class TrackPlay {
         text: label,
         font: '14px sans-serif',
         offsetY: -image.height / 2 - 9,
-        fill: new Fill({color: 'black'}),
+        fill: new Fill({color: textColor || 'black'}),
         stroke: new Stroke({
-          color: 'white',
+          color: textStroke || 'white',
           width: 2
         })
       }) : undefined
