@@ -43,12 +43,12 @@ abstract class TrackPlayAnimation {
       console.log('播放轨迹动画的元素不是线类型');
       return;
     }
+    this.setState();
     const image = await loadImg(img, false);
     if (!image) {
       console.log('图片加载失败');
       return
     }
-    this.setState();
     const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom, textColor, textStroke);
     if (zoom)
       this.mapHelper.zoomFeatures.set(this.layerInstance.id + (this as any).id, trackObj);
