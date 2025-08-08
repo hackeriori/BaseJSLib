@@ -33,8 +33,9 @@ abstract class TrackPlayAnimation {
    * @param zoom 缩放配置，不配置不会缩放
    * @param textColor 标签颜色
    * @param textStroke 标签描边色
+   * @param anchor 锚点位置
    */
-  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number, zoom?: ZoomConfig, textColor?: string, textStroke?: string) {
+  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number, zoom?: ZoomConfig, textColor?: string, textStroke?: string, anchor?: number[]) {
     if (!this.canPlayNow())
       return;
     const geometry = this.nativeFeature.getGeometry()!;
@@ -49,7 +50,7 @@ abstract class TrackPlayAnimation {
       console.log('图片加载失败');
       return
     }
-    const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom, textColor, textStroke);
+    const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom, textColor, textStroke, anchor);
     if (zoom)
       this.mapHelper.zoomFeatures.set(this.layerInstance.id + (this as any).id, trackObj);
     return trackObj;
@@ -76,7 +77,7 @@ export class TrackPlay {
 
   constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, public time: number,
               private showLine: boolean, color: string, width: number, label?: string, degree?: number,
-              zoom?: ZoomConfig, textColor?: string, textStroke?: string) {
+              zoom?: ZoomConfig, textColor?: string, textStroke?: string, anchor?: number[]) {
     //设置精灵
     this.styleBase = featureInstance.nativeFeature.getStyle() as Style;
     const geometry = featureInstance.nativeFeature.getGeometry()! as LineString;
@@ -94,7 +95,8 @@ export class TrackPlay {
       image: new Icon({
         img: image,
         imgSize: [image.width, image.height],
-        scale: currentZoom
+        scale: currentZoom,
+        anchor
       }),
       text: label ? new Text({
         text: label,
@@ -120,7 +122,7 @@ export class TrackPlay {
         img: image,
         imgSize: [image.width, image.height],
         scale: devicePixelRatio,
-        anchor: [1 - 0.5 * devicePixelRatio, 1 - 0.5 * devicePixelRatio]
+        anchor: anchor || [1 - 0.5 * devicePixelRatio, 1 - 0.5 * devicePixelRatio]
       }),
       text: label ? new Text({
         text: label,
