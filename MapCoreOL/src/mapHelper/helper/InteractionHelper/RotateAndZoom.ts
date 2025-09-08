@@ -2,7 +2,7 @@ import {MapFrame} from "../../MapFrame";
 import Map from "ol/Map";
 import MapHelper from "../../index";
 import BaseFeature from "../../instance/Feature/BaseFeature";
-import {calculateCenter} from "./shared";
+import {calculateCenter, setAllOverlayPointerEvents} from "./shared";
 import {Modify} from "ol/interaction";
 import {never} from "ol/events/condition";
 import Feature from "ol/Feature";
@@ -13,9 +13,11 @@ import {Geometry} from "ol/geom";
 
 export default class RotateAndZoom extends MapFrame {
   modify?: Modify
+  mapHelper: MapHelper;
 
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
+    this.mapHelper = mapHelper;
   }
 
   start(type: string[], callback?: (feature: BaseFeature) => void) {
@@ -69,6 +71,7 @@ export default class RotateAndZoom extends MapFrame {
         return defaultStyle(feature, level);
       },
     });
+    setAllOverlayPointerEvents(this.mapHelper, false);
     this.modify.on('modifystart', function (event) {
       event.features.forEach(function (feature) {
         (feature as Feature<Geometry>).set('modifyGeometry', {geometry: (feature as Feature<Geometry>).getGeometry()!.clone()}, true);

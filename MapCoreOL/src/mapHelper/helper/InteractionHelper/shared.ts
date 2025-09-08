@@ -10,6 +10,8 @@ import CircleStyle from "ol/style/Circle";
 import Fill from "ol/style/Fill";
 import MultiPoint from "ol/geom/MultiPoint";
 import Stroke from "ol/style/Stroke";
+import type MapHelper from '../../index';
+import type PelInstance from '../../instance/Feature/Pel';
 
 export function calculateCenter(geometry: Geometry) {
   let center: Coordinate, coordinates: Coordinate[] | undefined, minRadius;
@@ -50,7 +52,7 @@ export function calculateCenter(geometry: Geometry) {
     center: center,
     coordinates: coordinates,
     minRadius: minRadius,
-    sqDistances: sqDistances,
+    sqDistances: sqDistances
   };
 }
 
@@ -60,18 +62,18 @@ const style = new Style({
     return modifyGeometry ? modifyGeometry.geometry : feature.getGeometry();
   },
   fill: new Fill({
-    color: 'rgba(255, 255, 255, 0.2)',
+    color: 'rgba(255, 255, 255, 0.2)'
   }),
   stroke: new Stroke({
     color: '#ffcc33',
-    width: 2,
+    width: 2
   }),
   image: new CircleStyle({
     radius: 7,
     fill: new Fill({
-      color: '#ffcc33',
-    }),
-  }),
+      color: '#ffcc33'
+    })
+  })
 });
 
 export default function setRotateStyle(feature: Feature<Geometry>) {
@@ -88,9 +90,9 @@ export default function setRotateStyle(feature: Feature<Geometry>) {
           image: new CircleStyle({
             radius: 4,
             fill: new Fill({
-              color: '#ff3333',
-            }),
-          }),
+              color: '#ff3333'
+            })
+          })
         })
       );
       const coordinates = result.coordinates;
@@ -107,13 +109,24 @@ export default function setRotateStyle(feature: Feature<Geometry>) {
             image: new CircleStyle({
               radius: 4,
               fill: new Fill({
-                color: '#33cc33',
-              }),
-            }),
+                color: '#33cc33'
+              })
+            })
           })
         );
       }
     }
     return styles;
   })
+}
+
+// 遍历所有overlay，处理鼠标事件，避免节点拖动到overlay上时鼠标交互失效
+export function setAllOverlayPointerEvents(mapHelper: MapHelper, enable: boolean) {
+  for (const layerInstance of Object.values(mapHelper.layer.layerList)) {
+    for (const featureInstance of Object.values(layerInstance.pelList)) {
+      const dom = featureInstance.nativeOverlay.getElement();
+      if (dom)
+        dom.style.pointerEvents = enable ? 'auto' : 'none';
+    }
+  }
 }

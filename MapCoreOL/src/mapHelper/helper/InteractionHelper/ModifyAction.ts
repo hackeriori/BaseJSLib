@@ -3,14 +3,17 @@ import Map from "ol/Map";
 import MapHelper from "../../index";
 import BaseFeature from "../../instance/Feature/BaseFeature";
 import {Modify} from "ol/interaction";
-import {Point} from "ol/geom";
 import {getFeatureInstanceByFeature} from "../../global";
+import type PelInstance from '../../instance/Feature/Pel';
+import {setAllOverlayPointerEvents} from './shared';
 
 export default class ModifyAction extends MapFrame {
   modify?: Modify
+  mapHelper: MapHelper
 
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
+    this.mapHelper = mapHelper;
   }
 
   start(callback?: (feature: BaseFeature) => void) {
@@ -19,6 +22,7 @@ export default class ModifyAction extends MapFrame {
     this.modify = new Modify({
       features: collection
     });
+    setAllOverlayPointerEvents(this.mapHelper, false);
     this.modify.on('modifyend', evt => {
       if (callback) {
         let feature = evt.features.item(0);

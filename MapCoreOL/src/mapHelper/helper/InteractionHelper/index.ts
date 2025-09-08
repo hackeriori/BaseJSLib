@@ -9,7 +9,7 @@ import RotateAndZoom from "./RotateAndZoom";
 import Collection from "ol/Collection";
 import Feature from "ol/Feature";
 import {InteractionType} from "../../instance/Feature/types";
-import setRotateStyle from "./shared";
+import setRotateStyle, {setAllOverlayPointerEvents} from "./shared";
 import {getFeatureInstanceByFeature} from "../../global";
 import ModifyAction from "./ModifyAction";
 import {Geometry} from "ol/geom";
@@ -82,5 +82,7 @@ export default class InteractionHelper extends MapFrame {
       this.drawLayer.stopDraw();
       this.drawLayer = undefined;
     }
+    // 避免重复执行，就不放在各个交互模块中的stop中了
+    setAllOverlayPointerEvents(this.mapHelper, true)
   }
 }
