@@ -158,6 +158,7 @@ class PelInstance extends BaseFeature {
       if (this.styleLike) {
         this.nativeFeature.setStyle(this.styleLike);
         this.styleLike = undefined;
+        this.nativeSource.addFeature(this.nativeFeature);
       }
       //图层可见的情况下，并且没有聚合显示
       if (this.layerInstance.visibly && this.layerInstance.zoomVisibly && !this.isCluster)
@@ -184,6 +185,7 @@ class PelInstance extends BaseFeature {
       if (!this.styleLike) {
         this.styleLike = this.nativeFeature.getStyle();
         this.nativeFeature.setStyle(() => []);
+        this.nativeSource.removeFeature(this.nativeFeature);
       }
       changed = true;
     }

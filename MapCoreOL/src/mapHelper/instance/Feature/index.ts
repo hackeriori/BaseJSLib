@@ -97,6 +97,7 @@ class FeatureInstance extends BaseFeature {
       if (this.styleLike === undefined) {
         this.styleLike = this.nativeFeature.getStyle();
         this.nativeFeature.setStyle(() => []);
+        this.nativeSource.removeFeature(this.nativeFeature);
       }
     }
   }
@@ -112,6 +113,7 @@ class FeatureInstance extends BaseFeature {
       if (this.styleLike !== undefined) {
         this.nativeFeature.setStyle(this.styleLike);
         this.styleLike = undefined;
+        this.nativeSource.addFeature(this.nativeFeature);
       }
     }
   }
