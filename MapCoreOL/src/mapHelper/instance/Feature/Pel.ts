@@ -17,6 +17,7 @@ import TopologyMixin from "./TopologyMixin";
 import applyMixins from "../../../../../Utils/applyMixins";
 import BaseEvent from "ol/events/Event";
 import {getZoomScale} from '../../global';
+import {setAllOverlayPointerEvents} from '../../helper/InteractionHelper/shared';
 
 class PelInstance extends BaseFeature {
   //原生对象
@@ -82,6 +83,7 @@ class PelInstance extends BaseFeature {
         if (this.mapHelper.interaction.interactionType === "move") {
           if (ev.button !== 0)
             return
+          setAllOverlayPointerEvents(this.mapHelper, false);
           const pixel = this.mapHelper.map.getPixelFromCoordinate(
             this.nativeOverlay.getPosition()!
           );
@@ -98,6 +100,8 @@ class PelInstance extends BaseFeature {
           document.addEventListener('mousemove', handler);
           document.addEventListener('mouseup', () => {
             document.removeEventListener('mousemove', handler);
+            this.mapHelper.interaction.collection.clear();
+            setAllOverlayPointerEvents(this.mapHelper, true);
             if (this.mapHelper.interaction.move.callback) {
               this.mapHelper.interaction.move.callback(this);
             }
