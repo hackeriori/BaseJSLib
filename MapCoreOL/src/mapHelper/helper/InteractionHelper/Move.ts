@@ -23,8 +23,6 @@ export default class Move extends MapFrame {
     });
 
     this.translate.on('translateend', evt => {
-      setAllOverlayPointerEvents(this.mapHelper, true);
-      this.mapHelper.interaction.collection.clear();
       if (callback) {
         let feature = evt.features.item(0);
         if (feature.get('features')) {
@@ -33,6 +31,8 @@ export default class Move extends MapFrame {
         }
         callback(getFeatureInstanceByFeature(feature, this.mapHelper)!);
       }
+      setAllOverlayPointerEvents(this.mapHelper, true);
+      this.mapHelper.interaction.collection.clear();
     })
     this.translate.on('translatestart', evt => {
       setAllOverlayPointerEvents(this.mapHelper, false);
