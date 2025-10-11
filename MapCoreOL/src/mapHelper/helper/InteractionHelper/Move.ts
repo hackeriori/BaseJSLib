@@ -5,6 +5,7 @@ import {Translate} from "ol/interaction";
 import BaseFeature from "../../instance/Feature/BaseFeature";
 import {getFeatureInstanceByFeature} from "../../global";
 import {Point} from "ol/geom";
+import {setAllOverlayPointerEvents} from './shared';
 
 export default class Move extends MapFrame {
   private translate?: Translate
@@ -18,10 +19,12 @@ export default class Move extends MapFrame {
     this.mapHelper.interaction.interactionType = "move";
     const collection = this.mapHelper.interaction.collection;
     this.translate = new Translate({
-      features: collection,
+      features: collection
     });
 
     this.translate.on('translateend', evt => {
+      setAllOverlayPointerEvents(this.mapHelper, true);
+      this.mapHelper.interaction.collection.clear();
       if (callback) {
         let feature = evt.features.item(0);
         if (feature.get('features')) {
@@ -30,6 +33,9 @@ export default class Move extends MapFrame {
         }
         callback(getFeatureInstanceByFeature(feature, this.mapHelper)!);
       }
+    })
+    this.translate.on('translatestart', evt => {
+      setAllOverlayPointerEvents(this.mapHelper, false);
     })
     this.map.addInteraction(
       this.translate
