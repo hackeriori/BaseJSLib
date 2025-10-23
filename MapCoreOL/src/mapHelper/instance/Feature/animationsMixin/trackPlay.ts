@@ -34,8 +34,10 @@ abstract class TrackPlayAnimation {
    * @param textColor 标签颜色
    * @param textStroke 标签描边色
    * @param anchor 锚点位置
+   * @param textOffsetY 标签偏移Y轴
    */
-  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number, zoom?: ZoomConfig, textColor?: string, textStroke?: string, anchor?: number[]) {
+  async getTrackPlayAnimationObj(img: string, time = 3000, showLine = true, color = 'red', width = 2, label?: string, degree?: number, zoom?: ZoomConfig, textColor?: string, textStroke?: string, anchor?: number[],
+                                 textOffsetY?: number) {
     if (!this.canPlayNow())
       return;
     const geometry = this.nativeFeature.getGeometry()!;
@@ -50,7 +52,7 @@ abstract class TrackPlayAnimation {
       console.log('图片加载失败');
       return
     }
-    const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom, textColor, textStroke, anchor);
+    const trackObj = new TrackPlay(this as any, image, time, showLine, color, width, label, degree, zoom, textColor, textStroke, anchor, textOffsetY);
     if (zoom)
       this.mapHelper.zoomFeatures.set(this.layerInstance.id + (this as any).id, trackObj);
     return trackObj;
@@ -77,7 +79,7 @@ export class TrackPlay {
 
   constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, public time: number,
               private showLine: boolean, color: string, width: number, label?: string, degree?: number,
-              zoom?: ZoomConfig, textColor?: string, textStroke?: string, anchor?: number[]) {
+              zoom?: ZoomConfig, textColor?: string, textStroke?: string, anchor?: number[], textOffsetY?: number) {
     //设置精灵
     this.styleBase = featureInstance.nativeFeature.getStyle() as Style;
     const geometry = featureInstance.nativeFeature.getGeometry()! as LineString;
@@ -101,7 +103,7 @@ export class TrackPlay {
       text: label ? new Text({
         text: label,
         font: '14px sans-serif',
-        offsetY: -image.height / 2 - 9,
+        offsetY: textOffsetY ?? -image.height / 2 - 9,
         fill: new Fill({color: textColor || 'black'}),
         stroke: new Stroke({
           color: textStroke || 'white',
@@ -127,7 +129,7 @@ export class TrackPlay {
       text: label ? new Text({
         text: label,
         font: '14px sans-serif',
-        offsetY: -image.height / 2 - 9,
+        offsetY: textOffsetY ?? -image.height / 2 - 9,
         fill: new Fill({color: textColor || 'black'}),
         stroke: new Stroke({
           color: textStroke || 'white',
