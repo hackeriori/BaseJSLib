@@ -30,4 +30,6 @@ export interface ClusterStyle extends StyleType {
   increaseNumber?: number,
   //增长值
   increaseBy?: number
+  //图片列表（根据聚合数量决定），需要按从大到小的顺序排列
+  imgList?: {num: number, src: string}[]
 }

@@ -60,6 +60,15 @@ export default class LayerHelper extends MapFrame {
    */
   createVectorSource(options: VectorSourceOptions | ClusterSourceOptions, clusterStyles?: ClusterStyles, zoom?: ZoomConfig, dealEvent?: (feature: Feature<Geometry>, features: Feature<Geometry>[], normalStyle: Style[], highLightStyle: Style[], isAdd: boolean) => void) {
     const dealStyle = (x: ClusterStyle, length: number) => {
+      if (x.imgList && x.image && 'src' in x.image) {
+        for (let i = 0; i < x.imgList.length; i++) {
+          const item = x.imgList[i];
+          if (length >= item.num) {
+            x.image.src = item.src;
+            break;
+          }
+        }
+      }
       const style = this.mapHelper.style.createStyle(x);
       if (x.text)
         style.getText().setText(x.text.text?.replace('${num}', length.toString()));
