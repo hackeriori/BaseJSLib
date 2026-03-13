@@ -16,10 +16,13 @@ import Stroke from "ol/style/Stroke";
 import Text from 'ol/style/Text'
 import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
+import {noModifierKeys} from 'ol/events/condition';
 
 export default class Measure extends MapFrame {
   private draw?: Draw;
   private readonly source: VectorSource<Geometry>;
+  // 保存右键事件处理函数引用
+  private contextMenuHandler: ((e: MouseEvent) => void) | undefined;
 
   constructor(map: Map, mapHelper: MapHelper) {
     super(map, mapHelper);
@@ -112,14 +115,30 @@ export default class Measure extends MapFrame {
     let options: DrawOptions = {
       type: geometryType as any,
     }
+
+    // 获取地图画布DOM元素
+    const mapTarget = this.map.getTargetElement();
+    // ...在创建 Draw 前加入 condition：
     options = {...options, ...drawOptions};
     options.source = this.source;
+    // 只允许左键（button=0）触发绘制，右键不新增点
+    options.condition = (e: any) => noModifierKeys(e) && e.originalEvent.button === 0;
     this.draw = new Draw(options);
     this.draw.on('drawstart', evt => {
       let sketch = evt.feature;
 
       sketch.setStyle(() => getMeasureFeatureStyle(output, tooltipCoordinate, options.type === 'LineString'));
 
+      // 通过DOM元素绑定右键事件（替代map.on('contextmenu')）
+      this.contextMenuHandler = (e: MouseEvent) => {
+        // 阻止浏览器默认右键菜单
+        e.preventDefault();
+        if (this.draw) {
+          this.draw.removeLastPoint();
+        }
+      };
+      // 绑定DOM右键事件
+      mapTarget.addEventListener('contextmenu', this.contextMenuHandler);
       listener = sketch.getGeometry()!.on('change', (cEvt:any) => {
         const geom = cEvt.target;
         if (geom instanceof Polygon) {
@@ -146,6 +165,11 @@ export default class Measure extends MapFrame {
 
     this.draw.on('drawend', evt => {
       evt.feature.setStyle(getMeasureFeatureStyle(output, tooltipCoordinate, options.type === 'LineString'));
+      // 移除DOM右键事件监听，避免内存泄漏和多次触发
+      if (this.contextMenuHandler && mapTarget) {
+        mapTarget.removeEventListener('contextmenu', this.contextMenuHandler);
+        this.contextMenuHandler = undefined;
+      }
       if (listener)
         unByKey(listener);
       if (callBack)
@@ -163,6 +187,12 @@ export default class Measure extends MapFrame {
     if (this.draw) {
       this.map.removeInteraction(this.draw);
       this.draw = undefined;
+    }
+    // 新增：移除DOM右键事件
+    const mapTarget = this.map.getTargetElement();
+    if (this.contextMenuHandler && mapTarget) {
+      mapTarget.removeEventListener('contextmenu', this.contextMenuHandler);
+      this.contextMenuHandler = undefined;
     }
   }
 }
