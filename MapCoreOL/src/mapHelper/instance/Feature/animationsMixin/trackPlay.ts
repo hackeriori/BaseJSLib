@@ -19,6 +19,7 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import {Coordinate} from "ol/coordinate";
 import CanvasImmediateRenderer from 'ol/render/canvas/Immediate';
+import MapBrowserEvent from 'ol/MapBrowserEvent';
 
 abstract class TrackPlayAnimation {
   /**
@@ -76,6 +77,10 @@ export class TrackPlay {
   ratioTime = 0;
   state: 'play' | 'pause' | 'stop' = "stop";
   zoom?: ZoomConfig
+  // 点击回调
+  clickHandler?: (event: MapBrowserEvent<UIEvent>, trackPlay: TrackPlay) => void;
+  // 点击事件监听key（用于销毁）
+  clickListenerKey?: EventsKey;
 
   constructor(private featureInstance: FeatureInstance, image: HTMLImageElement, public time: number,
               private showLine: boolean, color: string, width: number, label?: string, degree?: number,
@@ -138,6 +143,82 @@ export class TrackPlay {
       }) : undefined
     });
     this.featureInstance.nativeFeature.setStyle([this.styleBase, this.styleOver]);
+  }
+
+  // 注册点击事件回调
+  onClick(handler: (event: MapBrowserEvent<UIEvent>, trackPlay: TrackPlay) => void) {
+    this.clickHandler = handler;
+    // 首次注册时绑定地图点击事件
+    if (!this.clickListenerKey) {
+      this.bindClickEvent();
+    }
+  }
+
+  // 绑定地图点击事件
+  private bindClickEvent() {
+    const map = this.featureInstance.map;
+    this.clickListenerKey = map.on('click', (event: MapBrowserEvent<UIEvent>) => {
+      // 检测是否点击到当前精灵
+      if (this.checkClickHit(event) && this.clickHandler) {
+        this.clickHandler(event, this);
+      }
+    });
+  }
+
+  // 检测点击是否命中精灵
+  private checkClickHit(event: MapBrowserEvent<UIEvent>): boolean {
+    const map = this.featureInstance.map;
+    const pixel = event.pixel; // 点击的像素坐标
+    const feature = this.featureInstance.nativeFeature;
+
+    // 场景1：动画播放中（play状态）- 精灵是动态绘制的，需手动计算位置
+    if (this.state === 'play') {
+      let currentPoint: Coordinate | null = null;
+
+      // 计算当前精灵的地理坐标
+      if (this.nowTime > 0) {
+        const nowLength = this.length * (this.nowTime / this.time);
+        const newLine = lineSliceAlong(this.line, 0, nowLength, {units: 'meters'});
+        if (newLine.geometry) {
+          newLine.geometry.coordinates = newLine.geometry.coordinates.map(x =>
+            this.featureInstance.mapHelper.projection.transCoordinate(x)
+          );
+          currentPoint = newLine.geometry.coordinates[newLine.geometry.coordinates.length - 1];
+        }
+      } else {
+        // 播放初始位置
+        currentPoint = (feature.getGeometry() as LineString).getCoordinates()[0];
+      }
+
+      if (currentPoint) {
+        // 地理坐标转像素坐标
+        const spritePixel = map.getPixelFromCoordinate(currentPoint);
+        // 计算点击像素与精灵像素的距离（容错范围=图标半宽/高）
+        const icon = this.pointStyle.getImage() as Icon;
+        const imgSize = icon.getImageSize() || [0, 0];
+        const scale = icon.getScale() as number || 1;
+        const tolerance = Math.max(imgSize[0], imgSize[1]) * scale / 2;
+
+        const dx = pixel[0] - spritePixel[0];
+        const dy = pixel[1] - spritePixel[1];
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        // 距离在容错范围内则命中
+        return distance <= tolerance;
+      }
+    }
+    // 场景2：暂停/停止状态 - 精灵是静态Style，用OpenLayers内置方法检测
+    else {
+      let isHit = false;
+      map.forEachFeatureAtPixel(pixel, (f) => {
+        if (f === feature) isHit = true;
+      }, {
+        // 仅检测当前图层
+        layerFilter: (layer) => layer === this.featureInstance.layerInstance.nativeLayer
+      });
+      return isHit;
+    }
+
+    return false;
   }
 
   async play() {
@@ -269,6 +350,11 @@ export class TrackPlay {
 
   destroy() {
     this.stop();
+    // 移除点击事件监听
+    if (this.clickListenerKey) {
+      unByKey(this.clickListenerKey);
+      this.clickListenerKey = undefined;
+    }
     this.featureInstance.destroy();
   }
 
