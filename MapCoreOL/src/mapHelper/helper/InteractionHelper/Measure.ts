@@ -83,7 +83,7 @@ export default class Measure extends MapFrame {
         stroke: new Stroke({
           color: '#3399CC',
           width: 1.25
-        }),
+        })
       });
       let styleText: Style | undefined;
       if (coordinate)
@@ -92,7 +92,7 @@ export default class Measure extends MapFrame {
           text: new Text({
             backgroundStroke: new Stroke({
               width: 1,
-              color: 'white',
+              color: 'white'
             }),
             backgroundFill: new Fill({
               color: '#ffcc33'
@@ -113,7 +113,7 @@ export default class Measure extends MapFrame {
     }
 
     let options: DrawOptions = {
-      type: geometryType as any,
+      type: geometryType as any
     }
 
     // 获取地图画布DOM元素
@@ -139,7 +139,7 @@ export default class Measure extends MapFrame {
       };
       // 绑定DOM右键事件
       mapTarget.addEventListener('contextmenu', this.contextMenuHandler);
-      listener = sketch.getGeometry()!.on('change', (cEvt:any) => {
+      listener = sketch.getGeometry()!.on('change', (cEvt: any) => {
         const geom = cEvt.target;
         if (geom instanceof Polygon) {
           const {area, unit} = formatArea(geom);
@@ -162,7 +162,13 @@ export default class Measure extends MapFrame {
         }
       });
     });
-
+    // 当右键回退时，如果最后一个点也被回退掉，会触发此事件，此时需要移除DOM右键事件监听，以避免下一次drawstart再次注册事件，会造成一次右键回退两个点
+    this.draw.on('drawabort', () => {
+      if (this.contextMenuHandler && mapTarget) {
+        mapTarget.removeEventListener('contextmenu', this.contextMenuHandler);
+        this.contextMenuHandler = undefined;
+      }
+    })
     this.draw.on('drawend', evt => {
       evt.feature.setStyle(getMeasureFeatureStyle(output, tooltipCoordinate, options.type === 'LineString'));
       // 移除DOM右键事件监听，避免内存泄漏和多次触发
