@@ -18,6 +18,36 @@ import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
 import {noModifierKeys} from 'ol/events/condition';
 
+function getMapPixel(map: Map, event: MouseEvent): number[] {
+  const viewport = map.getViewport();
+  const rect = viewport.getBoundingClientRect();
+  const size = map.getSize();
+
+  if (!size || !rect.width || !rect.height)
+    return [event.clientX - rect.left, event.clientY - rect.top];
+
+  return [
+    (event.clientX - rect.left) * size[0] / rect.width,
+    (event.clientY - rect.top) * size[1] / rect.height
+  ];
+}
+
+/** 在 Draw 处理鼠标移动前应用修正后的像素坐标。 */
+class ScaledDraw extends Draw {
+  constructor(private readonly map: Map, options: DrawOptions) {
+    super(options);
+  }
+
+  handleEvent(event: any): boolean {
+    if (event.originalEvent) {
+      const pixel = getMapPixel(this.map, event.originalEvent as MouseEvent);
+      event.pixel = pixel;
+      event.coordinate = this.map.getCoordinateFromPixel(pixel);
+    }
+    return super.handleEvent(event);
+  }
+}
+
 export default class Measure extends MapFrame {
   private draw?: Draw;
   private readonly source: VectorSource<Geometry>;
@@ -121,9 +151,9 @@ export default class Measure extends MapFrame {
     // ...在创建 Draw 前加入 condition：
     options = {...options, ...drawOptions};
     options.source = this.source;
-    // 只允许左键（button=0）触发绘制，右键不新增点
+    // 只允许左键（button=0）触发绘制，右键不新增点。
     options.condition = (e: any) => noModifierKeys(e) && e.originalEvent.button === 0;
-    this.draw = new Draw(options);
+    this.draw = new ScaledDraw(this.map, options);
     this.draw.on('drawstart', evt => {
       let sketch = evt.feature;
 

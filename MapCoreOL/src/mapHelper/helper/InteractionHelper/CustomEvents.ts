@@ -118,13 +118,12 @@ export default class CustomEvents extends MapFrame {
   }
 
   /**
-   * Convert a browser coordinate to an OpenLayers map pixel.
+   * 将浏览器坐标转换为 OpenLayers 地图像素坐标。
    *
-   * OpenLayers calculates MapBrowserEvent.pixel from the viewport's
-   * bounding rectangle. When the viewport (or one of its ancestors) is CSS
-   * transformed, that rectangle contains the displayed size while the map
-   * size remains the untransformed size. Mapping the client coordinate back
-   * to the map size also handles non-uniform scale.
+   * OpenLayers 根据 viewport 的边界矩形计算 MapBrowserEvent.pixel。
+   * 当 viewport 或其祖先元素使用 CSS transform 时，边界矩形反映的是
+   * 缩放后的显示尺寸，而地图内部尺寸未发生变化。将 client 坐标按地图
+   * 内部尺寸换算回来，同时支持非等比缩放。
    */
   private getMapPixel(event: MouseEvent): number[] {
     const viewport = this.map.getViewport();

@@ -9,6 +9,36 @@ import {fromCircle} from "ol/geom/Polygon";
 import SourceMixin from "./SourceMixin";
 import MapHelper from "../../index";
 
+function getMapPixel(map: Map, event: MouseEvent): number[] {
+  const viewport = map.getViewport();
+  const rect = viewport.getBoundingClientRect();
+  const size = map.getSize();
+
+  if (!size || !rect.width || !rect.height)
+    return [event.clientX - rect.left, event.clientY - rect.top];
+
+  return [
+    (event.clientX - rect.left) * size[0] / rect.width,
+    (event.clientY - rect.top) * size[1] / rect.height
+  ];
+}
+
+/** 在 Draw 处理鼠标移动前应用修正后的像素坐标。 */
+class ScaledDraw extends Draw {
+  constructor(private readonly map: Map, options: DrawOptions) {
+    super(options);
+  }
+
+  handleEvent(event: any): boolean {
+    if (event.originalEvent) {
+      const pixel = getMapPixel(this.map, event.originalEvent as MouseEvent);
+      event.pixel = pixel;
+      event.coordinate = this.map.getCoordinateFromPixel(pixel);
+    }
+    return super.handleEvent(event);
+  }
+}
+
 export default class DrawFeatureMixin {
   private nativeDraw?: Draw;
   private nativeSnap?: Snap;
@@ -40,7 +70,7 @@ export default class DrawFeatureMixin {
       options.geometryFunction = geometryFunction;
     }
     options.source = this.getVectorSource();
-    this.nativeDraw = new Draw(options);
+    this.nativeDraw = new ScaledDraw(this.map, options);
     this.nativeDraw.on('drawend', evt => {
       //处理圆类型
       const geometry = evt.feature.getGeometry()!;
