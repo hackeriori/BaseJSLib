@@ -27,13 +27,12 @@ export default class CustomEvents extends MapFrame {
     this.mapHelper.interaction.stopAll();
     const target = this.target;
     this.obSingleClick = this.map.on('singleclick', evt => {
-      const features = this.map.getFeaturesAtPixel(evt.pixel).filter(x => x.get('clickable'));
+      const pixel = this.getMapPixel(evt.originalEvent as MouseEvent);
+      const features = this.map.getFeaturesAtPixel(pixel).filter(x => x.get('clickable'));
       if (features.length > 0) {
         const firstFeature = features[0] as Feature<Geometry>;
         if (!this.mapHelper.interaction.interactionType) {
           const event = new BaseEvent('singleClick');
-          // 这里的坐标是基于canvas的偏移坐标，且已经经过缩放计算
-          const pixel = [...(evt as any).On];
           event.target = {
             coordinate: this.map.getCoordinateFromPixel(pixel),
             pixel
@@ -43,11 +42,12 @@ export default class CustomEvents extends MapFrame {
         return;
       }
       if (callback) {
-        callback(evt.coordinate);
+        callback(this.map.getCoordinateFromPixel(pixel));
       }
     }) as EventsKey;
     this.obDoubleClick = this.map.on('dblclick', evt => {
-      const features = this.map.getFeaturesAtPixel(evt.pixel);
+      const pixel = this.getMapPixel(evt.originalEvent as MouseEvent);
+      const features = this.map.getFeaturesAtPixel(pixel);
       if (features.length > 0) {
         const firstFeature = features[0] as Feature<Geometry>;
         if (!this.mapHelper.interaction.interactionType)
@@ -56,7 +56,7 @@ export default class CustomEvents extends MapFrame {
     }) as EventsKey;
     this.obRightClick = evt => {
       // 这里如果使用clientX，那么canvas原点不在0，0时会拿不到元素，但是使用offsetX又会在缩放时拿不到正确的坐标，需要自己二次计算
-      const pixel = [Math.round(evt.offsetX / devicePixelRatio), Math.round(evt.offsetY / devicePixelRatio)];
+      const pixel = this.getMapPixel(evt);
       const features = this.map.getFeaturesAtPixel(pixel);
       if (features.length > 0) {
         const firstFeature = features[0] as Feature<Geometry>;
@@ -77,7 +77,8 @@ export default class CustomEvents extends MapFrame {
     this.obPointerMove = this.map.on('pointermove', evt => {
       if (evt.dragging)
         return;
-      const features = this.map.getFeaturesAtPixel(evt.pixel).filter(x => x.get('clickable'));
+      const pixel = this.getMapPixel(evt.originalEvent as MouseEvent);
+      const features = this.map.getFeaturesAtPixel(pixel).filter(x => x.get('clickable'));
       let cursor = 'auto';
       if (features.length > 0) {
         const firstFeature = features[0] as Feature<Geometry>;
@@ -114,6 +115,29 @@ export default class CustomEvents extends MapFrame {
       }
       target.style.cursor = cursor;
     }) as EventsKey;
+  }
+
+  /**
+   * Convert a browser coordinate to an OpenLayers map pixel.
+   *
+   * OpenLayers calculates MapBrowserEvent.pixel from the viewport's
+   * bounding rectangle. When the viewport (or one of its ancestors) is CSS
+   * transformed, that rectangle contains the displayed size while the map
+   * size remains the untransformed size. Mapping the client coordinate back
+   * to the map size also handles non-uniform scale.
+   */
+  private getMapPixel(event: MouseEvent): number[] {
+    const viewport = this.map.getViewport();
+    const rect = viewport.getBoundingClientRect();
+    const size = this.map.getSize();
+
+    if (!size || !rect.width || !rect.height)
+      return [event.clientX - rect.left, event.clientY - rect.top];
+
+    return [
+      (event.clientX - rect.left) * size[0] / rect.width,
+      (event.clientY - rect.top) * size[1] / rect.height
+    ];
   }
 
   notifyLevel() {
