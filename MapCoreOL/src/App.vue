@@ -97,16 +97,3 @@ export default class App extends Vue {
 }
 </script>
 
-<style>
-html, body, #app {
-  margin: 0;
-  height: 100%;
-}
-
-.testDiv {
-  position: absolute;
-  left: 0.5em;
-  top: 0.5em;
-  background-color: white;
-}
-</style>
