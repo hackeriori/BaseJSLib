@@ -12,7 +12,7 @@ module.exports = (env, argv) => {
     configs.push(devConfig);
   else {
     configs.push(proConfig);
-    if (argv.isLite)
+    if (argv.isLite || env?.isLite === true || env?.isLite === 'true')
       configs.push(proLiteConfig);
   }
   return merge(configs);

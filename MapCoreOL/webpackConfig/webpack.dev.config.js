@@ -26,7 +26,13 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader']
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {esModule: false}
+          }
+        ]
       },
     ]
   },
@@ -38,14 +44,22 @@ module.exports = {
   ],
   devServer: {
     //自动打开浏览器
-    open: true
+    open: true,
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false
+      }
+    },
+    static: {
+      directory: resolve(__dirname, '../..')
+    }
   },
   externals: [
     {
-      vue: 'Vue',
       '@turf/turf': 'turf'
     },
-    function ({context, request}, callback) {
+    function ({request}, callback) {
       if (request.startsWith('ol/')) {
         const root = request.split('/');
         return callback(null, root);

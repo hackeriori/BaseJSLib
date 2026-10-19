@@ -1,6 +1,5 @@
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const {resolve} = require('path')
 
 module.exports = {
@@ -31,7 +30,6 @@ module.exports = {
         test: /\.html$/i,
         use: [
           {loader: "file-loader?name=[name].[ext]"},
-          {loader: "extract-loader"},
           {
             loader: "html-loader",
             options: {
@@ -56,7 +54,7 @@ module.exports = {
     // new MiniCssExtractPlugin({
     //   filename: 'mapCoreOL.css'
     // }),
-    new OptimizeCssAssetsWebpackPlugin()
+    new CssMinimizerPlugin()
   ],
   mode: "production",
 };

@@ -13,7 +13,7 @@ module.exports = {
       },
       {
         test: /\.less$/i,
-        use: [{loader: "file-loader?name=[name].css"}, 'extract-loader', 'css-loader', 'less-loader']
+        use: [{loader: "file-loader?name=[name].css"}, 'css-loader', 'less-loader']
       }
     ]
   }
